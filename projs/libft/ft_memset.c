@@ -1,19 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_isalpha.c                                       :+:      :+:    :+:   */
+/*   ft_memset.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/13 21:49:13 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/14 09:32:11 by amerkht          ###   ########.fr       */
+/*   Created: 2025/10/14 11:21:15 by amerkht           #+#    #+#             */
+/*   Updated: 2025/10/14 11:22:03 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stdio.h>
 
-int	ft_isalpha(int a)
+void	*ft_memset(void *data, int c, size_t size)
 {
-	if ((a >= 65 && a <= 90) || (a >= 97 && a <= 122))
-		return (1);
-	return (0);
+	unsigned char	*buf;
+
+	buf = (unsigned char *) data;
+	while (size-- > 0)
+		*buf++ = (unsigned int) c;
+	return (data);
 }
