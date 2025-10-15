@@ -1,33 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/15 18:56:59 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/15 18:57:02 by amerkht          ###   ########.fr       */
+/*   Created: 2025/10/15 18:57:54 by amerkht           #+#    #+#             */
+/*   Updated: 2025/10/15 18:57:57 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include <stddef.h>
 #include <stdlib.h>
 
-char	*ft_strdup(const char *s)
+void	*ft_calloc(size_t nmumb, size_t size)
 {
-	char	*re;
-	size_t	size;
-	size_t	i;
+	unsigned char	*re;
+	size_t			byt;
+	unsigned char	*buf;
 
-	i = 0;
-	size = 0;
-	while (s[size++])
-		;
-	re = malloc(sizeof(char) * size);
+	if (nmumb <= 0 || size <= 0)
+		return (malloc(0));
+	byt = nmumb * size;
+	re = malloc(byt);
 	if (!re)
 		return (NULL);
-	while (size - i > 0)
-	{
-		re[i] = s[i];
-		i++;
-	}
+	buf = re;
+	while (byt-- > 0)
+		*buf++ = 0;
 	return (re);
 }

@@ -1,33 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/15 18:56:59 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/15 18:57:02 by amerkht          ###   ########.fr       */
+/*   Created: 2025/10/15 18:57:40 by amerkht           #+#    #+#             */
+/*   Updated: 2025/10/15 18:57:44 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <stdlib.h>
-
-char	*ft_strdup(const char *s)
+int	ft_atoi(char *s)
 {
-	char	*re;
-	size_t	size;
-	size_t	i;
+	int		sign;
+	long	re;
 
-	i = 0;
-	size = 0;
-	while (s[size++])
-		;
-	re = malloc(sizeof(char) * size);
-	if (!re)
-		return (NULL);
-	while (size - i > 0)
+	sign = 1;
+	re = 0;
+	if (!s)
+		return (0);
+	while (*s == ' ')
+		s++;
+	if (*s == '-' || *s == '+')
 	{
-		re[i] = s[i];
-		i++;
+		if (*s == '-')
+			sign *= -1;
+		s++;
 	}
-	return (re);
+	while (*s >= '0' && *s <= '9')
+	{
+		re = re * 10 + (*s - '0');
+		s++;
+	}
+	return (re * sign);
 }
