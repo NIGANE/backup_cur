@@ -1,24 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memcpy.c                                        :+:      :+:    :+:   */
+/*   ft_striteri.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/14 11:49:45 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/17 13:55:42 by amerkht          ###   ########.fr       */
+/*   Created: 2025/10/16 19:06:45 by amerkht           #+#    #+#             */
+/*   Updated: 2025/10/16 19:06:53 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <stddef.h>
+#include <stdlib.h>
 
-void	*ft_memcpy(void *dest, void *src, size_t size)
+void	ft_striteri(char *s, void (*f)(unsigned int, char *))
 {
-	unsigned char	*dest_buf;
-	unsigned char	*src_buf;
+	size_t	i;
 
-	dest_buf = (unsigned char *) dest;
-	src_buf = (unsigned char *) src;
-	while (size-- > 0)
-		*dest_buf++ = *src_buf++;
-	return (dest);
+	if (!s)
+		return ;
+	i = 0;
+	while (s[i])
+	{
+		f(i, &s[i]);
+		i++;
+	}
+}
+
+#include <stdio.h>
+void	print_char(unsigned int index, char *c)
+{
+	printf("Index: %u, Char: %c\n", index, *c);
+}
+int main(void)
+{
+	char	*str = NULL;
+	
+	printf("Original string: %s\n", str);
+	ft_striteri(str, print_char);
+	return (0);
 }

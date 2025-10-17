@@ -1,24 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memcpy.c                                        :+:      :+:    :+:   */
+/*   ft_putendl_fd.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/14 11:49:45 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/17 13:55:42 by amerkht          ###   ########.fr       */
+/*   Created: 2025/10/16 19:12:55 by amerkht           #+#    #+#             */
+/*   Updated: 2025/10/16 19:14:27 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <stddef.h>
+#include <unistd.h>
 
-void	*ft_memcpy(void *dest, void *src, size_t size)
+void	ft_putendl_fd(char *s, int fd)
 {
-	unsigned char	*dest_buf;
-	unsigned char	*src_buf;
+	while (*s)
+		write(1, s++, fd);
+	write(1, "\n", fd);
+}
 
-	dest_buf = (unsigned char *) dest;
-	src_buf = (unsigned char *) src;
-	while (size-- > 0)
-		*dest_buf++ = *src_buf++;
-	return (dest);
+int 	main(void)
+{
+	ft_putendl_fd("home", 1);
+	return (0);
 }

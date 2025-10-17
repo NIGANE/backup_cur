@@ -1,24 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memcpy.c                                        :+:      :+:    :+:   */
+/*   ft_memset.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/14 11:49:45 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/17 13:55:42 by amerkht          ###   ########.fr       */
+/*   Created: 2025/10/14 11:21:15 by amerkht           #+#    #+#             */
+/*   Updated: 2025/10/14 11:22:03 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <stddef.h>
+#include <stdio.h>
 
-void	*ft_memcpy(void *dest, void *src, size_t size)
+void	*ft_memset(void *data, int c, size_t size)
 {
-	unsigned char	*dest_buf;
-	unsigned char	*src_buf;
+	unsigned char	*buf;
 
-	dest_buf = (unsigned char *) dest;
-	src_buf = (unsigned char *) src;
+	buf = (unsigned char *) data;
 	while (size-- > 0)
-		*dest_buf++ = *src_buf++;
-	return (dest);
+		*buf++ = (unsigned int) c;
+	return (data);
+}
+#include <string.h>
+int	main(void)
+{
+	char	*str = "";
+	printf("Before memset: %s\n", str);
+	ft_memset(str, '*', 5);
+	printf("After memset: %s\n", str);
+	return (0);
 }

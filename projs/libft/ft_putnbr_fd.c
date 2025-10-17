@@ -1,24 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memcpy.c                                        :+:      :+:    :+:   */
+/*   ft_putnbr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/14 11:49:45 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/17 13:55:42 by amerkht          ###   ########.fr       */
+/*   Created: 2025/10/17 11:24:01 by amerkht           #+#    #+#             */
+/*   Updated: 2025/10/17 11:24:06 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <stddef.h>
+#include <unistd.h>
 
-void	*ft_memcpy(void *dest, void *src, size_t size)
+void	ft_putchar_fd(char c, int fd)
 {
-	unsigned char	*dest_buf;
-	unsigned char	*src_buf;
+	write(1, &c, fd);
+}
 
-	dest_buf = (unsigned char *) dest;
-	src_buf = (unsigned char *) src;
-	while (size-- > 0)
-		*dest_buf++ = *src_buf++;
-	return (dest);
+void	ft_putnbr_fd(int n, int fd)
+{
+	if (n == -2147483648)
+	{
+		ft_putchar_fd('-', fd);
+		ft_putchar_fd('2', fd);
+		ft_putnbr_fd(147483648, fd);
+		return ;
+	}
+	if (n < 0)
+	{
+		ft_putchar_fd('-', fd);
+		n *= -1;
+	}
+	if (n >= 10)
+		ft_putnbr_fd(n / 10, fd);
+	ft_putchar_fd(n % 10 + '0', fd);
 }
