@@ -6,7 +6,7 @@
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 09:26:30 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/17 18:49:31 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/15 09:26:40 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stddef.h>
@@ -25,4 +25,20 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 		*dst++ = *src++;
 	*dst = '\0';
 	return (src_len);
+}
+
+#include <stdio.h>
+#include <bsd/string.h>
+int main() {
+	char dest1[9];
+	char dest2[9];
+	const char *src = "NULL";
+
+	size_t result1 = ft_strlcpy(dest1, src, sizeof(dest1));
+	// size_t result2 = strlcpy(dest2, src, 10);
+
+	printf("ft_strlcpy result: %zu, dest: %s\n", result1, dest1);
+	// printf("strlcpy result: %zu, dest: %s\n", result2, dest2);
+
+	return 0;
 }

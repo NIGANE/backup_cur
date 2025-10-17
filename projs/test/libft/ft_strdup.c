@@ -36,10 +36,10 @@ char	*ft_strdup(const char *s)
 #include <string.h>
 int main(void)
 {
-	const char	*original = "NULL";
+	const char	*original = NULL;
 	char		*duplicate;
 
-	duplicate = ft_strdup(original);
+	duplicate = strdup(original);
 	if (duplicate)
 	{
 		printf("Original: %s\n", original);

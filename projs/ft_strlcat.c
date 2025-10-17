@@ -20,12 +20,12 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 	d_len = 0;
 	f_size = 0;
 	s_len = 0;
-	if (size == 0)
-		return (0);
 	while (src[s_len])
 		s_len++;
 	while (dst[d_len])
 		d_len++;
+	if (size <= d_len)
+		return (size + s_len);
 	f_size = d_len + s_len;
 	while ((size - d_len - 1) > 0 && *src)
 		dst[d_len++] = *src++;
@@ -39,8 +39,8 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 int main(void)
 {
 	char		dest[20] = " Hello, ";
-	const char	*src = NULL;
-	size_t		size = 15;
+	const char	*src = "NULL";
+	size_t		size = 12;
 	size_t		result;
 
 	printf("full_length: %zu\n", strlen(dest) + strlen(src));

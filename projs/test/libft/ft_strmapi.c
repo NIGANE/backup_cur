@@ -6,7 +6,7 @@
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 16:34:41 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/17 19:14:14 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/16 16:34:51 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stdlib.h>
@@ -18,10 +18,10 @@ char	*ft_strdup(const char *s)
 	size_t	len;
 
 	len = 0;
-	if (!s)
-		return (NULL);
 	while (s[len])
 		len++;
+	if (!s)
+		return (NULL);
 	re = malloc(sizeof(char) * (len + 1));
 	if (!re)
 		return (NULL);
@@ -52,4 +52,23 @@ char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 		i++;
 	}
 	return (re);
+}
+
+#include <stdio.h>
+#include <ctype.h>
+char	trans(unsigned int i, char c)
+{
+	if (i % 2 == 0)
+		return (toupper(c));
+	return (c);
+}
+
+int	main(void)
+{
+	char	*res;
+
+	res = ft_strmapi("h", NULL);
+	printf("%s\n", res);
+	free(res);
+	return (0);
 }

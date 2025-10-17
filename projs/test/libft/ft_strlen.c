@@ -1,28 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlcpy.c                                       :+:      :+:    :+:   */
+/*   ft_strlen.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/15 09:26:30 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/17 18:49:31 by amerkht          ###   ########.fr       */
+/*   Created: 2025/10/14 10:34:16 by amerkht           #+#    #+#             */
+/*   Updated: 2025/10/14 10:34:34 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <stddef.h>
 
-size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
+int	ft_strlen(char *s)
 {
-	size_t	src_len;
+	int	len;
 
-	src_len = 0;
-	while (src[src_len])
-		src_len++;
-	if (dstsize <= 0)
-		return (src_len);
-	dstsize -= 1;
-	while (dstsize-- > 0)
-		*dst++ = *src++;
-	*dst = '\0';
-	return (src_len);
+	len = 0;
+	while (*s++)
+		len++;
+	return (len);
+}
+
+#include <stdio.h>
+int main(void)
+{
+	char str[] = "Hello, World!";
+	int length = ft_strlen(str);
+	printf("Length of the string \"%s\" is: %d\n", str, length);
+	return 0;
 }
