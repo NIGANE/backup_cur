@@ -6,13 +6,14 @@
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 19:10:04 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/16 19:11:42 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/18 14:02:37 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
+#include "libft.h"
 
 void	ft_putstr_fd(char *s, int fd)
 {
 	while (*s)
-		write(1, s++, fd);
+		write(fd, s++, 1);
 }

@@ -10,8 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include <stdlib.h>
+#include "libft.h"
 
-char	*ft_strdup(const char *s)
+char	*ft_strdup_to(const char *s)
 {
 	char	*re;
 	char	*bf;
@@ -43,7 +44,7 @@ char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 		return (NULL);
 	while (s[size])
 		size++;
-	re = ft_strdup(s);
+	re = ft_strdup_to(s);
 	if (!re)
 		return (NULL);
 	while (re[i])

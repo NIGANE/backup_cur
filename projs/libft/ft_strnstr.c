@@ -6,15 +6,16 @@
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 13:52:15 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/15 13:52:36 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/18 10:42:31 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stdio.h>
+#include "libft.h"
 
 char	*ft_strnstr(const char *big, const char *little, size_t len)
 {
 	size_t	lit_size;
-	int	i;
+	size_t	i;
 
 	i = 0;
 	lit_size = 0;
@@ -26,7 +27,7 @@ char	*ft_strnstr(const char *big, const char *little, size_t len)
 	{
 		if (*big == *little)
 		{
-			while (*(big + i) == little[i] && len >= i)
+			while (little[i] && *(big + i) == little[i] && len >= i)
 				i++;
 			if (little[i] == '\0')
 				return ((char *)big);

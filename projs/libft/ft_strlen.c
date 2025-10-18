@@ -6,11 +6,12 @@
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 10:34:16 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/14 10:34:34 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/18 09:46:59 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include "libft.h"
 
-int	ft_strlen(char *s)
+size_t	ft_strlen(const char *s)
 {
 	int	len;
 

@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 #include <stdlib.h>
 #include <string.h>
+#include "libft.h"
 
 int	count_mumb(const char *s, char c)
 {
@@ -42,7 +43,7 @@ char	**free_arr(char **ar, size_t i)
 	return (ar);
 }
 
-char	*ft_strdup(const char *s, char c)
+char	*ft_strdup_till(const char *s, char c)
 {
 	size_t	t;
 	size_t	len;
@@ -78,7 +79,7 @@ char	**ft_split(char const *s, char c)
 			s++;
 		if (*s && *s != c)
 		{
-			re[i] = ft_strdup(s, c);
+			re[i] = ft_strdup_till(s, c);
 			if (!re[i])
 				return (free_arr(re, i));
 			while (*s && *s != c)

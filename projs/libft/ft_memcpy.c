@@ -6,12 +6,13 @@
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 11:49:45 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/17 13:55:42 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/18 10:28:17 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stddef.h>
+#include "libft.h"
 
-void	*ft_memcpy(void *dest, void *src, size_t size)
+void	*ft_memcpy(void *dest, const void *src, size_t size)
 {
 	unsigned char	*dest_buf;
 	unsigned char	*src_buf;

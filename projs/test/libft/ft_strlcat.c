@@ -5,50 +5,61 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/15 10:01:27 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/15 10:01:31 by amerkht          ###   ########.fr       */
+/*   Created: 2025/07/21 18:56:46 by amerkht           #+#    #+#             */
+/*   Updated: 2025/07/22 12:22:54 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stddef.h>
 
-size_t	ft_strlcat(char *dst, const char *src, size_t size)
+size_t	ne_strlen(const char *str)
 {
-	size_t	s_len;
-	size_t	d_len;
-	size_t	f_size;
+	size_t	i;
 
-	d_len = 0;
-	f_size = 0;
-	s_len = 0;
-	while (src[s_len])
-		s_len++;
-	while (dst[d_len])
-		d_len++;
-	if (size <= d_len)
-		return (size + s_len);
-	f_size = d_len + s_len;
-	while ((size - d_len - 1) > 0 && *src)
-		dst[d_len++] = *src++;
-	dst[d_len] = '\0';
-	return (f_size);
+	i = 0;
+	while (str[i] != '\0')
+		i++;
+	return (i);
 }
 
+size_t	ft_strlcat(char *dest, const char *src, size_t size)
+{
+	size_t	sr_len;
+	size_t	ds_len;
+	size_t	i;
+
+	i = 0;
+	sr_len = ne_strlen(src);
+	ds_len = ne_strlen(dest);
+	if (size != 0)
+	{
+		while (src[i] != '\0' && i + ds_len < size - 1)
+		{
+			dest[ds_len + i] = src[i];
+			i++;
+		}
+		dest[ds_len + i] = '\0';
+	}
+	if (ds_len < size)
+		return (sr_len + ds_len);
+	else
+		return (size + sr_len);
+}
 #include <stdio.h>
 #include <bsd/string.h>
 
 int main(void)
 {
 	char		dest[20] = " Hello, ";
-	const char	*src = "NULL";
-	size_t		size = 12;
+	char	*src = "ggg";
+	size_t		size = sizeof(dest);
 	size_t		result;
 
 	printf("full_length: %zu\n", strlen(dest) + strlen(src));
-	// result = ft_strlcat(dest, src, size);
-	// printf("Resulting Length: %zu\n", result);
-	// printf("Concatenated String: %s\n", dest);
-	result = strlcat(dest, src, size);
+	result = ft_strlcat(dest, src, size);
 	printf("Resulting Length: %zu\n", result);
 	printf("Concatenated String: %s\n", dest);
+	// result = strlcat(dest, src, size);
+	// printf("Resulting Length: %zu\n", result);
+	// printf("Concatenated String: %s\n", dest);
 	return (0);
 }

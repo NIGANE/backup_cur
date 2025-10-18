@@ -11,25 +11,28 @@
 /* ************************************************************************** */
 
 #include <stdlib.h>
+#include "libft.h"
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
 	char	*re;
 	size_t	i;
+	size_t	j;
 
 	i = 0;
+	j = 0;
 	re = malloc(sizeof(char) * len);
 	if (!re)
 		return (NULL);
-	while (*s)
+	while (s[i])
 	{
-		if (*s == (char)start)
+		if (i == start)
 		{
-			while (*s && len-- > 0)
-				re[i++] = *s++;
+			while (s[i] && len-- > 0)
+				re[j++] = s[i++];
 			return (re);
 		}
-		s++;
+		i++;
 	}
 	return (malloc(0));
 }

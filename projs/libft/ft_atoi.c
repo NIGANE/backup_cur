@@ -6,10 +6,12 @@
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:57:40 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/15 18:57:44 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/18 10:37:20 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-int	ft_atoi(char *s)
+#include "libft.h"
+
+int	ft_atoi(const char *s)
 {
 	int		sign;
 	long	re;

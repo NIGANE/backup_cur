@@ -6,7 +6,7 @@
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:57:54 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/15 18:57:57 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/18 10:31:34 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stddef.h>
@@ -34,7 +34,7 @@ void	*ft_calloc(size_t nmumb, size_t size)
 
 int main()
 {
-	size_t nmemb = 5;
+	size_t nmemb = -2;
 	size_t size = sizeof(int);
 	int *arr = (int *)ft_calloc(nmemb, size);
 	if (arr == NULL)

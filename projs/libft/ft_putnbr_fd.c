@@ -6,14 +6,15 @@
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 11:24:01 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/17 11:24:06 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/18 14:02:19 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
+#include "libft.h"
 
-void	ft_putchar_fd(char c, int fd)
+void	ft_putchar_fd_me(char c, int fd)
 {
-	write(1, &c, fd);
+	write(fd, &c, 1);
 }
 
 void	ft_putnbr_fd(int n, int fd)
@@ -27,10 +28,10 @@ void	ft_putnbr_fd(int n, int fd)
 	}
 	if (n < 0)
 	{
-		ft_putchar_fd('-', fd);
+		ft_putchar_fd_me('-', fd);
 		n *= -1;
 	}
 	if (n >= 10)
 		ft_putnbr_fd(n / 10, fd);
-	ft_putchar_fd(n % 10 + '0', fd);
+	ft_putchar_fd_me(n % 10 + '0', fd);
 }

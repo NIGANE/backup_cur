@@ -9,7 +9,9 @@
 /*   Updated: 2025/10/14 11:27:06 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include "libft.h"
 #include <stdlib.h>
+
 void	ft_bzero(void *data, size_t size)
 {
 	unsigned char	*buf;

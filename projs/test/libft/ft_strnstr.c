@@ -26,7 +26,7 @@ char	*ft_strnstr(const char *big, const char *little, size_t len)
 	{
 		if (*big == *little)
 		{
-			while (*(big + i) == little[i] && len >= i)
+			while (little[i] && *(big + i) == little[i] && len >= i)
 				i++;
 			if (little[i] == '\0')
 				return ((char *)big);
@@ -41,12 +41,12 @@ char	*ft_strnstr(const char *big, const char *little, size_t len)
 #include <bsd/string.h>
 int	main(void)
 {
-	char *str1 = "ff fa afa afdf fedf fNULL";
-	char *str2 = "NULL";
-	size_t n = 30;
-	char *result1 = ft_strnstr(str1, str2, 10);
-	char *result2 = strnstr(str1, str2, 10);
+	char *str1 = "NULL";
+	char *str2 = NULL;
+	size_t n = 6;
+	char *result1 = ft_strnstr(str1, str2, n);
+	// char *result2 = strnstr(str1, str2, n);
 	printf("Custom ft_strnstr result: %s\n", result1);
-	printf("Standard strnstr result: %s\n", result2);
+	// printf("Standard strnstr result: %s\n", result2);
 	return (0);
 }
