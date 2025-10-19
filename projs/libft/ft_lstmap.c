@@ -5,19 +5,19 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/18 19:32:08 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/18 19:32:13 by amerkht          ###   ########.fr       */
+/*   Created: 2025/10/19 09:48:54 by amerkht           #+#    #+#             */
+/*   Updated: 2025/10/19 09:55:57 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "libft.h"
 #include <stdlib.h>
 
-void	lst_clear(t_list **head, void (*del)(void *))
+t_list	*lst_clear(t_list **head, void (*del)(void *))
 {
 	t_list	*temp;
 
 	if (!head || !del)
-		return ;
+		return (NULL);
 	while (*head)
 	{
 		temp = *head;
@@ -27,44 +27,34 @@ void	lst_clear(t_list **head, void (*del)(void *))
 		free(temp);
 	}
 	*head = NULL;
+	return (*head);
 }
 
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 {
 	t_list	*cur;
 	t_list	*head;
+	t_list	*new;
 
 	if (!lst || !f || !del)
 		return (NULL);
-	cur = malloc(sizeof(t_list));
-	if (!cur)
-		return (NULL);
-	cur->content = f(lst->content);
-	if (!cur->content)
-	{
-		free(cur);
-		return (NULL);
-	}
-	cur->next = NULL;
-	head = cur;
-	lst = lst->next;
+	cur = NULL;
+	head = NULL;
 	while (lst)
 	{
-		cur->next = malloc(sizeof(t_list));
-		if (!cur->next)
-		{
-			lst_clear(&head, del);
-			return (NULL);
-		}
-		cur->next->content = f(lst->content);
-		if (!cur->next->content)
-		{
-			lst_clear(&head, del);
-			return (NULL);
-		}
-		cur->next->next = NULL;
+		new = malloc(sizeof(t_list));
+		if (!new)
+			return (lst_clear(&head, del));
+		if (head == NULL)
+			head = new;
+		else
+			cur->next = new;
+		new->content = f(lst->content);
+		if (!new->content)
+			return (lst_clear(&head, del));
+		new->next = NULL;
+		cur = new;
 		lst = lst->next;
-		cur = cur->next;
 	}
 	return (head);
 }

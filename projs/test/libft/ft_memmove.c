@@ -27,7 +27,7 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 	{
 		d += n;
 		s += n;
-		while (n-- > 0)
+		while (*s && n-- > 0)
 			*(--d) = *(--s);
 	}
 	return (dest);
@@ -37,17 +37,17 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 #include <string.h>
 int main() 
 {
-	char str1[20] = "";
+	char str1[] = "12345678";
 	char str2[20] = "";
 
 	// Overlapping regions: dest starts within src
-	ft_memmove(str1 + 7, str1, 6);
+	ft_memmove(str1 + 1, str1, 6);
 	printf("ft_memmove result: %s\n", str1);
 
 	// strcpy(str2, "abcdefg");
 	// Reset str2 for standard memmove test
-	memmove(str2 + 7, str2, 6);
-	printf("memmove result: %s\n", str2);
+	// memmove(str2 + 7, str2, 6);
+	// printf("memmove result: %s\n", str2);
 
 	return 0;
 }

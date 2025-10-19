@@ -50,6 +50,8 @@ char	*ft_strdup_till(const char *s, char c)
 	char	*re;
 
 	len = 0;
+	if (!s)
+		return (NULL);
 	while (s[len] && s[len] != c)
 		len++;
 	re = malloc(sizeof(char) * (len + 1));
