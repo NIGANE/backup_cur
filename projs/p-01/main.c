@@ -1,10 +1,27 @@
 
 
-#include "libft/libft.h"
+#include "libft.h"
 #include <stdio.h>
 #include <bsd/string.h>
 #include <ctype.h>
 
+void print_content(void *content)
+{
+    printf("%s\n", (char *)content);
+}
+
+void *dup_and_x(void *data)
+{
+    char *s = strdup((char *)data);
+    if (!s) return NULL;
+    s[0] = 'X';
+    return s;
+}
+
+void del_content(void *data)
+{
+    free(data);
+}
 int main(void)
 {
 
@@ -49,13 +66,14 @@ int main(void)
     // printf("ft_memcmp(mem, dest, 6) = %d\n", ft_memcmp(mem, dest, 6));
     
     
-    // printf("ft_atoi(\"123\") = %d\n", ft_atoi(""));
+    // printf("ft_atoi(\"123\") = %d\n", ft_atoi("0"));
     // char *calloc_test = ft_calloc(5, sizeof(char));
     // for (int i = 0; i < 5; i++)
     // printf("%d ", calloc_test[i]);
     // printf("\n");
     // free(calloc_test);
-    // printf("ft_itoa(4567) = %s\n", ft_itoa(00));
+    printf("ft_itoa(4567) = %s\n", ft_itoa(00));
+    
     
     
     
@@ -84,13 +102,61 @@ int main(void)
             //     }
             //     printf("\n");
             //     free(split);
-            // }
-            
-            // ft_putchar_fd('X', 1);
-            ft_putstr_fd("", 1);
-            ////////////////////////////////////////////////////////////
-            ft_putendl_fd(NULL, 1);
-            //////////////////////////////////////////////////////////
-    ft_putnbr_fd(42, 1);
+        // }
+        
+        // ft_putchar_fd('X', 1);
+        // ft_putstr_fd("", 1);
+        // ft_putendl_fd(NULL, 1);
+        // ft_putnbr_fd(42, 1);
+        ////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////
+
+
+     printf("=== BONUS TESTS START ===\n");
+
+    // 1. Create nodes
+    // t_list *a = ft_lstnew(strdup("one"));
+    // t_list *b = ft_lstnew(strdup("two"));
+    // t_list *c = ft_lstnew(strdup("three"));
+
+    // print_content(a->content);
+    // print_content(b->content);
+    // print_content(c->content);
+
+    // // 2. Add front
+    // ft_lstadd_front(&a, b);
+    // ft_lstadd_front(&a, c);
+    // printf("List after add_front:\n");
+    // ft_lstiter(a, print_content);
     
+    // // 3. List size
+    // printf("List size: %d\n", ft_lstsize(a));
+    
+    // // 4. Last element
+    // t_list *last = ft_lstlast(a);
+    // printf("Last: %s\n", (char *)last->content);
+    
+    // // 5. Add back
+    // ft_lstadd_back(&a, ft_lstnew(strdup("four")));
+    // printf("After add_back:\n");
+    // ft_lstiter(a, print_content);
+    
+    // // 6. Map (create new list)
+    // t_list *mapped = ft_lstmap(a, dup_and_x, del_content);
+    // printf("Mapped list (X start):\n");
+    // ft_lstiter(mapped, print_content);
+    // ft_lstiter(a, print_content);
+    
+    // // 7. Delete one node
+    // ft_lstdelone(mapped->next->next, del_content);
+    // mapped->next->next = NULL;
+    // printf("After delone:\n");
+    // ft_lstiter(mapped, print_content);
+
+    // // 8. Clear both lists
+    // ft_lstclear(&a, del_content);
+    // ft_lstclear(&mapped, del_content);
+
+    // printf("=== BONUS TESTS END ===\n");
+    return 0;
 }    

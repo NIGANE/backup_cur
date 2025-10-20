@@ -16,7 +16,6 @@ SRCS_BONUS = ft_lstnew.c ft_lstadd_front.c ft_lstadd_back.c ft_lstsize.c ft_lstl
 OBJS_MANDATORY = $(SRCS_MANDATORY:.c=.o)
 
 OBJS_BONUS = $(SRCS_BONUS:.c=.o)
-# INCLUDES = -I includes
 
 all: $(NAME)
 $(NAME): $(OBJS_MANDATORY)

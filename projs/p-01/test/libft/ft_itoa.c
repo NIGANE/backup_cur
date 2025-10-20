@@ -73,7 +73,7 @@ char	*to_str(int n, int sign, int len)
 	return (re);
 }
 
-char	*ft_strdup(const char *s)
+char	*dup_func(const char *s)
 {
 	char	*re;
 	size_t	size;
@@ -101,7 +101,7 @@ char	*ft_itoa(int n)
 
 	sign = 1;
 	if (n == -2147483648)
-		return (ft_strdup("-2147483648"));
+		return (dup_func("-2147483648"));
 	len = ft_nbrlen(n);
 	if (n <= 0)
 	{
