@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include <stddef.h>
-
+#include <stdio.h>
 char	*ft_strrchr(const char *s, int c)
 {
 	int	i;
@@ -18,28 +18,26 @@ char	*ft_strrchr(const char *s, int c)
 	i = 0;
 	if (!s)
 		return (NULL);
-	while (s[i++])
-		;
+	while (s[i])
+		i++;
+	printf("i after loop: %d\n", i);
+	if (c == '\0')
+		return ((char *)&s[i]);
 	while (i >= 0)
 	{
 		if (s[i] == c)
 			return ((char *)&s[i]);
 		i--;
 	}
-	if (c == '\0')
-		return ((char *)&s[i]);
 	return (NULL);
 }
 
 #include <stdio.h>
 int main()
 {
-	const char *str = NULL;
-	char ch = 'h';
+	const char *str = "hello world , hello universe";
+	char ch = 'm';
 	char *result = ft_strrchr(str, ch);
-	if (result)
-		printf("Last occurrence of '%c': %s\n", ch, result);
-	else
-		printf("Character '%c' not found.\n", ch);
+	printf("Last occurrence of '%c':%s\n", ch, result);
 	return 0;
 }
