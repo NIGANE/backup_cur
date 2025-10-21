@@ -22,7 +22,6 @@ char	*ft_strrchr(const char *s, int c)
 		return (NULL);
 	while (s[i])
 		i++;
-	printf("i after loop: %d\n", i);
 	if (c == '\0')
 		return ((char *)&s[i]);
 	while (i >= 0)
