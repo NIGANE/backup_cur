@@ -29,6 +29,8 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 
 	i = 0;
 	sr_len = ne_strlen(src);
+	if (!dest && size == 0)
+		return (sr_len);
 	ds_len = ne_strlen(dest);
 	if (size != 0)
 	{
@@ -49,17 +51,11 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 
 int main(void)
 {
-	char		dest[20] = " Hello, ";
-	char	*src = "ggg";
-	size_t		size = sizeof(dest);
-	size_t		result;
-
-	printf("full_length: %zu\n", strlen(dest) + strlen(src));
-	result = ft_strlcat(dest, src, size);
-	printf("Resulting Length: %zu\n", result);
-	printf("Concatenated String: %s\n", dest);
-	// result = strlcat(dest, src, size);
-	// printf("Resulting Length: %zu\n", result);
-	// printf("Concatenated String: %s\n", dest);
+	char		*dest = NULL;
+	char		*src = "World!";
+	size_t		size = 0;
+	// printf("ft_strlcat: %zu\n", ft_strlcat(dest, src, size));
+	printf("strlcat: %zu\n", strlcat(dest, src, size));
+	printf("Resulting dest: '%s'\n", dest);
 	return (0);
 }

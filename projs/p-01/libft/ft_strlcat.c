@@ -30,6 +30,8 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 
 	i = 0;
 	sr_len = ne_strlen(src);
+	if (!dest && size == 0)
+		return (sr_len);
 	ds_len = ne_strlen(dest);
 	if (size != 0)
 	{

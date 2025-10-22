@@ -18,7 +18,7 @@ int	ft_atoi(char *s)
 	re = 0;
 	if (!s)
 		return (0);
-	while (*s == ' ')
+	while (*s == ' ' || (*s >= 9 && *s <= 13))
 		s++;
 	if (*s == '-' || *s == '+')
 	{
@@ -37,23 +37,23 @@ int	ft_atoi(char *s)
 #include <stdlib.h>
 int main(void)
 {
-	char *s = "345222";
+	char *s = NULL;
 	printf("ft_atoi(%s) => %d\n", s, ft_atoi(s));
 	printf("atoi(%s) => %d\n", s, atoi(s));
 	printf("\n\n");
 
 	// printf("ft_atoi(NULL) => %d\n", atoi(NULL)); // non-null argument
 
-	printf("ft_atoi("") => %d\n", ft_atoi(""));
-	printf("atoi("") => %d\n", atoi(""));
-	printf("\n\n");
+	// printf("ft_atoi("") => %d\n", ft_atoi(""));
+	// printf("atoi("") => %d\n", atoi(""));
+	// printf("\n\n");
 
-	char *s1 = "-34522";
-	printf("ft_atoi(%s) => %d\n", s1, ft_atoi(s1));
-	printf("atoi(%s) => %d\n", s1, atoi(s1));
-	printf("\n\n");
+	// char *s1 = "-34522";
+	// printf("ft_atoi(%s) => %d\n", s1, ft_atoi(s1));
+	// printf("atoi(%s) => %d\n", s1, atoi(s1));
+	// printf("\n\n");
 
-	char *s2 = "-2147483648";
-	printf("ft_atoi(%s) => %d\n", s2, ft_atoi(s2));
-	printf("atoi(%s) => %d\n", s2, atoi(s2));
+	// char *s2 = "-2147483648";
+	// printf("ft_atoi(%s) => %d\n", s2, ft_atoi(s2));
+	// printf("atoi(%s) => %d\n", s2, atoi(s2));
 }

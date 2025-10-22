@@ -20,7 +20,7 @@ int	ft_atoi(const char *s)
 	re = 0;
 	if (!s)
 		return (0);
-	while (*s == ' ')
+	while (*s == ' ' || (*s >= 9 && *s <= 13))
 		s++;
 	if (*s == '-' || *s == '+')
 	{
