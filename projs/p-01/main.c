@@ -5,90 +5,109 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-/* Helper macro to print test results */
-#define TEST(name, expr, expected_fmt, expected_val) \
-    do { \
-        printf("%-15s => ", name); \
-        printf("Result: " expected_fmt " | Expected: " expected_fmt "\n", (expr), (expected_val)); \
-    } while (0)
-
-/* Helper for string comparison */
-#define TEST_STR(name, expr, expected) \
-    do { \
-        printf("%-15s => ", name); \
-        char *res = (expr); \
-        printf("Result: \"%s\" | Expected: \"%s\"\n", res, expected); \
-        free(res); \
-    } while (0)
+static char add_one(unsigned int i, char c)
+{
+	(void)i;
+	return (c + 1);
+}
 
 int main(void)
 {
-    printf("=== BASIC CHARACTER TESTS ===\n");
-    TEST("ft_isalpha", ft_isalpha('A'), "%d", isalpha('A'));
-    TEST("ft_isdigit", ft_isdigit('9'), "%d", isdigit('9'));
-    TEST("ft_isalnum", ft_isalnum('@'), "%d", isalnum('@'));
-    TEST("ft_isascii", ft_isascii(200), "%d", isascii(200));
-    TEST("ft_isprint", ft_isprint(31), "%d", isprint(31));
-    TEST("ft_tolower", ft_tolower('A'), "%c", tolower('A'));
-    TEST("ft_toupper", ft_toupper('a'), "%c", toupper('a'));
-    puts("");
+	printf("=== CHARACTER TESTS ===\n");
+	printf("ft_isalpha('A') = %d | expected = %d\n", ft_isalpha('A'), isalpha('A'));
+	printf("ft_isdigit('9') = %d | expected = %d\n", ft_isdigit('9'), isdigit('9'));
+	printf("ft_isalnum('@') = %d | expected = %d\n", ft_isalnum('@'), isalnum('@'));
+	printf("ft_isascii(200) = %d | expected = %d\n", ft_isascii(200), isascii(200));
+	printf("ft_isprint(31)  = %d | expected = %d\n", ft_isprint(31), isprint(31));
+	printf("ft_tolower('A') = %c | expected = %c\n", ft_tolower('A'), tolower('A'));
+	printf("ft_toupper('a') = %c | expected = %c\n", ft_toupper('a'), toupper('a'));
+	printf("\n");
 
-    printf("=== STRING TESTS ===\n");
-    TEST("ft_strlen", ft_strlen("Hello"), "%zu", strlen("Hello"));
-    TEST_STR("ft_strdup", ft_strdup("42"), "42");
-    TEST("ft_strncmp", ft_strncmp("abc", "abd", 2), "%d", strncmp("abc", "abd", 2));
-    TEST("ft_strchr", (size_t)(ft_strchr("abc", 'b') - "abc"), "%zu", (size_t)(strchr("abc", 'b') - "abc"));
-    TEST("ft_strrchr", (size_t)(ft_strrchr("abcabc", 'b') - "abcabc"), "%zu", (size_t)(strrchr("abcabc", 'b') - "abcabc"));
-    TEST("ft_strlcpy", ft_strlcpy((char[10]){0}, "abcd", 3), "%zu", 4);
-    TEST("ft_strlcat", ft_strlcat((char[10]){"Hi"}, "All", 10), "%zu", strlen("Hi") + strlen("All"));
-    TEST_STR("ft_strjoin", ft_strjoin("Hello ", "World"), "Hello World");
-    TEST_STR("ft_substr", ft_substr("abcdef", 2, 3), "cde");
-    TEST_STR("ft_strtrim", ft_strtrim("  hello  ", " "), "hello");
-    TEST_STR("ft_strmapi", ft_strmapi("abc", [](unsigned int i, char c){return c + 1;}), "bcd");
-    puts("");
+	printf("=== STRING TESTS ===\n");
+	printf("ft_strlen('Hello') = %zu | expected = %zu\n", ft_strlen("Hello"), strlen("Hello"));
 
-    printf("=== MEMORY TESTS ===\n");
-    char src[] = "Hello";
-    char dest[10];
-    ft_memcpy(dest, src, 6);
-    TEST("ft_memcmp", ft_memcmp("abc", "abd", 2), "%d", memcmp("abc", "abd", 2));
+	char *dup = ft_strdup("42");
+	printf("ft_strdup('42') = '%s' | expected = '42'\n", dup);
+	free(dup);
 
-    char buf[5] = {1, 2, 3, 4, 5};
-    ft_bzero(buf, 5);
-    TEST("ft_bzero", buf[0], "%d", 0);
+	printf("ft_strncmp('abc','abd',2) = %d | expected = %d\n", ft_strncmp("abc", "abd", 2), strncmp("abc", "abd", 2));
 
-    char *p = ft_calloc(3, sizeof(char));
-    TEST("ft_calloc", p[0], "%d", 0);
-    free(p);
-    puts("");
+	printf("ft_strchr('abc','b') = %ld | expected = %ld\n",
+		ft_strchr("abc", 'b') - "abc", strchr("abc", 'b') - "abc");
 
-    printf("=== ITOA / ATOI TESTS ===\n");
-    TEST_STR("ft_itoa", ft_itoa(-12345), "-12345");
-    TEST("ft_atoi", ft_atoi("   -42abc"), "%d", atoi("   -42abc"));
-    puts("");
+	printf("ft_strrchr('abcabc','b') = %ld | expected = %ld\n",
+		ft_strrchr("abcabc", 'b') - "abcabc", strrchr("abcabc", 'b') - "abcabc");
 
-    printf("=== SPLIT TEST ===\n");
-    char **split = ft_split("hello world 42", ' ');
-    for (int i = 0; split && split[i]; i++)
-        printf("split[%d] = \"%s\"\n", i, split[i]);
-    puts("");
+	char d1[10] = "Hi";
+	char d2[10] = "Hi";
+	printf("ft_strlcpy(dest,'abcd',3) = %zu | expected = 4\n", ft_strlcpy(d1, "abcd", 3));
+	printf("ft_strlcat(dest,'All',10) = %zu | expected = %zu\n", ft_strlcat(d2, "All", 10), strlen("Hi") + strlen("All"));
 
-    printf("=== LINKED LIST TESTS ===\n");
-    t_list *lst1 = ft_lstnew("first");
-    t_list *lst2 = ft_lstnew("second");
-    ft_lstadd_back(&lst1, lst2);
-    printf("lstsize: %d\n", ft_lstsize(lst1));
-    printf("lstlast: %s\n", (char *)ft_lstlast(lst1)->content);
-    ft_lstclear(&lst1, NULL);
-    puts("");
+	char *joined = ft_strjoin("Hello ", "World");
+	printf("ft_strjoin('Hello ','World') = '%s' | expected = 'Hello World'\n", joined);
+	free(joined);
 
-    printf("=== FILE DESCRIPTOR TESTS (prints to terminal) ===\n");
-    ft_putstr_fd("Hello", 1);
-    ft_putchar_fd('\n', 1);
-    ft_putendl_fd("World", 1);
-    ft_putnbr_fd(42, 1);
-    ft_putchar_fd('\n', 1);
+	char *sub = ft_substr("abcdef", 2, 3);
+	printf("ft_substr('abcdef',2,3) = '%s' | expected = 'cde'\n", sub);
+	free(sub);
 
-    puts("\n=== ALL TESTS DONE ===");
-    return 0;
+	char *trim = ft_strtrim("  hello  ", " ");
+	printf("ft_strtrim('  hello  ',' ') = '%s' | expected = 'hello'\n", trim);
+	free(trim);
+
+	char *mapi = ft_strmapi("abc", add_one);
+	printf("ft_strmapi('abc',+1) = '%s' | expected = 'bcd'\n", mapi);
+	free(mapi);
+	printf("\n");
+
+	printf("=== MEMORY TESTS ===\n");
+	char src[] = "Hello";
+	char dest[10];
+	ft_memcpy(dest, src, 6);
+	printf("ft_memcpy -> dest = '%s' | expected = 'Hello'\n", dest);
+	printf("ft_memcmp('abc','abd',2) = %d | expected = %d\n", ft_memcmp("abc", "abd", 2), memcmp("abc", "abd", 2));
+
+	char buf[5] = {1, 2, 3, 4, 5};
+	ft_bzero(buf, 5);
+	printf("ft_bzero -> buf[0] = %d | expected = 0\n", buf[0]);
+
+	char *p = ft_calloc(3, sizeof(char));
+	printf("ft_calloc(3,1) first byte = %d | expected = 0\n", p[0]);
+	free(p);
+	printf("\n");
+
+	printf("=== ITOA / ATOI TESTS ===\n");
+	char *itoa_res = ft_itoa(-12345);
+	printf("ft_itoa(-12345) = '%s' | expected = '-12345'\n", itoa_res);
+	free(itoa_res);
+	printf("ft_atoi('   -42abc') = %d | expected = %d\n", ft_atoi("   -42abc"), atoi("   -42abc"));
+	printf("\n");
+
+	printf("=== SPLIT TEST ===\n");
+	char **split = ft_split("hello world 42", ' ');
+	for (int i = 0; split && split[i]; i++)
+		printf("split[%d] = '%s'\n", i, split[i]);
+	for (int i = 0; split && split[i]; i++)
+		free(split[i]);
+	free(split);
+	printf("\n");
+
+	printf("=== LINKED LIST TESTS ===\n");
+	t_list *lst1 = ft_lstnew("first");
+	t_list *lst2 = ft_lstnew("second");
+	ft_lstadd_back(&lst1, lst2);
+	printf("ft_lstsize = %d | expected = 2\n", ft_lstsize(lst1));
+	printf("ft_lstlast = '%s' | expected = 'second'\n", (char *)ft_lstlast(lst1)->content);
+	ft_lstclear(&lst1, NULL);
+	printf("\n");
+
+	printf("=== FD TESTS (will print on terminal) ===\n");
+	ft_putstr_fd("Hello", 1);
+	ft_putchar_fd('\n', 1);
+	ft_putendl_fd("World", 1);
+	ft_putnbr_fd(42, 1);
+	ft_putchar_fd('\n', 1);
+
+	printf("\n=== ALL TESTS DONE ===\n");
+	return 0;
 }
