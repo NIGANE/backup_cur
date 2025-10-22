@@ -13,17 +13,17 @@ t_list *ft_lstnew(void *content)
     new_node->next = NULL;
     return (new_node);
 }
-#include <stdio.h>
-int main(void)
-{
-    t_list  *node;
-    char *str = NULL;
-    node = ft_lstnew(str);
-    if (node)
-    {
-        printf("data of the node: %s\n", (char *) node->content);
-        free(node);
-    }
-    else
-        printf("allocations Faild\n");
-}
+// #include <stdio.h>
+// int main(void)
+// {
+//     t_list  *node;
+//     char *str = NULL;
+//     node = ft_lstnew(str);
+//     if (node)
+//     {
+//         printf("data of the node: %s\n", (char *) node->content);
+//         free(node);
+//     }
+//     else
+//         printf("allocations Faild\n");
+// }

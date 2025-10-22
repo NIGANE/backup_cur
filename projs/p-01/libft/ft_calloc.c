@@ -9,9 +9,10 @@
 /*   Updated: 2025/10/15 18:57:57 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <stddef.h>
-#include <stdlib.h>
 #include "libft.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 void	*ft_calloc(size_t nmumb, size_t size)
 {
@@ -21,6 +22,8 @@ void	*ft_calloc(size_t nmumb, size_t size)
 
 	if (nmumb <= 0 || size <= 0)
 		return (malloc(0));
+	if (nmumb != 0 && SIZE_MAX / nmumb < size)
+		return (NULL);
 	byt = nmumb * size;
 	re = malloc(byt);
 	if (!re)

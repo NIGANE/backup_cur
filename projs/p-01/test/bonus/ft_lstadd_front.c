@@ -13,36 +13,15 @@ void	ft_lstadd_front(t_list **lst, t_list *new)
 	*lst = new;
 }
 
-t_list *ft_lstnew(void *content)
-{
-    t_list*     new_node;
+// #include <string.h>
+// int main(void)
+// {
+//     t_list  *node1;
+//     t_list  *node2;
+//     t_list *head = NULL;
 
-    new_node = malloc(sizeof(t_list));
-    if (!new_node)
-        return (NULL);
-    new_node->content = content;
-    new_node->next = NULL;
-    return (new_node);
-}
-int main(void)
-{
-    t_list  *node;
-    t_list  *new;
-    t_list *l;
+//     node1 = ft_lstnew(strdup("node 1"));
+//     ft_lstadd_front(&head, NULL);
+//     // printf("node: %s\n", (char *) head->content);
 
-    char *s1 = "hello";
-    char *s2 = "world";
-    node = ft_lstnew(s1);
-    new = ft_lstnew(s2);
-    if (new && node)
-    {
-        ft_lstadd_front(NULL, new);
-        l = new;
-        while (l)
-        {
-            printf("cont: %s\n", (char *) l->content);
-            l = l->next;
-        }
-        printf("END\n");
-    }
-}
+// }

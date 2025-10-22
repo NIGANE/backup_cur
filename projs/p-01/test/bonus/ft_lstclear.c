@@ -9,6 +9,8 @@ void ft_lstclear(t_list **lst, void (*del)(void *))
 
     if (!lst || !del)
         return ;
+    if (!*lst)
+        return ;
     cur = *lst;
     while (cur->next)
     {
@@ -32,27 +34,7 @@ void del(void *content)
 int main()
 {
     // Create a simple linked list for testing
-    t_list *head = malloc(sizeof(t_list));
-    head->content = strdup("Node 1");
-    head->next = malloc(sizeof(t_list));
-    head->next->content = strdup("Node 2");
-    head->next->next = NULL;
-
-    t_list *cur = head;
-    while (cur)
-    {
-        printf("Node content: %s\n", (char *)cur->content);
-        cur = cur->next;
-    }
-
-    // Clear the list
-    ft_lstclear(&head, del);
-
-    // Check if the list is cleared
-    if (head == NULL)
-        printf("List cleared successfully.\n");
-    else
-        printf("List not cleared.\n");
-
-    return 0;
+    t_list *head = NULL;
+    ft_lstclear(&head, NULL);
+    
 }

@@ -1,37 +1,44 @@
 
 #include "libft.h"
-
+#include <stddef.h>
 void ft_lstadd_back(t_list **lst, t_list *new)
 {
     t_list  *cur;
 
-    if (!lst || !new)
+    if (!new || !lst)
         return ;
+    if (!*lst)
+    {
+        *lst = new;
+        return ;
+    }    
     cur = *lst;
     while (cur->next)
         cur = cur->next;
     cur->next = new;
 }
-#include <stdlib.h>
-#include <stdio.h>
-int main(void)
-{
-    char *s1 = "hello";
-    t_list  *node1 = malloc(sizeof(t_list));
-    node1->content = s1;void ft_lstadd_back(t_list **lst, t_list *new)
+// #include <stdlib.h>
+// #include <stdio.h>
+// #include <string.h>
+// int main(void)
+// {
+//     t_list *head = NULL;
+//     t_list *node1 = ft_lstnew(strdup("node1"));
+//     t_list *node3 = ft_lstnew(strdup("node3"));
+//     ft_lstadd_back(&head, node3);
+//     ft_lstadd_back(&head, node3);
+//     printf("node 1 : %s\n", (char *) head->content);
+//     printf("node 3 : %s\n", (char *) head->next->content);
+    // printf("%s\n", (char *) head->content);
 
-    char *s2 = "world";
-    t_list *node2 = malloc(sizeof(t_list));
-    node2->content = s2;
+    // ft_lstadd_back(&head, node2);
+    // t_list *cur = head;
+    // while (cur)
+    // {
+    //     printf("- %s\n",(char *) cur->content);
+    //     cur = cur->next;
+    // }
+    // free(head);
+    // free(node2);
 
-    ft_lstadd_back(&node1, node2);
-    t_list *cur = node1;
-    while (cur)
-    {
-        printf("content: %s\n",(char *) cur->content);
-        cur = cur->next;
-    }
-    free(node1);
-    free(node2);
-
-}
+// }

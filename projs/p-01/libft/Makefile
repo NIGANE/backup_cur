@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: amerkht <marvin@42.fr>                     +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/10/22 13:58:25 by amerkht           #+#    #+#              #
+#    Updated: 2025/10/22 13:58:27 by amerkht          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 CC = cc -Wall -Werror -Wextra
 AR = ar rcs
 RM = rm -f
@@ -19,11 +31,9 @@ OBJS_BONUS = $(SRCS_BONUS:.c=.o)
 
 all: $(NAME)
 $(NAME): $(OBJS_MANDATORY)
-	@echo "\n-------------creating the lib for mandatory files: --------\n"
 	$(AR) $(NAME) $(OBJS_MANDATORY)
 
 ${OBJS_MANDATORY}: ${SRCS_MANDATORY}
-	@echo "\n-------------creating the objects for mandatory files: --------\n"
 	${CC} -c ${SRCS_MANDATORY}
 
 clean:
@@ -36,9 +46,7 @@ fclean: clean
 re: fclean all
 
 bonus: $(OBJS_BONUS) 
-	@echo "\n-------------creating the lib for bonus files: --------\n"
 	${AR} ${NAME} ${OBJS_BONUS}
 
 ${OBJS_BONUS} : ${SRCS_BONUS}
-	@echo "\n-------------creating the objects for bonus files: --------\n"
 	${CC} -c ${SRCS_BONUS}

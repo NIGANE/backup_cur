@@ -1,7 +1,7 @@
-LIB_N = ${LIB_NAME}
-LIB_L = ${LIB_LOCA}
+LIB_N = ft
+LIB_L = libft
 CC = cc -Wall -Wextra -Werror
-LIB_I = ${LIB_INCLUDES}
+LIB_I = libft
 all:
 	@$(CC) main.c -I ${LIB_I} -L ${LIB_L} -l${LIB_N} -o exec.out
 	./exec.out
