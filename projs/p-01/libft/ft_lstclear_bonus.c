@@ -3,13 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lstclear_bonus.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 16:48:29 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/22 16:48:31 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/23 17:08:56 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft.h"
+
 #include <stdlib.h>
 
 void	ft_lstclear(t_list **lst, void (*del)(void *))
@@ -19,10 +19,8 @@ void	ft_lstclear(t_list **lst, void (*del)(void *))
 
 	if (!lst || !del)
 		return ;
-	if (!*lst)
-		return ;
-	cur = *lst;
-	while (cur->next)
+	tmp = *lst;
+	while (cur)
 	{
 		temp = cur;
 		cur = cur->next;
