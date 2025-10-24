@@ -6,11 +6,11 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 16:48:29 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/23 17:08:56 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/24 18:46:40 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
+#include "libft.h"
 
 void	ft_lstclear(t_list **lst, void (*del)(void *))
 {
@@ -19,13 +19,12 @@ void	ft_lstclear(t_list **lst, void (*del)(void *))
 
 	if (!lst || !del)
 		return ;
-	tmp = *lst;
+	cur = *lst;
 	while (cur)
 	{
 		temp = cur;
 		cur = cur->next;
 		del(temp->content);
-		temp->next = NULL;
 		free(temp);
 	}
 	*lst = NULL;

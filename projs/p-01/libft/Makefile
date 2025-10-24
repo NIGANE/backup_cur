@@ -8,7 +8,9 @@ SRC =	ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint.c ft_touppe
 		ft_strnstr.c  ft_strdup.c  ft_memset.c  ft_bzero.c  ft_memcpy.c  ft_memmove.c  ft_memchr.c  ft_memcmp.c  ft_calloc.c  ft_atoi.c  ft_itoa.c \
 		ft_substr.c  ft_strjoin.c  ft_strtrim.c  ft_split.c  ft_strmapi.c  ft_striteri.c  ft_putchar_fd.c  ft_putstr_fd.c  ft_putendl_fd.c  ft_putnbr_fd.c
 
+SRC_B = ft_lstadd_back_bonus.c ft_lstadd_front_bonus.c ft_lstclear_bonus.c ft_lstdelone_bonus.c ft_lstiter_bonus.c ft_lstlast_bonus.c ft_lstmap_bonus.c ft_lstnew_bonus.c ft_lstsize_bonus.c
 
+OBJ_B = $(SRC_B:.c=.o)
 OBJ = $(SRC:.c=.o)
 
 all:$(LIB)
@@ -22,19 +24,17 @@ ${LIB}: ${OBJ}
 
 
 clean:
-	$(RM) $(OBJ) $(BONUS_OBJ)
+	$(RM) $(OBJ) $(OBJ_B)
 
 fclean: clean
 	$(RM) $(LIB)
+	@${RM} .bonus
 
 re: fclean all
 
 
-# bonus: $(OBJ) $(BONUS_OBJ)
-# 	$(AR) $(NAME) $(OBJ) $(BONUS_OBJ)
+bonus: all ${OBJ_B}
+	${AR} -c ${LIB} ${OBJ_B}
 
-# bonus: .bonus
-# .bonus: &{OBJ_B}
-# 	${AR} -c ${LIB} ${OBJ_B}
-# 	touch .bonus
-.SECONDARY: ${OBJ}
+.PHONY: all clean fclean re bonus
+.SECONDARY: ${OBJ} ${OBJ_B}

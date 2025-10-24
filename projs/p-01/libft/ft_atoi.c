@@ -6,10 +6,10 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 10:46:16 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/24 10:48:37 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/10/24 16:15:25 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft.h"
+
 
 int	ft_atoi(const char *s)
 {

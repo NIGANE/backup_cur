@@ -1,6 +1,6 @@
 LIB_N = ft
 LIB_L = libft
-CC = cc -Wall -Wextra -Werror
+CC = cc 
 LIB_I = libft
 all:
 	@$(CC) main.c -I ${LIB_I} -L ${LIB_L} -l${LIB_N} -o exec.out
