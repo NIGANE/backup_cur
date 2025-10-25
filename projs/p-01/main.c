@@ -23,8 +23,7 @@ static void	del(void *content)
 
 static void	*modify(void *content)
 {
-	char *str = (char *)content;
-	char *new_str = ft_memset(str, 'X', 1);
+	char *new_str = ft_memset(strdup((char *)content), 'X', 1);
 	return (new_str);
 }
 int main(void)
@@ -71,8 +70,8 @@ int main(void)
 	// printf("\n\n");
 	
 	
-	// char *joined = ft_strjoin("Hello ", "World");
-	// printf("ft_strjoin('Hello ','World') = '%s' | expected = 'Hello World'\n", joined);
+	// char *joined = ft_strjoin("hello ", "world");
+	// printf("ft_strjoin('hello ','world') = '%s' | expected = 'hello world'\n", joined);
 	// free(joined);
 	// printf("\n\n");
 	
@@ -91,7 +90,7 @@ int main(void)
 	// free(mapi);
 	// printf("\n\n");
 	
-	printf("=== MEMORY TESTS ===\n");
+	// printf("=== MEMORY TESTS ===\n");
 	
 	// char src[] = "Hello";
 	// char dest[10];
@@ -126,32 +125,32 @@ int main(void)
 	// free(split);
 	// printf("\n");
 
-	printf("=== LINKED LIST TESTS ===\n");
-	t_list *lst = NULL;
-	t_list *lst1 = ft_lstnew(ft_strdup("first"));
-	t_list *lst2 = ft_lstnew(ft_strdup("second"));
-	ft_lstadd_front(&lst, lst2);
-	ft_lstadd_front(&lst, lst1);
+	// printf("=== LINKED LIST TESTS ===\n");
+	// t_list *lst = NULL;
+	// t_list *lst1 = ft_lstnew(ft_strdup("first"));
+	// t_list *lst2 = ft_lstnew(ft_strdup("second"));
+	// ft_lstadd_front(&lst, lst2);
+	// ft_lstadd_front(&lst, lst1);
 
 	// printf("ft_lstsize = %d | expected = 2\n", ft_lstsize(lst1));
 	// printf("ft_lstlast = '%s' | expected = 'second'\n", (char *)ft_lstlast(lst1)->content);
 
 
-	t_list *lst_new = ft_lstmap(lst, (void *)modify, del);
+	// t_list *lst_new = ft_lstmap(lst, (void *)modify, del);
 
-	ft_lstiter(lst_new, (void *)printed);
-	ft_lstiter(lst1, (void *)printed);
+	// ft_lstiter(lst_new, (void *)printed);
+	// ft_lstiter(lst1, (void *)printed);
 	// ft_lstclear(&lst_new, del);
 	// ft_lstclear(&lst1, del);
-	printf("\n");
+	// printf("\n");
 
 	// printf("=== FD TESTS (will print on terminal) ===\n");
-	// ft_putstr_fd("Hello", 1);
+	// ft_putstr_fd("Hello", -1);
 	// ft_putchar_fd('\n', 1);
 	// ft_putendl_fd("World", 1);
 	// ft_putnbr_fd(42, 1);
 	// ft_putchar_fd('\n', 1);
 
-	printf("\n=== ALL TESTS DONE ===\n");
+	// printf("\n=== ALL TESTS DONE ===\n");
 	return 0;
 }
