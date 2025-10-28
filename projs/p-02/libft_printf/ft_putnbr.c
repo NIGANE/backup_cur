@@ -1,26 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncmp.c                                       :+:      :+:    :+:   */
+/*   ft_putnbr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/15 11:51:50 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/15 11:51:56 by amerkht          ###   ########.fr       */
+/*   Created: 2025/10/17 11:24:01 by amerkht           #+#    #+#             */
+/*   Updated: 2025/10/28 18:50:26 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <stddef.h>
-#include "libft.h"
 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
+#include "ft_printf.h"
+
+void	ft_putnbr(long long n, int *count)
 {
-	while (n > 0 && *s1 && *s2 && *s1 == *s2)
+	if (n < 0)
 	{
-		s1++;
-		s2++;
-		n--;
+		ft_putchar('-');
+		n *= -1;
+		*count += 1;
 	}
-	if (n == 0)
-		return (0);
-	return ((unsigned char)*s1 - (unsigned char)*s2);
+	if (n >= 10)
+		ft_putnbr(n / 10, count);
+	*count += ft_putchar(n % 10 + '0');
 }

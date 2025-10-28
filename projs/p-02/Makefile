@@ -1,7 +1,7 @@
-LIB_N = ft
-LIB_L = libft
+LIB_N = printf
+LIB_L = libft_printf
 CC = cc 
-LIB_I = libft
+LIB_I = libft_printf
 all:
 	@$(CC) main.c -I ${LIB_I} -L ${LIB_L} -l${LIB_N} -o exec.out
 	./exec.out
