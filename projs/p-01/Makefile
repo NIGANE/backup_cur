@@ -9,3 +9,6 @@ all:
 lbsd:
 	@$(CC) main.c -I ${LIB_I} -L ${LIB_L} -l${LIB_N} -lbsd -o exec.out
 	./exec.out
+
+clean: 
+	rm -rf exec.out

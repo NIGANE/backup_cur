@@ -1,4 +1,4 @@
-LIB = libprintf.a
+LIB = libftprintf.a
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 AR = ar rcs
@@ -11,7 +11,7 @@ SRC =	ft_calloc.c \
 		ft_putstr.c \
 		ft_putnbr.c \
 		ft_hexabase.c \
-		ft_printf.c \
+		ft_printf.c \	
 		ft_strlen.c
 
 OBJ = $(SRC:.c=.o)
@@ -19,9 +19,8 @@ OBJ = $(SRC:.c=.o)
 all: $(LIB)
 
 ${LIB}: ${OBJ}
-	${AR} ${LIB} ${OBJ} 
-	$(MAKE) clean
-
+	${AR} ${LIB} ${OBJ}
+	
 %.o: %.c 
 	$(CC) $(CFLAGS) -I ${INCLUDES} -c $< -o $@
 

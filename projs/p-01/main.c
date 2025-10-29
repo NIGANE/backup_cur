@@ -5,27 +5,27 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-static char add_one(unsigned int i, char c)
-{
-	(void)i;
-	return (c + 1);
-}
+// static char add_one(unsigned int i, char c)
+// {
+// 	(void)i;
+// 	return (c + 1);
+// }
 
-static void	*printed(void *content)
-{
-	printf("Node content: %s\n", (char *)content);
-	return (content);
-}
-static void	del(void *content)
-{
-	free(content);
-}
+// static void	*printed(void *content)
+// {
+// 	printf("Node content: %s\n", (char *)content);
+// 	return (content);
+// }
+// static void	del(void *content)
+// {
+// 	free(content);
+// }
 
-static void	*modify(void *content)
-{
-	char *new_str = ft_memset(strdup((char *)content), 'X', 1);
-	return (new_str);
-}
+// static void	*modify(void *content)
+// {
+// 	char *new_str = ft_memset(strdup((char *)content), 'X', 1);
+// 	return (new_str);
+// }
 int main(void)
 {
 	// printf("=== CHARACTER TESTS ===\n");
@@ -113,7 +113,7 @@ int main(void)
 	// char *itoa_res = ft_itoa(-2147483648);
 	// printf("ft_itoa(-2147483648) = '%s' | expected = '-2147483648'\n", itoa_res);
 	// free(itoa_res);
-	// printf("ft_atoi('   -42abc') = %d | expected = %d\n", ft_atoi("214748364855"), atoi("214748364855"));
+	// printf("ft_atoi('   -42abc') =  | expected = %d\n", atoi(NULL));
 	// printf("\n");
 
 	// printf("=== SPLIT TEST ===\n");

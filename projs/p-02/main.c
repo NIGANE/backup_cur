@@ -4,12 +4,12 @@
 
 int main(void)
 {
-    int nb = 234;
-    int size_ft;
-    int size_printf;
-    size_ft = ft_printf("hex: %X\n", nb);
-    size_printf = printf("hex: %X\n", nb);
-    printf("ft_printf size: %d\n", size_ft);
-    printf("printf size: %d\n", size_printf);
-    return (0);
+    
+    printf("%s", 435);
+    int a = 345;
+
 }
+// detect digit after %
+// if d == 0 padd with 0
+// if seccond number padd until d2 - nbrlen > 0
+// else padd with ' '
