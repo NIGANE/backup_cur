@@ -1,6 +1,5 @@
 
-#include "ft_printf.h"
-
+#include "../include/ft_printf.h"
 void ft_hexabase(unsigned long int nb, char *hex, int *count)
 {
     if (nb == 0)

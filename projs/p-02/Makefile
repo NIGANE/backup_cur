@@ -17,3 +17,5 @@ gdb:
 nfl:
 	@cc main.c -I ${LIB_I} -L ${LIB_L} -l${LIB_N} -o exec.out
 	./exec.out
+clean:
+	rm -f exec.out

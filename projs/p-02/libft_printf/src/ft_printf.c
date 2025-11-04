@@ -1,6 +1,5 @@
 
-#include "ft_printf.h"
-
+#include "../include/ft_printf.h"
 
 static void print_pointer(unsigned long n, int *count, char *hex)
 {
@@ -52,24 +51,18 @@ int ft_printf(const char *s, ...)
     {
         if (*s == '%' && *(s + 1))
         {
-            check(s, args, &count);
-            s++;
+            if (ft_strchr("cspdiuxX%", *(s + 1)))
+            {
+                check(s, args, &count);
+                s++;
+            }
+            else
+                count += ft_putchar(*s);
         }
         else
-        count += ft_putchar(*s);
+            count += ft_putchar(*s);
         s++;
     }
     va_end(args);
     return (count);
 }
-// if (*(s + 1) == '-')
-// {
-//     //use atoi to calc padding
-// }
-// else if (ft_isdigit(*(s + 1)))
-// {
-//     // know next number if its 0 or diff than 0
-//     // using atoi to calc numb of padding
-// }
-// else
-

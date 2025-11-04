@@ -1,6 +1,5 @@
 
-#include "ft_printf.h"
-
+#include "../include/ft_printf.h"
 long long ft_nbrlen(long long n)
 {
     long long len;

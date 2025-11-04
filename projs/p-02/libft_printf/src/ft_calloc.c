@@ -6,13 +6,11 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:57:54 by amerkht           #+#    #+#             */
-/*   Updated: 2025/10/28 16:44:16 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/11/04 13:58:03 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
-#include <stdint.h>
-#include <stdlib.h>
+#include "../include/ft_printf.h"
 
 void	*ft_calloc(size_t nmumb, size_t size)
 {

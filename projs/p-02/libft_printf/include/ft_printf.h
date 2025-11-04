@@ -13,8 +13,8 @@ size_t    ft_strlen(char *s);
 int    ft_putstr(char *s);
 void	*ft_calloc(size_t nmemb, size_t size);
 int	ft_putchar(char c);
-size_t    ft_strlen(char *s);
 void	ft_putnbr(long long n, int *count);
 int	ft_printf(const char *format, ...);
+char	*ft_strchr(const char *s, int c);
 
 #endif

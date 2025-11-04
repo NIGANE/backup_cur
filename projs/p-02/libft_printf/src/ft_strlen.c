@@ -1,5 +1,4 @@
-#include "ft_printf.h"
-
+#include "../include/ft_printf.h"
 size_t	ft_strlen(char *s)
 {
     size_t	i;

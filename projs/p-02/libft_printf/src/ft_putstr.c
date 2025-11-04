@@ -1,6 +1,4 @@
-#include "ft_printf.h"
-#include <stddef.h>
-
+#include "../include/ft_printf.h"
 
 int	ft_putstr(char *s)
 {

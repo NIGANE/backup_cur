@@ -1,13 +1,53 @@
-#include "libft_printf/ft_printf.h"
+#include "libft_printf/include/ft_printf.h"
 #include <stdio.h>
 #include <limits.h>
 
+void nor_func(int a, int b )
+{
+    int *p = &a;
+    printf("Address of a: %d\n", *p);
+    printf("Address of b: %d\n", p[1]);
+}
+
 int main(void)
 {
-    
-    printf("%s", 435);
-    int a = 345;
 
+    nor_func(5, 10);
+    
+    // int ft_size = ft_printf("%d\n", 435);
+    // int size = printf("%d\n", 435);
+
+    // int ft_size = ft_printf("%c\n", 0);
+    // int size = printf("%c\n", 0);
+
+    // int ft_size = ft_printf("%s\n", NULL);
+    // int size = printf("%s\n", NULL);
+
+    // int ft_size = ft_printf("%s\n", "");
+    // int size = printf("%s\n", "");
+
+    // int ft_size = ft_printf("%p\n", NULL);
+    // int size = printf("%p\n", NULL);
+    
+    // int a = 334;
+    // int ft_size = ft_printf("%p\n", &a);
+    // int size = printf("%p\n", &a);
+
+    #include <limits.h>
+    // int ft_size = ft_printf("%red%\n", INT_MIN);
+    // int size = printf("%red%\n", INT_MIN);
+
+    // int ft_size = ft_printf("%u\n", -1);
+    // int size = printf("%u\n", -1);
+
+    // int ft_size = ft_printf("%X\n", 255);
+    // int size = printf("%X\n", 255);
+
+    // int ft_size = ft_printf("%  %\n");
+    // int size = printf("%  %\n");
+    
+    // printf("\nft_size = %d\n", ft_size);
+    // printf("size = %d\n", size);
 }
 // detect digit after %
 // if d == 0 padd with 0
