@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 15:41:36 by amerkht           #+#    #+#             */
-/*   Updated: 2025/11/04 15:41:37 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/11/04 18:32:47 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,5 +28,6 @@ int	ft_putchar(char c);
 void	ft_putnbr(long long n, int *count);
 int	ft_printf(const char *format, ...);
 char	*ft_strchr(const char *s, int c);
+int char_count(char *s, char a);
 
 #endif

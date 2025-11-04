@@ -6,7 +6,8 @@ SRCS = src/ft_calloc.c \
 	   src/ft_strchr.c \
 	   src/ft_putnbr.c \
 	   src/ft_hexabase.c \
-	   src/ft_strlen.c 
+	   src/ft_strlen.c \
+	   src/char_count.c
 
 OBJS = $(SRCS:.c=.o)
 CC = gcc

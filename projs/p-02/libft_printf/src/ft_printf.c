@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 15:42:21 by amerkht           #+#    #+#             */
-/*   Updated: 2025/11/04 15:42:22 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/11/04 18:33:18 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,18 +60,19 @@ int	ft_printf(const char *s, ...)
 	va_list	args;
 
 	count = 0;
+	if (!s)
+		return (-1);
 	va_start(args, s);
 	while (*s)
 	{
-		if (*s == '%' && *(s + 1))
+		if (*s == '%' && *(s + 1) && ft_strchr("cspdiuxX%", *(s + 1)))
 		{
-			if (ft_strchr("cspdiuxX%", *(s + 1)))
-			{
 				check(s, args, &count);
 				s++;
-			}
-			else
-				count += ft_putchar(*s);
+		}
+		else if (*s == '%' && !*(s + 1) && char_count((char *)s, '%') == 1)
+		{
+			return (-1);
 		}
 		else
 			count += ft_putchar(*s);
