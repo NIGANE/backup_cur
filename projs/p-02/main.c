@@ -35,7 +35,7 @@ int main(void)
 
     // int ft_size = ft_printf("%X\n", 255);
     // int size = printf("%X\n", 255);
-    char *s = "%  red  %";
+    char *s = "% %  red  %";
 
     int ft_size = ft_printf(s);
     int size = printf(s);
