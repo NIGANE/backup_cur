@@ -5,12 +5,13 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/17 11:24:01 by amerkht           #+#    #+#             */
-/*   Updated: 2025/11/04 13:58:31 by amerkht          ###   ########.fr       */
+/*   Created: 2025/11/04 15:42:28 by amerkht           #+#    #+#             */
+/*   Updated: 2025/11/04 15:46:47 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ft_printf.h"
+
 void	ft_putnbr(long long n, int *count)
 {
 	if (n < 0)

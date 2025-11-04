@@ -2,17 +2,10 @@
 #include <stdio.h>
 #include <limits.h>
 
-void nor_func(int a, int b )
-{
-    int *p = &a;
-    printf("Address of a: %d\n", *p);
-    printf("Address of b: %d\n", p[1]);
-}
 
 int main(void)
 {
 
-    nor_func(5, 10);
     
     // int ft_size = ft_printf("%d\n", 435);
     // int size = printf("%d\n", 435);
@@ -43,11 +36,11 @@ int main(void)
     // int ft_size = ft_printf("%X\n", 255);
     // int size = printf("%X\n", 255);
 
-    // int ft_size = ft_printf("%  %\n");
-    // int size = printf("%  %\n");
+    int ft_size = ft_printf("%  %\n");
+    int size = printf("%  %\n");
     
-    // printf("\nft_size = %d\n", ft_size);
-    // printf("size = %d\n", size);
+    printf("\nft_size = %d\n", ft_size);
+    printf("size = %d\n", size);
 }
 // detect digit after %
 // if d == 0 padd with 0
