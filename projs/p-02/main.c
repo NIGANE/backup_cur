@@ -35,9 +35,10 @@ int main(void)
 
     // int ft_size = ft_printf("%X\n", 255);
     // int size = printf("%X\n", 255);
-    char *s = "% %  red  %";
+    char *s = NULL;
 
-    int ft_size = ft_printf(s);
+    int ft_size = ft_printf(NULL);
+    printf("\n");
     int size = printf(s);
     
     printf("\nft_size = %d\n", ft_size);
@@ -46,4 +47,4 @@ int main(void)
 // detect digit after %
 // if d == 0 padd with 0
 // if seccond number padd until d2 - nbrlen > 0
-// else padd with ' '
+// else padd with ' 's
