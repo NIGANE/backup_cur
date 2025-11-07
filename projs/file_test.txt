@@ -1,8 +1,18 @@
-hello world
+test
+example
 
-Voici les consignes à suivre dans le but de proposer un sujet:
-Pour proposer un sujet il faut obligatoirement écrire tout ce qui est demandé en anglais.
-Vous devez suivre chaque étape sans exception possible.
-Le projet que vous pouvez proposer sera mis en place sur la seconde partie du cursus uniquement. À savoir le POST-CC.
-Vous devez réfléchir au public visé par votre projet. Est-ce que ce sujet est pensé pour votre campus uniquement ou il y a une volonté de vouloir proposer ce projet pour tous les campus. Attention à ne pas prendre cette question à la légère.
-En cas du moindre doute/problème il faudra rentrer en contact avec un membre de l’équipe pédagogique de votre campus en priorité (pedago@campus).
+file content
+data
+
+File: get_next_line.c
+--- a/file:///home/amerkht/Desktop/backup_cur/projs/get_next_line.c
++++ b/file:///home/amerkht/Desktop/backup_cur/projs/get_next_line.c
+@@ -108,7 +108,6 @@
+
+        if (!temp)
+            {
+                free(re);
+                return (NULL);
+            }
+            temp = free_some(temp);
+end
