@@ -13,7 +13,11 @@
 #define BUFFER_SIZE 42
 #endif
 
-
+size_t	ft_strlen(char *s);
+int		ft_strchr(char *s, int c);
+char	*ft_strdup(const char *s);
+char	*ft_strjoin(char *s, char *b);
+char    *get_next_line(int fd);
 
 
 #endif

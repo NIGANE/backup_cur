@@ -1,6 +1,6 @@
 CC = cc 
 CFLAGS = -Wall -Wextra -Werror
-SRC = get_next_line.c
+SRC = get_next_line.c get_next_line_utils.c main.c
 all:
 	@${CC} ${CFLAGS} ${SRC} -o exec.out
 	./exec.out
