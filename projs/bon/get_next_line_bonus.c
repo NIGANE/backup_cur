@@ -1,5 +1,16 @@
-#include "../man/get_next_line.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/11 10:34:23 by amerkht           #+#    #+#             */
+/*   Updated: 2025/11/11 10:34:35 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "get_next_line_bonus.h"
 
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 {
@@ -87,22 +98,22 @@ static char	*get_line(char *s, int fd)
 	return (s);
 }
 
-char	*get_next_line_bonus(int fd)
+char	*get_next_line(int fd)
 {
-	static char	**temp;
+	static char	*temp[65535];
 	char		*re;
 
-	if (fd < 0 || (fd >= 1 && fd <= 2))
+	if (fd < 0)
 		return (NULL);
-	temp = get_line(temp, fd);
-	if (!temp)
+	temp[fd] = get_line(temp[fd], fd);
+	if (!temp[fd])
 		return (NULL);
-	re = extract_line(temp);
+	re = extract_line(temp[fd]);
 	if (!re)
 	{
-		free(temp);
+		free(temp[fd]);
 		return (NULL);
 	}
-	temp = free_some(temp);
+	temp[fd] = free_some(temp[fd]);
 	return (re);
 }

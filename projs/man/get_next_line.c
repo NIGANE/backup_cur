@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 15:52:49 by amerkht           #+#    #+#             */
-/*   Updated: 2025/11/07 15:52:55 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/11/11 09:10:39 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ char	*get_next_line(int fd)
 	static char	*temp;
 	char		*re;
 
-	if (fd < 0 || (fd >= 1 && fd <= 2))
+	if (fd < 0)
 		return (NULL);
 	temp = get_line(temp, fd);
 	if (!temp)
