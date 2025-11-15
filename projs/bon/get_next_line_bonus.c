@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 10:34:23 by amerkht           #+#    #+#             */
-/*   Updated: 2025/11/11 10:34:35 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/11/15 11:14:04 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ static char	*get_line(char *s, int fd)
 
 char	*get_next_line(int fd)
 {
-	static char	*temp[65535];
+	static char	*temp[MAX_FD];
 	char		*re;
 
 	if (fd < 0)
