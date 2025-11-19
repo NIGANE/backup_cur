@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 15:53:02 by amerkht           #+#    #+#             */
-/*   Updated: 2025/11/15 11:15:40 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/11/18 09:25:45 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@
 # include <unistd.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1000000
+#  define BUFFER_SIZE 42
 # endif
-#  define MAX_FD 60556
+# define MAX_FD 1048576
 
 size_t	ft_strlen(char *s);
 int		ft_strchr(char *s, int c);
