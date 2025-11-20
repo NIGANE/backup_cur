@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 10:34:23 by amerkht           #+#    #+#             */
-/*   Updated: 2025/11/15 11:14:04 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/11/20 09:38:53 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ static char	*get_line(char *s, int fd)
 	char	*bf;
 	char	*tp;
 
-	bf = malloc(BUFFER_SIZE + 1);
+	bf = (char *) malloc((size_t)(BUFFER_SIZE) + 1);
 	if (!bf)
 		return (NULL);
 	size = 1;

@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 15:52:49 by amerkht           #+#    #+#             */
-/*   Updated: 2025/11/19 10:45:26 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/11/20 09:54:18 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,27 +116,4 @@ char	*get_next_line(int fd)
 	}
 	temp = free_some(temp);
 	return (re);
-}
-
-
-#include <stdio.h>
-int main(void)
-{
-	int fd;
-	fd = open("file", O_RDONLY);
-	if (fd < 0)
-	{
-		printf("err");
-		return 1;
-	}
-	
-	char *line = get_next_line(fd);
-	
-	while (line)
-	{
-		printf("%s", line);
-		free(line);
-		line = get_next_line(fd);
-	}
-	close(fd);
 }
