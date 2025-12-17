@@ -6,7 +6,7 @@
 
 int main(int ar, char **av)
 {
-    
+
     if( ar <= 1){
         printf("nothing given\n");
         return 1;
@@ -16,8 +16,15 @@ int main(int ar, char **av)
     t_stack *b = stack_init();
     if (!a || !b)
         return 1;
-    extract_stack(a, ar, av);
+    a = extract_stack(a, ar, av);
+    if (!a)
+    {
+        free_stack(b);
+        ft_putstr("Error\n");
+        return 1;
+    }
     print_stack(a);
     free_stack(a);
+    free_stack(b);
     return 0;
 }

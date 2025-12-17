@@ -1,8 +1,8 @@
 #include "../includes/sta1.h"
 
-int ft_atoi(char *str)
+long ft_atoi(char *str)
 {
-    int sum;
+    long sum;
     int sign;
 
     sum = 0;
