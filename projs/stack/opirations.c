@@ -2,24 +2,28 @@
 
 void sa(t_stack *a)
 {
-    swap(&(a->top));
+    if (a)
+        swap(&(a->top));
 }
 
 void sb(t_stack *b)
 {
-    swap(&(b->top));
+    if (b)
+        swap(&(b->top));
 }
 
 void ss(t_stack *a, t_stack *b)
 {
-    swap(&(a->top));
-    swap(&(b->top));
+    sa(a);
+    sb(b);
 }
 
 void pa(t_stack *a, t_stack *b)
 {
     t_stack_node *node;
 
+    if (!a || !b)
+        return ;
     node = pop(b);
     if (node)
     {
@@ -30,10 +34,12 @@ void pa(t_stack *a, t_stack *b)
     }
 }
 
-void pb(t_stack *a, t_stack *b)
+void pb(t_stack *b, t_stack *a)
 {
     t_stack_node *node;
 
+    if (!a || !b)
+        return ;
     node = pop(a);
     if (node)
     {

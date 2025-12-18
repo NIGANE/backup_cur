@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "./../includes/sta1.h"
+#include "./../includes/op.h"
 
 
 int main(int ar, char **av)
@@ -23,7 +24,8 @@ int main(int ar, char **av)
         ft_putstr("Error\n");
         return 1;
     }
-    print_stack(a);
+    sort(a, b);
+    
     free_stack(a);
     free_stack(b);
     return 0;

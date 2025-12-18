@@ -9,7 +9,11 @@ void rotate(t_stack *stack)
     if (!stack)
         return;
     tmp = pop(stack);
+    if (!tmp)
+        return ;
     cur = stack->top;
+    if (!cur)
+        return (push(stack, tmp->data), free(tmp));
     while (cur->next)
         cur = cur->next;
     cur->next = tmp;

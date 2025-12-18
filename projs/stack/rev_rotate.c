@@ -9,8 +9,16 @@ void rev_rotate(t_stack *stack)
     if (!stack)
         return;
     cur = stack->top;
-    while (cur->next->next)
-        cur = cur->next;
+    if (!cur)
+        return ;
+
+    if (!cur->next)
+        return ;
+    else
+    {
+        while (cur->next->next)
+            cur = cur->next;
+    }
     last = cur->next;
     cur->next = NULL;
     last->next = stack->top;
