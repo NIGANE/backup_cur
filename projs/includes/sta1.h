@@ -8,6 +8,7 @@
 typedef struct s_stack_node
 {
     int data;
+    int index;
     struct s_stack_node *next;
 
 } t_stack_node;

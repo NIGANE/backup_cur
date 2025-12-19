@@ -54,6 +54,7 @@ t_stack *extract_stack(t_stack *st, int count, char **av)
             if (!valid(*splited_arr) || in_stack(ft_atoi(*splited_arr), st) || long_num(*splited_arr))
                 return (free_split_arr(buffer),free_stack(st),NULL);
             push(st, ft_atoi(*splited_arr++));
+
         }
         free_split_arr(buffer);
     }
