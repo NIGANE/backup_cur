@@ -1,5 +1,19 @@
 #include "../includes/sta1.h"
 
+void to_arr(t_stack *a, int *arr)
+{
+    t_stack_node *cur;
+
+    if (!a)
+        return ;
+    cur = a->top;
+    while (cur)
+    {
+        *arr++ = cur->data;
+        cur = cur->next;
+    }
+}
+
 
 void swap_arr(int *a, int *b)
 {
@@ -27,4 +41,14 @@ void sort_arr(int *arr, int size)
         }
         i++;
     }
+}
+
+void free_split_arr(char **arr)
+{
+    char **bf;
+
+    bf = arr;
+    while (*bf != NULL)
+        free(*bf++);
+    free(arr);
 }

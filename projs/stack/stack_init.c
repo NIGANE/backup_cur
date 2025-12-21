@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "../includes/sta1.h"
 
 t_stack *stack_init()
