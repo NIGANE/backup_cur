@@ -10,11 +10,10 @@ void print_stack(t_stack *stack)
     cur = stack->top;
     if (!cur)
         return ;
-    printf("Stack contents (top to bottom):\n");
     while (cur != NULL)
     {
         printf("|");
-        printf("%d", cur->data);
+        printf("%d (%d)", cur->data, cur->index);
         printf("|\n");
         cur = cur->next;
     }

@@ -4,6 +4,15 @@
 #include "./../includes/sta1.h"
 #include "./../includes/op.h"
 
+void sep(char *a)
+{
+    int i;
+
+    i = 0;
+    while (i++ < 20)
+        ft_putstr(a);
+    printf("\n");
+}
 
 int main(int ar, char **av)
 {
@@ -24,8 +33,17 @@ int main(int ar, char **av)
         ft_putstr("Error\n");
         return 1;
     }
+    sep("+");
     sort(a, b);
-    
+    sep("+");
+    if (check(a))
+        printf("OK\n");
+    else
+        printf("KO\n");
+    sep("+");
+    print_stack(a);
+    sep("+");
+
     free_stack(a);
     free_stack(b);
     return 0;
