@@ -62,5 +62,3 @@ void sort_5(t_stack *a, t_stack *b)
     sort_4(a, b);
     pa(a, b);
 }
-
-void sort_6_100()

@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#define CHUNK_SIZE 
 
 typedef struct s_stack_node
 {
@@ -32,8 +33,19 @@ void swap(t_stack_node **top);
 void rotate(t_stack *stack);
 void rev_rotate(t_stack *stack);
 void print_stack(t_stack *stack);
+int find_smallest(t_stack *stack);
+int find_largest(t_stack *stack);
+int check(t_stack *stack);
+t_stack_node *find(int data, t_stack *stack);
+void sort_arr(int *arr, int size);
+void to_arr(t_stack *a, int *arr);
+t_stack *indexing(t_stack *a);
 
 void sort(t_stack *a, t_stack *b);
+void sort_3(t_stack *a);
+void sort_4(t_stack *a, t_stack *b);
+void sort_5(t_stack *a, t_stack *b);
+void sort_6_100(t_stack *a, t_stack *b);
 
 t_stack *extract_stack(t_stack *st, int cn, char **av);
 long ft_atoi(char *str);

@@ -38,7 +38,6 @@ void pa(t_stack *a, t_stack *b)
         node->next = a->top;
         a->top = node;
         a->size++;
-        b->size--;
     }
     printf("pa\n");
 }
@@ -55,7 +54,6 @@ void pb(t_stack *b, t_stack *a)
         node->next = b->top;
         b->top = node;
         b->size++;
-        a->size--;
     }
     printf("pb\n");
 }
