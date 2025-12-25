@@ -1,28 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   push.c                                             :+:      :+:    :+:   */
+/*   op.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/25 21:49:35 by amerkht           #+#    #+#             */
-/*   Updated: 2025/12/25 21:49:43 by amerkht          ###   ########.fr       */
+/*   Created: 2025/12/25 21:45:20 by amerkht           #+#    #+#             */
+/*   Updated: 2025/12/25 21:45:26 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+# ifndef OP_H
+#define OP_H
+
 #include "./sta1.h"
 
-t_stack *push(t_stack *stack, int data)
-{
-    t_stack_node *new_node;
+void sa(t_stack *a);
+void sb(t_stack *b);
+void ss(t_stack *a, t_stack *b);
+void pa(t_stack *a, t_stack *b);
+void pb(t_stack *a, t_stack *b);
+void ra(t_stack *stack);
+void rb(t_stack *stack);
+void rr(t_stack *a, t_stack *b);
+void rra(t_stack *stack);
+void rrb(t_stack *stack);
+void rrr(t_stack *a, t_stack *b);
 
-    if (!stack)
-        return (NULL);
-    new_node = create_stack(data);
-    if (!new_node)
-        return (free_stack(stack), NULL);
-    new_node->next = stack->top;
-    stack->top = new_node;
-    stack->size++;
-    return stack;
-}
+#endif

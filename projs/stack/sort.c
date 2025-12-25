@@ -5,7 +5,6 @@
 
 void sort(t_stack *a, t_stack *b)
 {
-
     if (a->size < 2)
         return ;
     if (check(a))
@@ -27,3 +26,5 @@ void sort(t_stack *a, t_stack *b)
         sort_6_100(a, b);
     }
 }
+
+

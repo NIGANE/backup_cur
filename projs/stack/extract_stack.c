@@ -1,6 +1,16 @@
-#include "../includes/sta1.h"
-#include <stdio.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   extract_stack.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/12/25 21:46:29 by amerkht           #+#    #+#             */
+/*   Updated: 2025/12/25 21:46:48 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "./sta1.h"
 
 int some_digit(char *s)
 {
@@ -54,7 +64,6 @@ t_stack *extract_stack(t_stack *st, int count, char **av)
             if (!valid(*splited_arr) || in_stack(ft_atoi(*splited_arr), st) || long_num(*splited_arr))
                 return (free_split_arr(buffer),free_stack(st),NULL);
             push(st, ft_atoi(*splited_arr++));
-
         }
         free_split_arr(buffer);
     }

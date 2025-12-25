@@ -1,41 +1,38 @@
-#include "./../includes/sta1.h"
-#include "./../includes/op.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/12/25 21:48:43 by amerkht           #+#    #+#             */
+/*   Updated: 2025/12/25 21:48:51 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-void sep(char *a)
+#include "./op.h"
+#include "./sta1.h"
+
+int	main(int ar, char **av)
 {
-    int i;
+	t_stack	*a;
+	t_stack	*b;
 
-    i = 0;
-    while (i++ < 20)
-        ft_putstr(a);
-    printf("\n");
-}
-
-int main(int ar, char **av)
-{
-    if( ar <= 1)
-        return 1;
-
-    t_stack *a = stack_init();
-    t_stack *b = stack_init();
-    if (!a || !b)
-        return 1;
-    a = extract_stack(a, ar, av);
-    if (!a)
-    {
-        free_stack(b);
-        ft_putstr("Error\n");
-        return 1;
-    }
-    sort(a, b);
-    // print_stack(a);
-    // sep("+");
-    // if (check(a))
-    //     printf("OK\n");
-    // else
-    //     printf("KO\n");
-    
-    free_stack(a);
-    free_stack(b);
-    return 0;
+	if (ar <= 1)
+		return (1);
+	a = stack_init();
+	b = stack_init();
+	if (!a || !b)
+		return (1);
+	a = extract_stack(a, ar, av);
+	if (!a)
+	{
+		free_stack(b);
+		ft_putstr("Error\n");
+		return (1);
+	}
+	sort(a, b);
+	free_stack(a);
+	free_stack(b);
+	return (0);
 }

@@ -24,3 +24,5 @@ void rev_rotate(t_stack *stack)
     last->next = stack->top;
     stack->top = last;
 }
+
+

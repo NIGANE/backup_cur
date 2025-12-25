@@ -12,8 +12,6 @@ void sort_3(t_stack *a)
         ra(a);
     else if (index == 1)
         rra(a);
-    
-    
     if (a->top->data > a->top->next->data)
         sa(a);
 }
@@ -60,3 +58,5 @@ void sort_5(t_stack *a, t_stack *b)
     sort_4(a, b);
     pa(a, b);
 }
+
+

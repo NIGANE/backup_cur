@@ -14,3 +14,5 @@ void swap(t_stack_node **top)
     next->next = cur;
     *top = next;
 }
+
+
