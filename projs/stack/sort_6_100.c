@@ -2,16 +2,23 @@
 #include "../includes/op.h"
 
 
-void movetop(t_stack *a, int index)
+int get_pos(t_stack *st, int index)
 {
-    while (index-- > 0)
-        ra(a);
-}
+    t_stack_node *cur;
+    int i;
 
-void movebottom(t_stack *a, int index)
-{
-    while (index++ < a->size)
-        rra(a);
+    if (!st)
+        return (-1);
+    cur = st->top;
+    i = 0;
+    while (cur)
+    {
+        if (cur->index == index)
+            return (i);
+        i++;
+        cur = cur->next;
+    }
+    return (-1);
 }
 
 void chunking(t_stack *a, t_stack *b, int low, int size)
@@ -29,18 +36,18 @@ void chunking(t_stack *a, t_stack *b, int low, int size)
         last_match = -1;
         if (cur->index >= low && cur->index <= low + size - 1) // the current low < data < heigh
         {
-            printf("founded on index: %d\n", i);
-            if (first_match == -1 && i < a->size / 2)
+            if (first_match == -1 && i <= a->size / 2)
                 first_match = i;
             else
                 last_match = i;
-            if (first_match < size - last_match && first_match != -1)
-                movetop(a, first_match);
+            if (i <= a->size / 2 && first_match != -1)
+                movetop_a(a, first_match);
             else
-                movebottom(a, last_match);
+                movebottom_a(a, last_match);
             pb(b, a);
             if (b->top->index < (low + (low + size - 1)) / 2 && b->size > 1 )
                 rb(b);
+            break ;
         }
         i++;
         cur = cur->next;
@@ -62,14 +69,22 @@ void sort_6_100(t_stack *a, t_stack *b)
         chunk_num = 13;
     chunk_size = a->size / chunk_num;
     low = 0;
-    print_stack(a);
     while (chunk_num-- > 0)
     {
         i = 0;
         while (i++ < chunk_size)
             chunking(a, b, low, chunk_size);
         low += chunk_size;
-        printf("low had beed updated: %d\n", low);
     }
-    print_stack(b);
+    i = a->size + b->size;
+    while (b->size > 0)
+    {
+        low = get_pos(b, i - 1);
+        if (low > b->size / 2)
+            movebottom_b(b, low); 
+        else 
+            movetop_b(b, low);
+        pa(a, b);
+        i--;
+    }
 }

@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include "./../includes/sta1.h"
 #include "./../includes/op.h"
 
@@ -33,17 +30,14 @@ int main(int ar, char **av)
         ft_putstr("Error\n");
         return 1;
     }
-    // sep("+");
     sort(a, b);
-    // sep("+");
-    // if (check(a))
-    //     printf("OK\n");
-    // else
-    //     printf("KO\n");
-    sep("+");
     print_stack(a);
-    // sep("+");
-
+    sep("+");
+    if (check(a))
+        printf("OK\n");
+    else
+        printf("KO\n");
+    
     free_stack(a);
     free_stack(b);
     return 0;

@@ -17,4 +17,5 @@ void rotate(t_stack *stack)
     while (cur->next)
         cur = cur->next;
     cur->next = tmp;
+    stack->size++;
 }

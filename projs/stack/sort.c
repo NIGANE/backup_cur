@@ -10,7 +10,6 @@ void sort(t_stack *a, t_stack *b)
         return ;
     if (check(a))
         return ;
-    printf("stack_size = %d\n", a->size);
     if (a->size == 2)
     {
         if (a->top->data > a->top->next->data)
@@ -27,5 +26,4 @@ void sort(t_stack *a, t_stack *b)
         indexing(a);
         sort_6_100(a, b);
     }
-    
 }
