@@ -40,6 +40,10 @@ t_stack_node *find(int data, t_stack *stack);
 void sort_arr(int *arr, int size);
 void to_arr(t_stack *a, int *arr);
 t_stack *indexing(t_stack *a);
+void movetop_a(t_stack *st, int index);
+void movebottom_a(t_stack *st, int index);
+void movetop_b(t_stack *st, int index);
+void movebottom_b(t_stack *st, int index);
 
 void sort(t_stack *a, t_stack *b);
 void sort_3(t_stack *a);
