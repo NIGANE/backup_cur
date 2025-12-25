@@ -1,5 +1,5 @@
-#include "../includes/sta1.h"
-#include "../includes/op.h"
+#include "./sta1.h"
+#include "./op.h"
 
 
 void sort_to_b(t_stack *a, t_stack *b ,int chunk_num)

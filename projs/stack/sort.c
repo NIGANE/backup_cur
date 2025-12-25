@@ -1,6 +1,6 @@
 
-#include "../includes/op.h"
-#include "../includes/sta1.h"
+#include "./op.h"
+#include "./sta1.h"
 
 
 void sort(t_stack *a, t_stack *b)
