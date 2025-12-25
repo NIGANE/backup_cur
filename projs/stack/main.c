@@ -13,11 +13,8 @@ void sep(char *a)
 
 int main(int ar, char **av)
 {
-
-    if( ar <= 1){
-        printf("nothing given\n");
+    if( ar <= 1)
         return 1;
-    }
 
     t_stack *a = stack_init();
     t_stack *b = stack_init();
@@ -31,12 +28,12 @@ int main(int ar, char **av)
         return 1;
     }
     sort(a, b);
-    print_stack(a);
-    sep("+");
-    if (check(a))
-        printf("OK\n");
-    else
-        printf("KO\n");
+    // print_stack(a);
+    // sep("+");
+    // if (check(a))
+    //     printf("OK\n");
+    // else
+    //     printf("KO\n");
     
     free_stack(a);
     free_stack(b);

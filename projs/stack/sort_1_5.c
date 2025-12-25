@@ -20,10 +20,8 @@ void sort_3(t_stack *a)
 
 void sort_4(t_stack *a, t_stack *b)
 {
-    t_stack_node *top;
     int index;
 
-    top = a->top;
     index = find_smallest(a);
     if (index == 1)
         ra(a);
