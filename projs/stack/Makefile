@@ -1,23 +1,49 @@
-
-CC=cc
+CC = cc
 CFLAGS = -Wall -Wextra -Werror
-SRCS=*.c
-NAME=push_swap
+RM = rm -f
 
-all :
-	@$(CC) ${CFLAGS} ${SRCS} -o push_swap
-	@echo "compiled successfuly"
-	
+NAME = push_swap
 
-gdb :
-	@$(CC)  ${SRCS} -o push_swap -g
-	@echo "compiled successfuly"
+PS_SRCS = array_operations.c \
+	check.c \
+	extract_stack.c \
+	find_various.c \
+	ft_atoi.c \
+	ft_putstr.c \
+	ft_split.c \
+	ft_strlen.c \
+	ps_main.c \
+	moving_node.c \
+	operations_1.c \
+	opirations.c \
+	push.c \
+	rev_rotate.c \
+	rotate.c \
+	sort_1_5.c \
+	sort_6_100.c \
+	sort.c \
+	sort_to_b.c \
+	stack_op1.c \
+	stack_op2.c \
+	swap.c
 
-nfl :
-	@cc  ${SRCS} -o push_swap
-	@echo "compiled successfuly"
-	
+PS_OBJS = $(PS_SRCS:.c=.o)
 
-clean :
-	rm -f push_swap
-	clear
+all: $(NAME)
+
+$(NAME): $(PS_OBJS)
+	$(CC) $(CFLAGS) $(PS_OBJS) -o $(NAME)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	$(RM) $(PS_OBJS)
+
+fclean: clean
+	$(RM) $(NAME)
+
+re: fclean all
+
+.PHONEY: ${NAME} all clean fclean re
+.SECONDARRY: ${PS_OBJS}

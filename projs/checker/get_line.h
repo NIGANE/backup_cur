@@ -13,7 +13,6 @@
 #  define BUFFER_SIZE 42
 # endif
 
-size_t	ft_strlen(char *s);
 int		ft_strchr(char *s, int c);
 char	*extract_line(const char *s);
 char	*ft_strjoin(char *s, char *b);

@@ -1,20 +1,7 @@
 
 
-#include "get_next_line.h"
-
-size_t	ft_strlen(char *s)
-{
-	size_t	len;
-
-	if (!s)
-	{
-		return (0);
-	}
-	len = 0;
-	while (*s++)
-		len++;
-	return (len);
-}
+#include "get_line.h"
+#include "../stack/sta1.h"
 
 size_t	valid_len(char *s)
 {

@@ -1,5 +1,7 @@
 
-#include "get_next_line.h"
+#include "get_line.h"
+#include "../stack/sta1.h"
+
 
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 {
