@@ -1,28 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   push.c                                             :+:      :+:    :+:   */
+/*   abs.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/25 21:49:35 by amerkht           #+#    #+#             */
-/*   Updated: 2025/12/25 21:49:43 by amerkht          ###   ########.fr       */
+/*   Created: 2025/12/29 22:09:09 by amerkht           #+#    #+#             */
+/*   Updated: 2025/12/30 00:22:11 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./sta1.h"
+#include "./op.h"
 
-t_stack	*push(t_stack *stack, int data)
+int	abs(int n)
 {
-	t_stack_node	*new_node;
-
-	if (!stack)
-		return (NULL);
-	new_node = create_stack(data);
-	if (!new_node)
-		return (free_stack(stack), NULL);
-	new_node->next = stack->top;
-	stack->top = new_node;
-	stack->size++;
-	return (stack);
+	return ((-n * (n < 0) + n * (n >= 0)));
 }
+

@@ -1,28 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   push.c                                             :+:      :+:    :+:   */
+/*   indexing.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/25 21:49:35 by amerkht           #+#    #+#             */
-/*   Updated: 2025/12/25 21:49:43 by amerkht          ###   ########.fr       */
+/*   Created: 2025/12/30 00:09:32 by amerkht           #+#    #+#             */
+/*   Updated: 2025/12/30 00:09:55 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./sta1.h"
+#include "op.h"
 
-t_stack	*push(t_stack *stack, int data)
+t_stack	*indexing(t_stack *a)
 {
-	t_stack_node	*new_node;
+	int				*arr;
+	int				i;
+	t_stack_node	*cur;
 
-	if (!stack)
+	if (!a)
 		return (NULL);
-	new_node = create_stack(data);
-	if (!new_node)
-		return (free_stack(stack), NULL);
-	new_node->next = stack->top;
-	stack->top = new_node;
-	stack->size++;
-	return (stack);
+	i = 0;
+	arr = malloc(sizeof(int) * a->size);
+	if (!arr)
+		return (a);
+	to_arr(a, arr);
+	sort_arr(arr, a->size);
+	while (i < a->size)
+	{
+		cur = find(arr[i], a);
+		cur->index = i;
+		i++;
+	}
+	free(arr);
+	return (a);
 }

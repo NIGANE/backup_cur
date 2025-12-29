@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   opirations.c                                       :+:      :+:    :+:   */
+/*   opirations_checker.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/25 21:49:52 by amerkht           #+#    #+#             */
-/*   Updated: 2025/12/29 22:32:51 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/12/30 00:23:37 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ void	sa(t_stack *a)
 	if (a)
 	{
 		swap(&(a->top));
-		ft_putstr("sa\n");
 	}
 }
 
@@ -26,7 +25,6 @@ void	sb(t_stack *b)
 	if (b)
 	{
 		swap(&(b->top));
-		ft_putstr("sb\n");
 	}
 }
 
@@ -34,7 +32,6 @@ void	ss(t_stack *a, t_stack *b)
 {
 	sa(a);
 	sb(b);
-	ft_putstr("ss\n");
 }
 
 void	pa(t_stack *a, t_stack *b)
@@ -50,7 +47,6 @@ void	pa(t_stack *a, t_stack *b)
 		a->top = node;
 		a->size++;
 	}
-	ft_putstr("pa\n");
 }
 
 void	pb(t_stack *b, t_stack *a)
@@ -66,5 +62,4 @@ void	pb(t_stack *b, t_stack *a)
 		b->top = node;
 		b->size++;
 	}
-	ft_putstr("pb\n");
 }

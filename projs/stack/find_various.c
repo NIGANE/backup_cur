@@ -6,85 +6,81 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/25 21:47:11 by amerkht           #+#    #+#             */
-/*   Updated: 2025/12/25 21:47:23 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/12/30 00:08:43 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./sta1.h"
 #include "./op.h"
+#include "./sta1.h"
 
-int indexof(int data, t_stack *a)
+int	indexof(int data, t_stack *a)
 {
-    t_stack_node *cur;
-    int i;
+	t_stack_node	*cur;
+	int				i;
 
-    i = 0;
-    cur = a->top;
-    while (cur)
-    {
-        if (data == cur->data)
-            return (i);
-        i++;
-        cur = cur->next;
-    }
-    return (i);
+	i = 0;
+	cur = a->top;
+	while (cur)
+	{
+		if (data == cur->data)
+			return (i);
+		i++;
+		cur = cur->next;
+	}
+	return (i);
 }
 
-int find_smallest(t_stack *a)
+int	find_smallest(t_stack *a)
 {
-    int s;
-    int i;
-    t_stack_node *cur;
+	int				s;
+	int				i;
+	t_stack_node	*cur;
 
-    if (!a)
-        return (-1);
-    cur = a->top;
-    s = a->top->data;
-    while (cur)
-    {
-        if (cur->data < s)
-            s = cur->data;
-        cur = cur->next;
-    }
-
-    i = indexof(s, a);
-    return (i);
+	if (!a)
+		return (-1);
+	cur = a->top;
+	s = a->top->data;
+	while (cur)
+	{
+		if (cur->data < s)
+			s = cur->data;
+		cur = cur->next;
+	}
+	i = indexof(s, a);
+	return (i);
 }
 
-int find_largest(t_stack *a)
+int	find_largest(t_stack *a)
 {
-    int l;
-    int i;
-    t_stack_node *cur;
+	int				l;
+	int				i;
+	t_stack_node	*cur;
 
-    if (!a)
-        return (-1);
-    cur = a->top;
-    l = a->top->data;
-    while (cur)
-    {
-        if (cur->data > l)
-            l = cur->data;
-        cur = cur->next;
-    }
-
-    i = indexof(l, a);
-    return (i);
+	if (!a)
+		return (-1);
+	cur = a->top;
+	l = a->top->data;
+	while (cur)
+	{
+		if (cur->data > l)
+			l = cur->data;
+		cur = cur->next;
+	}
+	i = indexof(l, a);
+	return (i);
 }
-
-t_stack_node *find(int data, t_stack *a)
+t_stack_node	*find(int data, t_stack *a)
 {
-    t_stack_node *cur;
+	t_stack_node	*cur;
 
-    if (!a)
-        return (NULL);
-
-    cur = a->top;
-    while(cur)
-    {
-        if (cur->data == data)
-            return (cur);
-        cur = cur->next;
-    }
-    return (NULL);
+	if (!a)
+		return (NULL);
+	cur = a->top;
+	while (cur)
+	{
+		if (cur->data == data)
+			return (cur);
+		cur = cur->next;
+	}
+	return (NULL);
 }

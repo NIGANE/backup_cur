@@ -6,61 +6,61 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/25 21:45:56 by amerkht           #+#    #+#             */
-/*   Updated: 2025/12/26 16:33:15 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/12/29 22:40:28 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./sta1.h"
+#include "./op.h"
 
-void to_arr(t_stack *a, int *arr)
+void	to_arr(t_stack *a, int *arr)
 {
-    t_stack_node *cur;
+	t_stack_node	*cur;
 
-    if (!a)
-        return ;
-    cur = a->top;
-    while (cur)
-    {
-        *arr++ = cur->data;
-        cur = cur->next;
-    }
+	if (!a)
+		return ;
+	cur = a->top;
+	while (cur)
+	{
+		*arr++ = cur->data;
+		cur = cur->next;
+	}
 }
 
-
-void swap_arr(int *a, int *b)
+void	swap_arr(int *a, int *b)
 {
-    int temp;
+	int	temp;
 
-    temp = *a;
-    *a = *b;
-    *b = temp;
+	temp = *a;
+	*a = *b;
+	*b = temp;
 }
 
-void sort_arr(int *arr, int size)
+void	sort_arr(int *arr, int size)
 {
-    int i;
-    int j;
+	int	i;
+	int	j;
 
-    i = 0;
-    while (i < size - 1)
-    {
-        j = 0;
-        while (j < size - 1 - i)
-        {
-            if (arr[j] > arr[j + 1])
-                swap_arr(arr + j, arr + j + 1);
-            j++;
-        }
-        i++;
-    }
+	i = 0;
+	while (i < size - 1)
+	{
+		j = 0;
+		while (j < size - 1 - i)
+		{
+			if (arr[j] > arr[j + 1])
+				swap_arr(arr + j, arr + j + 1);
+			j++;
+		}
+		i++;
+	}
 }
 
-void free_split_arr(char **arr)
+void	free_split_arr(char **arr)
 {
-    char **bf;
+	char	**bf;
 
-    bf = arr;
-    while (*bf != NULL)
-        free(*bf++);
-    free(arr);
+	bf = arr;
+	while (*bf != NULL)
+		free(*bf++);
+	free(arr);
 }

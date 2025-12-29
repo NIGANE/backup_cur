@@ -6,42 +6,41 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/25 21:49:18 by amerkht           #+#    #+#             */
-/*   Updated: 2025/12/25 21:49:28 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/12/29 22:36:50 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./op.h"
 #include "./sta1.h"
 
-void rb(t_stack *stack)
+void	rb(t_stack *stack)
 {
-    rotate(stack);
-    printf("rb\n");
-}
-void rr(t_stack *a, t_stack *b)
-{
-    rotate(a);
-    rotate(b);
-    printf("rr\n");
+	rotate(stack);
+	ft_putstr("rb\n");
 }
 
-void rra(t_stack *stack)
+void	rr(t_stack *a, t_stack *b)
 {
-    rev_rotate(stack);
-    printf("rra\n");
+	rotate(a);
+	rotate(b);
+	ft_putstr("rr\n");
 }
 
-void rrb(t_stack *stack)
+void	rra(t_stack *stack)
 {
-    rev_rotate(stack);
-    printf("rrb\n");
+	rev_rotate(stack);
+	ft_putstr("rra\n");
 }
 
-void rrr(t_stack *a, t_stack *b)
+void	rrb(t_stack *stack)
 {
-    rev_rotate(a);
-    rev_rotate(b);
-    printf("rrr\n");
+	rev_rotate(stack);
+	ft_putstr("rrb\n");
 }
 
-
+void	rrr(t_stack *a, t_stack *b)
+{
+	rev_rotate(a);
+	rev_rotate(b);
+	ft_putstr("rrr\n");
+}

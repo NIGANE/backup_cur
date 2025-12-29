@@ -1,28 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   push.c                                             :+:      :+:    :+:   */
+/*   operations_1_checker.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/25 21:49:35 by amerkht           #+#    #+#             */
-/*   Updated: 2025/12/25 21:49:43 by amerkht          ###   ########.fr       */
+/*   Created: 2025/12/25 21:49:18 by amerkht           #+#    #+#             */
+/*   Updated: 2025/12/30 00:24:23 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "./op.h"
 #include "./sta1.h"
 
-t_stack	*push(t_stack *stack, int data)
+void	rb(t_stack *stack)
 {
-	t_stack_node	*new_node;
+	rotate(stack);
+}
 
-	if (!stack)
-		return (NULL);
-	new_node = create_stack(data);
-	if (!new_node)
-		return (free_stack(stack), NULL);
-	new_node->next = stack->top;
-	stack->top = new_node;
-	stack->size++;
-	return (stack);
+void	rr(t_stack *a, t_stack *b)
+{
+	rotate(a);
+	rotate(b);
+}
+
+void	rra(t_stack *stack)
+{
+	rev_rotate(stack);
+}
+
+void	rrb(t_stack *stack)
+{
+	rev_rotate(stack);
+}
+
+void	rrr(t_stack *a, t_stack *b)
+{
+	rev_rotate(a);
+	rev_rotate(b);
 }

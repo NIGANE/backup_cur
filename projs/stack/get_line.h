@@ -1,28 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   push.c                                             :+:      :+:    :+:   */
+/*   get_line.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/25 21:49:35 by amerkht           #+#    #+#             */
-/*   Updated: 2025/12/25 21:49:43 by amerkht          ###   ########.fr       */
+/*   Created: 2025/12/30 00:00:21 by amerkht           #+#    #+#             */
+/*   Updated: 2025/12/30 00:01:51 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./sta1.h"
+#ifndef GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
 
-t_stack	*push(t_stack *stack, int data)
-{
-	t_stack_node	*new_node;
+# include <fcntl.h>
+# include <stddef.h>
+# include <stdint.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
 
-	if (!stack)
-		return (NULL);
-	new_node = create_stack(data);
-	if (!new_node)
-		return (free_stack(stack), NULL);
-	new_node->next = stack->top;
-	stack->top = new_node;
-	stack->size++;
-	return (stack);
-}
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 42
+# endif
+
+int		ft_strchr(char *s, int c);
+char	*extract_line(const char *s);
+char	*ft_strjoin(char *s, char *b);
+char	*get_next_line(int fd);
+
+#endif
