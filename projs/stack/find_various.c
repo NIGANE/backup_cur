@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/25 21:47:11 by amerkht           #+#    #+#             */
-/*   Updated: 2025/12/30 00:08:43 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/12/30 10:01:00 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ int	find_largest(t_stack *a)
 	i = indexof(l, a);
 	return (i);
 }
+
 t_stack_node	*find(int data, t_stack *a)
 {
 	t_stack_node	*cur;

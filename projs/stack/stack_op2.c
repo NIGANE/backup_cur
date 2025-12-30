@@ -33,4 +33,3 @@ void	stack_rev(t_stack_node **top)
 	}
 	*top = prev;
 }
-

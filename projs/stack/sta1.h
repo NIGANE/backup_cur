@@ -6,13 +6,12 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/25 21:45:31 by amerkht           #+#    #+#             */
-/*   Updated: 2025/12/29 22:43:49 by amerkht          ###   ########.fr       */
+/*   Updated: 2025/12/30 10:19:15 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef STA1_H
 # define STA1_H
-# include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 

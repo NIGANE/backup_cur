@@ -1,7 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_line.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/12/30 10:01:26 by amerkht           #+#    #+#             */
+/*   Updated: 2025/12/30 10:01:32 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include "get_line.h"
 #include "./sta1.h"
-
+#include "get_line.h"
 
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 {
@@ -69,7 +79,7 @@ static char	*get_line(char *s, int fd)
 	char	*bf;
 	char	*tp;
 
-	bf = (char *) malloc((size_t)(BUFFER_SIZE) + 1);
+	bf = (char *)malloc((size_t)(BUFFER_SIZE) + 1);
 	if (!bf)
 		return (NULL);
 	size = 1;
