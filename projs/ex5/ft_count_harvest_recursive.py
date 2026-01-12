@@ -1,5 +1,5 @@
 def rep(x):
-    if x == 0:
+    if x <= 0:
         return
     rep(x - 1)
     print("Day ", x)
