@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import dis
+
 
 """
 Helper file for Growing Code.
@@ -139,5 +141,16 @@ def main():
 
 # This line means: "If someone runs this file directly, call main()"
 # You don't need to understand this yet, just know it makes the program start
+
+class Plant:
+    def __init__(self, name):
+        self.name = name
+
+
+def my_main():
+    # print("the resu: ", 2 + 2, True, [1, 2, 3], sep=" | ")
+    dis.dis("print('Hello, World!')")
+
+
 if __name__ == "__main__":
-    main()
+    my_main()
