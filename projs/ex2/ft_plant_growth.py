@@ -1,28 +1,32 @@
 class Plant:
-    def __init__(self, name:str, height:int, age:int):
+    def __init__(self, name: str, height: int, age: int):
         self.name = name
         self.height = height
         self.age = age
-    def grow(self,):
-        self.height += 0.8
-    def age(self):
-        self.age += 1
-    def get_info(self):
-        return f"{self.name}: {self.height}cm, {self.age} days old"
+
+
+def grow(pl: type[Plant]):
+    pl.height += 1
+
+def age(pl: type[Plant]):
+    pl.age += 1
+
+def get_info(pl: type[Plant]):
+    return f"{pl.name}: {pl.height}cm, {pl.age} days old"
     
 
 def main():
     print("=== Day 1 ===")
     rosee = Plant("rose", 25, 30)
-    print(rosee.get_info())
+    print(get_info(rosee))
     i = 1
     print("=== Day 7 ===")
     while (i < 7):
-        rosee.grow()
-        # rosee.age()
+        grow(rosee)
+        age(rosee)
         i += 1
-    print(rosee.get_info())
-    # print(f"Growth this week: {i * 0.81}cm")
+    print(get_info(rosee))
+    print(f"Growth this week: +{rosee.height - 25}cm")
 
 
 if __name__ == "__main__":
