@@ -6,7 +6,7 @@ class SecurePlant:
         self.__age = age
         print(f"Plant created: {self.__name}")
 
-    def set_height(self, height: float):
+    def set_height(self, height: int):
         if (height > 0):
             self.__height = height
             print(f"Height updated {self.__height}cm [OK]")
@@ -30,7 +30,7 @@ class SecurePlant:
     def get_info(self):
         return (f"Current plant: {self.__name} ({self.get_height()}cm, {self.get_age()} days)")
 
-def main():
+def main() -> None:
     print("=== Garden Security System ===")
     new_plant = SecurePlant("Rose")
     new_plant.set_height(25)
