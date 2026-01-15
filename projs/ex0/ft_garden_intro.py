@@ -1,5 +1,8 @@
 
 def main():
+    """
+        print variables values
+    """
     name = "Rose"
     height = "25cm"
     age = "30 days"
