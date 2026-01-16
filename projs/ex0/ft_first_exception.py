@@ -1,4 +1,21 @@
 def check_temperature(temp_str: str) -> int:
+    """
+    Validates and checks if a temperature string is within the safe range
+
+    The function attempts to convert the input string to an integer and checks
+        it against a safe threshold (0°C to 40°C).
+
+    Args:
+        temp_str (str): The temperature value as a string (e.g., "25").
+
+    Returns:
+        int: The parsed temperature if successful, or -1 if a ValueError
+            occurred or the input was invalid.
+
+    Note:
+        Success or failure
+            messages are printed directly to the standard output.
+    """
     tp = -1
     try:
         tp = int(temp_str)
@@ -15,6 +32,12 @@ def check_temperature(temp_str: str) -> int:
 
 
 def test_temperature_input() -> None:
+    """
+    Runs a suite of test cases for the check_temperature function.
+
+    Tests include a valid temperature, a non-numeric string, and values
+    exceeding the high and low safety boundaries.
+    """
     print("=== Garden Temperature Checker ===\n")
     print("Testing temperature: 25")
     check_temperature("25")

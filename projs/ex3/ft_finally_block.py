@@ -1,9 +1,28 @@
 
 class WaterError(Exception):
+    """
+    Exception raised for errors in the plant watering process.
+
+    Attributes:
+        message -- explanation of why the watering failed
+    """
     pass
 
 
 def water_plants(plant_list: list[str]) -> None:
+    """
+    Iterates through a list of plants and performs the watering process.
+
+    Args:
+        plant_list (list[str]): A list of plant names to be watered.
+
+    Raises:
+        WaterError: If a `None` value is encountered in the plant list.
+
+    Note:
+        The 'finally' block ensures that the watering system is shut down 
+        regardless of whether the operation succeeded or failed.
+    """
     try:
         for plant in plant_list:
             if (plant is None):
@@ -16,10 +35,14 @@ def water_plants(plant_list: list[str]) -> None:
 
 
 def test_watering_system() -> None:
+    """
+    Tests the watering system with both valid and invalid plant lists to
+    demonstrate custom exception handling and system cleanup.
+    """
     print("=== Garden Watering System ===\n")
     print("Testing normal watering...")
-    goot_plants = ["tomato", "lettuce", "carrots"]
-    water_plants(goot_plants)
+    good_plants = ["tomato", "lettuce", "carrots"]
+    water_plants(good_plants)
     print("Watering completed successfully!")
     print("")
     print("Testing with error...")
