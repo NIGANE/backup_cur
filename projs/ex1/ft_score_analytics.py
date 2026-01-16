@@ -42,7 +42,7 @@ def ft_score_analytics() -> None:
             arr_print(data)
             print(f"Total players: {len(data)}")
             print(f"Total score: {sum(data)}")
-            print(f"Average score: {sum(data) / (len(data) - 1)}")
+            print(f"Average score: {(sum(data) / (len(data) - 1)):.1f}")
             print(f"High score: {max(data)}")
             print(f"Low score: {min(data)}")
             print(f"Score range: {max(data) - min(data)}")
