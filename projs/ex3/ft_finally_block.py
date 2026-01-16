@@ -20,7 +20,7 @@ def water_plants(plant_list: list[str]) -> None:
         WaterError: If a `None` value is encountered in the plant list.
 
     Note:
-        The 'finally' block ensures that the watering system is shut down 
+        The 'finally' block ensures that the watering system is shut down
         regardless of whether the operation succeeded or failed.
     """
     try:
