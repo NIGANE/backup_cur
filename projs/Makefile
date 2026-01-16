@@ -1,4 +1,4 @@
-NAME = ex2/ft_coordinate_system.py
+NAME = ex3/ft_achievement_tracker.py
 CCC = python3
 
 all:
