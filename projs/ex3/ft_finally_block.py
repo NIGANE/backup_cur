@@ -23,6 +23,7 @@ def water_plants(plant_list: list[str]) -> None:
         The 'finally' block ensures that the watering system is shut down
         regardless of whether the operation succeeded or failed.
     """
+    print("Opening watering system")
     try:
         for plant in plant_list:
             if (plant is None):
