@@ -1,4 +1,4 @@
-NAME = ex4/ft_raise_errors.py
+NAME = ex5/ft_garden_management.py
 CCC = python3
 
 all:

@@ -1,30 +1,41 @@
-
-
-def  check_plant_health(plant_name: str, water_level, sunlight_hours) -> None:
+def check_plant_health(
+        plant_name: str, water_level: int, sunlight_hours: int
+        ) -> None:
     try:
-        for plant in plant_list:
-            if (plant is None):
-                raise ValueError("Cannot water None - invalid plant!")
-            print(f"Watering {plant}")
-    except ValueError as we:
-        print(f"Error: {we}")
-    finally:
-        print("Closing watering system (cleanup)")
+        if (plant_name is None):
+            raise ValueError("Plant name cannot be empty!")
+        if (water_level > 10):
+            raise ValueError(f"Water level {water_level} is too high (max 10)")
+        if (water_level < 1):
+            raise ValueError(f"Water level {water_level} is too low (min 1)")
+        if (sunlight_hours > 12):
+            err = f"Sunlight hours {sunlight_hours} is too high (max 12)"
+            raise ValueError(err)
+        if (sunlight_hours < 2):
+            err = f"Sunlight hours {sunlight_hours} is too low (min 2)"
+            raise ValueError(err)
+    except ValueError as err:
+        print(f"Error: {err}")
+    else:
+        print(f"Plant '{plant_name}' is healthy!")
 
 
-def test_watering_system() -> None:
-    print("=== Garden Watering System ===\n")
-    print("Testing normal watering...")
-    goot_plants = ["tomato", "lettuce", "carrots"]
-    water_plants(goot_plants)
-    print("Watering completed successfully!")
+def test_plant_checks() -> None:
+    print("=== Garden Plant Health Checker ===\n")
+    print("Testing good values...")
+    check_plant_health("tomato", 2, 2)
     print("")
-    print("Testing with error...")
-    bad_plants = ["tomato", None]
-    water_plants(bad_plants)
+    print("Testing empty plant name...")
+    check_plant_health(None, 2, 2)
     print("")
-    print("Cleanup always happens, even with errors!")
+    print("Testing empty plant name...")
+    check_plant_health("tomato", 15, 2)
+    print("")
+    print("Testing empty plant name...")
+    check_plant_health("tomato", 2, 0)
+    print("")
+    print("All error raising tests completed!")
 
 
 if (__name__ == "__main__"):
-    test_watering_system()
+    test_plant_checks()
