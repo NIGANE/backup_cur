@@ -7,8 +7,8 @@ def ft_achievement_tracker(data: dict):
     print("")
     print("=== Achievement Analytics ===")
     for value in data.values():
-        my_set.add(value)
-    print(f"All unique achievements: {set()}")
+        my_set.update(set(value))
+    print(f"All unique achievements: {set(my_set)}")
 
 
 def main() -> None:
