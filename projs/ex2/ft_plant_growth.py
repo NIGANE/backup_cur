@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 class Plant:
     """
         Represents a plant with growth-related attributes.

@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 class SecurePlant:
     """
         Represents a plant with restricted access to its internal state.
