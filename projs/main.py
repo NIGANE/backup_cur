@@ -1,7 +1,13 @@
 class Me:
+
     def __init__(self, name):
-        self.__name = name
+        self.name = name
+        self.age = ""
     pass
 
+
 addOne = Me("achraf")
-print(addOne._Me__name)
+print(addOne.name)
+print(addOne.age)
+addOne.age = 45
+print(addOne.age)

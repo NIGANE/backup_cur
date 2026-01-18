@@ -27,48 +27,40 @@ class Plant:
         """
         self.name = name
         self.height = height
-        self.age = age
+        self.ag = age
 
+    def grow(s) -> None:
+        """
+            Increase the height of a plant by one centimeter.
+        """
+        s.height += 1
 
-def grow(pl: type[Plant]):
-    """
-        Increase the height of a plant by one centimeter.
+    def age(s) -> None:
+        """
+            Increase the age of a plant by one day.
 
-        Parameters
-        ----------
-        pl : Plant
-            The plant to grow.
-    """
-    pl.height += 1
+            Parameters
+            ----------
+            pl : Plant
+                The plant whose age will be incremented.
+        """
+        s.ag += 1
 
+    def get_info(pl) -> str:
+        """
+            Return a formatted string describing the plant.
 
-def age(pl: type[Plant]):
-    """
-        Increase the age of a plant by one day.
+            Parameters
+            ----------
+            pl : Plant
+                The plant to describe.
 
-        Parameters
-        ----------
-        pl : Plant
-            The plant whose age will be incremented.
-    """
-    pl.age += 1
-
-
-def get_info(pl: type[Plant]):
-    """
-        Return a formatted string describing the plant.
-
-        Parameters
-        ----------
-        pl : Plant
-            The plant to describe.
-
-        Returns
-        -------
-        str
-            A string containing the plant name, height, and age.
-    """
-    return f"{pl.name}: {pl.height}cm, {pl.age} days old"
+            Returns
+            -------
+            str
+                A string containing the plant name, height, and age.
+        """
+        return f"{pl.name}: {pl.height}cm, {pl.ag} days old"
 
 
 def main():
@@ -77,14 +69,14 @@ def main():
     """
     print("=== Day 1 ===")
     rosee = Plant("rose", 25, 30)
-    print(get_info(rosee))
+    print(rosee.get_info())
     i = 1
     print("=== Day 7 ===")
     while (i < 7):
-        grow(rosee)
-        age(rosee)
+        rosee.grow()
+        rosee.age()
         i += 1
-    print(get_info(rosee))
+    print(rosee.get_info())
     print(f"Growth this week: +{rosee.height - 25}cm")
 
 
