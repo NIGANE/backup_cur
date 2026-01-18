@@ -22,3 +22,7 @@ ARGS4 = sword:1 potion:5 shield:2 armor:3 helmet:1
 EX4 = ex4/ft_inventory_system.py
 4:
 	@${CCC} ${EX4} ${ARGS4}
+
+EX5 = ex5/ft_data_stream.py
+5:
+	@${CCC} ${EX5}
