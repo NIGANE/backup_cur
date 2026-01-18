@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 class GardenManager:
     """
     Manages a garden and its plants.
@@ -10,6 +11,45 @@ class GardenManager:
     total_gardens : int
         Total number of GardenManager instances created.
     """
+
+    class GardenStats:
+
+        @classmethod
+        def plant_type(cls, owner: 'GardenManager') -> None:
+            """
+            Display a count of plant types in a garden.
+
+            Parameters
+            ----------
+            owner : GardenManager
+                The garden manager whose plants are analyzed.
+            """
+            data = {"Plant": 0, "FloweringPlant": 0, "PrizeFlower": 0}
+            for plant in owner.get_plants():
+                if isinstance(plant, PrizeFlower):
+                    data["PrizeFlower"] += 1
+                elif isinstance(plant, FloweringPlant):
+                    data["FloweringPlant"] += 1
+                elif isinstance(plant, Plant):
+                    data["Plant"] += 1
+
+            print(
+                f"Plant types: {data['Plant']} regular,"
+                f" {data['FloweringPlant']} flowering,"
+                f" {data['PrizeFlower']} prize flowers"
+            )
+
+        @staticmethod
+        def get_total_gardens(cls: type['GardenManager']):
+            """
+            Return the total number of gardens managed.
+
+            Returns
+            -------
+            str
+                A formatted summary of total gardens.
+            """
+            return f"Total gardens managed: {cls.total_gardens}"
 
     total_gardens = 0
 
@@ -76,7 +116,7 @@ class GardenManager:
         """
         return self.__score
 
-    def info(self):
+    def info(self) -> None:
         """
         Return a summary of garden activity.
 
@@ -138,46 +178,6 @@ class GardenManager:
         for plant in self.__plants:
             height += plant.get_height()
         return height > 0
-
-
-class GardenStats:
-
-    @classmethod
-    def plant_type(cls, owner: 'GardenManager') -> None:
-        """
-        Display a count of plant types in a garden.
-
-        Parameters
-        ----------
-        owner : GardenManager
-            The garden manager whose plants are analyzed.
-        """
-        data = {"Plant": 0, "FloweringPlant": 0, "PrizeFlower": 0}
-        for plant in owner.get_plants():
-            if isinstance(plant, PrizeFlower):
-                data["PrizeFlower"] += 1
-            elif isinstance(plant, FloweringPlant):
-                data["FloweringPlant"] += 1
-            elif isinstance(plant, Plant):
-                data["Plant"] += 1
-
-        print(
-            f"Plant types: {data['Plant']} regular,"
-            f" {data['FloweringPlant']} flowering,"
-            f" {data['PrizeFlower']} prize flowers"
-        )
-
-    @staticmethod
-    def get_total_gardens(cls: type['GardenManager']):
-        """
-        Return the total number of gardens managed.
-
-        Returns
-        -------
-        str
-            A formatted summary of total gardens.
-        """
-        return f"Total gardens managed: {cls.total_gardens}"
 
 
 class Plant:
@@ -277,7 +277,7 @@ class FloweringPlant(Plant):
         super().__init__(name, height)
         self.__color = color
 
-    def describe(self) -> None:
+    def describe(self) -> str:
         """
         Describe the flowering plant.
 
@@ -318,7 +318,7 @@ class PrizeFlower(FloweringPlant):
         super().__init__(name, height, color)
         self.__points = points
 
-    def describe(self) -> None:
+    def describe(self) -> str:
         """
         Describe the prize flower.
 
@@ -353,7 +353,7 @@ def main() -> None:
     print("")
     print(alice.info())
 
-    GardenStats.plant_type(alice)
+    GardenManager.GardenStats.plant_type(alice)
     print("")
 
     print(f"Height validation test: {alice.height_test()}")
@@ -363,7 +363,7 @@ def main() -> None:
         f" {bob.get_owner()}: {bob.get_garden_score()}"
     )
 
-    print(GardenStats.get_total_gardens(GardenManager))
+    print(GardenManager.GardenStats.get_total_gardens(GardenManager))
 
 
 if __name__ == "__main__":
