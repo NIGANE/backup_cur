@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 def count(ele: str, data: list[str]) -> int:
     """
     Counts the occurrences of a specific string within a list.
