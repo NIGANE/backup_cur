@@ -1,20 +1,63 @@
+
+class GardenError(Exception):
+    """
+    Custom exception for garden-specific logic and hardware failures.
+    Inherits standard argument handling automatically from Exception.
+    Used to categorize errors distinct from standard Python exceptions.
+    Provides a clean way to filter garden-related issues in try blocks.
+    """
+    pass
+
+
 class GardenManager:
+    """
+    Manages a collection of plants and oversees watering and health validation.
+
+    This class acts as the central controller for garden operations,
+        maintaining internal state for plant data and system resources
+        like water levels.
+
+    Attributes:
+        wl (int): Initial water level for the garden tank.
+    """
 
     def __init__(s, wl: int = 0) -> None:
+        """
+        Initializes the GardenManager with an empty plant list
+            and a tank level.
+        """
         s.__plants = []
         s.__water_level = wl
 
     def add_plants(s, plants: list[str]) -> None:
+        """
+        Adds a list of plant dictionaries to the internal registry.
+
+        Args:
+            plants (list[dict]): A list of dictionaries, where each dict
+                must contain a 'name' key.
+
+        Raises:
+            GardenError: If a plant in the list has a 'None'
+                value for its name.
+        """
         try:
             for p in plants:
                 if (p["name"] is None):
-                    raise ValueError("Plant name cannot be empty!")
+                    raise GardenError("Plant name cannot be empty!")
                 s.__plants.append(p)
                 print(f"Added {p["name"]} successfully")
-        except ValueError as er:
+        except GardenError as er:
             print(f"Error adding plant: {er}")
 
     def water_plants(s) -> None:
+        """
+        Increments the water level of all registered plants.
+
+        Note:
+            Utilizes a 'finally' block to ensure the watering system hardware
+            (simulated) is always shut down safely.
+        """
         print("Opening watering system")
         try:
             for p in s.__plants:
@@ -24,6 +67,13 @@ class GardenManager:
             print("Closing watering system (cleanup)")
 
     def health_check(s) -> None:
+        """
+        Evaluates the health status of all plants based on water
+            and light levels.
+
+        If a plant exceeds safe thresholds, a GardenError containing a
+            dictionary of error details is raised and handled.
+        """
         print("Checking plant health...")
         try:
             for pl in s.__plants:
@@ -33,50 +83,62 @@ class GardenManager:
                         "message": (f"Water level {pl["water_level"]} "
                                     f"is too high (max 10)")
                                 }
-                    raise ValueError(err_obj)
+                    raise GardenError(err_obj)
                 if (pl["water_level"] < 1):
                     err_obj = {
                         "name": pl["name"],
                         "message": (f"Water level {pl["water_level"]} "
                                     f"is too low (min 1)")
                                 }
-                    raise ValueError(err_obj)
+                    raise GardenError(err_obj)
                 if (pl["sunlight_hours"] > 12):
                     err_obj = {
                         "name": pl["name"],
                         "message": f"Sunlight hours {pl["sunlight_hours"]} "
                         f"is too high (max 12)"
                     }
-                    raise ValueError(err_obj)
+                    raise GardenError(err_obj)
                 if (pl["sunlight_hours"] < 2):
                     err_obj = {
                         "name": pl["name"],
                         "message": f"Sunlight hours {pl["sunlight_hours"]} "
                         f"is too low (min 2)"
                     }
-                    raise ValueError(err_obj)
+                    raise GardenError(err_obj)
                 print(
                     f"{pl["name"]}: healthy (water: {pl["water_level"]}"
                     f", sun: {pl["sunlight_hours"]})"
                     )
-        except ValueError as e:
+        except GardenError as e:
             print(
                 f"Error checking {e.args[0]["name"]}: "
                 f"{e.args[0]["message"]}"
                 )
 
     def tank_check(s) -> None:
+        """
+        Checks the system's main water reservoir level.
+
+        Prints an error message if the tank is empty but ensures system
+            recovery through the use of a 'finally' block.
+        """
         try:
             if (s.__water_level < 1):
                 err = "Not enough water in tank"
-                raise ValueError(err)
-        except ValueError as er:
+                raise GardenError(err)
+        except GardenError as er:
             print(f"Caught GardenError: {er}")
         finally:
             print("System recovered and continuing...")
 
 
 def test_garden_management() -> None:
+    """
+    Simulates garden operations to test plant additions and health checks.
+    It verifies that the system handles invalid data and low water levels.
+    The test ensures that cleanup always occurs via try-finally blocks.
+    Final output confirms system stability and successful error recovery.
+    """
     print("=== Garden Management System ===\n")
     gardens = [
         {"name": "tomato", "water_level": 4, "sunlight_hours": 8},
