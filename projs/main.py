@@ -1,4 +1,4 @@
-ele = (1, 2, 3)
-re = iter(ele)
-print(next(re))
-print(next(re))
+data = {"name": "achraf", "age": 53}
+
+
+print(len(data))

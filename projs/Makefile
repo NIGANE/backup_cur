@@ -1,7 +1,10 @@
 NAME = ex4/ft_inventory_system.py
 CCC = python3
 
-ARGS0 = 
+
+main:
+	@$(CCC) main.py
+
 EX0 = ex0/ft_command_quest.py
 0:
 	@${CCC} ${EX0} 
@@ -26,3 +29,7 @@ EX4 = ex4/ft_inventory_system.py
 EX5 = ex5/ft_data_stream.py
 5:
 	@${CCC} ${EX5}
+
+EX6 = ex6/ft_analytics_dashboard.py
+6:
+	@${CCC} ${EX6}
