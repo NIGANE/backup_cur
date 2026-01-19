@@ -330,6 +330,11 @@ class PrizeFlower(FloweringPlant):
         return super().describe() + f", Prize points: {self.__points}"
 
 
+def add_plants_to_garden(garden: GardenManager, *plants: Plant) -> None:
+    for e in plants:
+        garden.add_plant(e)
+
+
 def main() -> None:
     """
     Run the Garden Manager demonstration.
@@ -343,7 +348,7 @@ def main() -> None:
     alice = GardenManager("alice", 218)
     bob = GardenManager("bob", 92)
 
-    alice.add_plant(oak, rose, sunflower)
+    add_plants_to_garden(alice, oak, rose, sunflower)
     print("")
 
     alice.plants_grow()
