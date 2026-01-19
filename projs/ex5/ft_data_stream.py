@@ -73,7 +73,12 @@ def is_prime(x: int) -> bool:
 
 
 def call_primes(x: int) -> list[int]:
-    return [ele for ele in range(x) if is_prime(ele)]
+    re = []
+    i = 0
+    while len(re) < x:
+        if is_prime(i):
+            re = [*re, i]
+    return re
 
 
 def ft_data_stream(data: list[dict]) -> None:
