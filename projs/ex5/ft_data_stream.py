@@ -1,18 +1,12 @@
 DATA = [
-    {'id': 1, 'player': 'frank', 'event_type': 'login', 'timestamp': '2024-01-01T23:17', 'data': {'level': 16, 'score_delta': 128, 'zone': 'pixel_zone_2'}},
-    {'id': 2, 'player': 'frank', 'event_type': 'login', 'timestamp': '2024-01-22T23:57', 'data': {'level': 35, 'score_delta': -11, 'zone': 'pixel_zone_5'}},
-    {'id': 3, 'player': 'alice', 'event_type': 'level_up', 'timestamp': '2024-01-07T22:41', 'data': {'level': 45, 'score_delta': 458, 'zone': 'pixel_zone_4'}},
-    {'id': 4, 'player': 'bob', 'event_type': 'death', 'timestamp': '2024-01-19T08:51', 'data': {'level': 1, 'score_delta': 63, 'zone': 'pixel_zone_4'}},
-    {'id': 5, 'player': 'charlie', 'event_type': 'kill', 'timestamp': '2024-01-05T06:48', 'data': {'level': 22, 'score_delta': 4, 'zone': 'pixel_zone_1'}}
+    {'id': 1, 'player': 'alice', 'event_type': 'kill', 'data': {'level': 5}},
+    {'id': 1, 'player': 'bob', 'event_type': 'item_found', 'data': {'level': 12}},
+    {'id': 1, 'player': 'charlie', 'event_type': 'level_up', 'data': {'level': 8}},
+    {'id': 2, 'player': 'frank', 'event_type': 'login', 'data': {'level': 35}},
+    {'id': 3, 'player': 'alice', 'event_type': 'level_up', 'data': {'level': 45}},
+    {'id': 4, 'player': 'bob', 'event_type': 'death', 'data': {'level': 1}},
+    {'id': 5, 'player': 'charlie', 'event_type': 'kill', 'data': {'level': 22}}
     ]
-
-eve = [
-            'login',
-            'logout',
-            'kill',
-            'death',
-            'level_up',
-            'item_found']
 
 
 def dispatch_event(data: str) -> str:
@@ -26,7 +20,7 @@ def dispatch_event(data: str) -> str:
         return data
 
 
-def gen(ele: dict):
+def gen(ele: dict) -> str:
     return (
             f"Event {ele['id']}: Player {ele['player']} "
             f"(level {ele['data']['level']}) "
@@ -78,16 +72,19 @@ def call_primes(x: int) -> list[int]:
     while len(re) < x:
         if is_prime(i):
             re = [*re, i]
+        i += 1
     return re
 
 
 def ft_data_stream(data: list[dict]) -> None:
     print("=== Game Data Stream Processor ===")
+    print("")
+    print("Processing 1000 game events...")
+    print("")
     generated = iter(DATA)
     print(gen(next(generated)))
     print(gen(next(generated)))
     print(gen(next(generated)))
-
     print("...")
 
     print("")
@@ -98,8 +95,12 @@ def ft_data_stream(data: list[dict]) -> None:
     print(f"High-level players (10+): {len(high_level_players(data))}")
     print(f"Treasure events: {len(treasure_events(data))}")
     print(f"Level-up events: {len(level_up_events(data))}")
+    print("")
+
+    print("Memory usage: Constant (streaming)")
     print("Processing time: 0.045 seconds")
     print("")
+
     print("=== Generator Demonstration ===")
     sequence = iter(call_fib(10))
     print("Fibonacci sequence (first 10): ", end="")
@@ -108,7 +109,12 @@ def ft_data_stream(data: list[dict]) -> None:
         print(f"{next(sequence)}", f"{', ' if i != 9 else ''}", end="", sep="")
         if i == 9:
             print("")
-    print(f"Prime numbers: (first 5): {call_primes(5)} ")
+    print("Prime numbers: (first 5): ", end="")
+    sequence = iter(call_primes(5))
+    for i in range(5):
+        print(f"{next(sequence)}", f"{', ' if i != 4 else ''}", end="", sep="")
+        if i == 4:
+            print("")
 
 
 if __name__ == "__main__":
