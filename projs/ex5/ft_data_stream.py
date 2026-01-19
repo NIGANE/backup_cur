@@ -46,6 +46,36 @@ def level_up_events(data: list[dict]) -> list[dict]:
     return [ele for ele in data if ele['event_type'] == "level_up"]
 
 
+def fib(x: int) -> int:
+    if (x == 0 or x == 1):
+        return x
+    if (x < 0):
+        return 0
+    return fib(x - 1) + fib(x - 2)
+
+
+def call_fib(x: int) -> list[int]:
+    i = 0
+    re = []
+    while i < x:
+        re = [*re, fib(i)]
+        i += 1
+    return re
+
+
+def is_prime(x: int) -> bool:
+    if (x < 2):
+        return False
+    return (
+        True if len([ele for ele in range(2, x) if x % ele == 0]) == 0
+        else False
+        )
+
+
+def call_primes(x: int) -> list[int]:
+    return [ele for ele in range(x) if is_prime(ele)]
+
+
 def ft_data_stream(data: list[dict]) -> None:
     print("=== Game Data Stream Processor ===")
     generated = iter(DATA)
@@ -66,6 +96,14 @@ def ft_data_stream(data: list[dict]) -> None:
     print("Processing time: 0.045 seconds")
     print("")
     print("=== Generator Demonstration ===")
+    sequence = iter(call_fib(10))
+    print("Fibonacci sequence (first 10): ", end="")
+    i = 0
+    for i in range(10):
+        print(f"{next(sequence)}", f"{', ' if i != 9 else ''}", end="", sep="")
+        if i == 9:
+            print("")
+    print(f"Prime numbers: (first 5): {call_primes(5)} ")
 
 
 if __name__ == "__main__":
