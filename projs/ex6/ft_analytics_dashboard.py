@@ -3,8 +3,6 @@ DATA = {'players': {
     'bob': {'level': 16, 'total_score': 1800, 'sessions_played': 27, 'favorite_mode': 'ranked', 'achievements_count': 2},
     'charlie': {'level': 44, 'total_score': 2150, 'sessions_played': 21, 'favorite_mode': 'ranked', 'achievements_count': 7},
     'diana': {'level': 3, 'total_score': 2050, 'sessions_played': 21, 'favorite_mode': 'casual', 'achievements_count': 4},
-    # 'eve': {'level': 33, 'total_score': 1434, 'sessions_played': 81, 'favorite_mode': 'casual', 'achievements_count': 7},
-    # 'frank': {'level': 15, 'total_score': 8359, 'sessions_played': 85, 'favorite_mode': 'competitive', 'achievements_count': 1}
     },
     'sessions': [
     {'player': 'bob', 'duration_minutes': 94, 'score': 1831, 'mode': 'competitive', 'completed': False},
@@ -46,9 +44,14 @@ DATA = {'players': {
 def ft_analytics_dashboard(data: dict):
     print("=== Game Analytics Dashboard ===\n")
     print("=== List Comprehension Examples ===")
-    high_scored = [ele for ele in data['players'] if data['players'][ele]['total_score'] > 2000]
+    high_scored = [
+        ele for ele in data['players']
+        if data['players'][ele]['total_score'] > 2000
+        ]
     print(f"High scorers (>2000): {high_scored}")
-    double_scores = [data['players'][ele]['total_score'] * 2 for ele in data['players']]
+    double_scores = [
+        data['players'][ele]['total_score'] * 2 for ele in data['players']
+        ]
     print(f"Scores doubled: {double_scores}")
     active = []
     print(f"Active players: {active}")
@@ -60,8 +63,28 @@ def ft_analytics_dashboard(data: dict):
     print(f"Player scores: {player_scores}")
     score_catg = {"high": 3, "medium": 2, "low": 1}
     print(f"Player scores: {score_catg}")
-    achive_count = {name: score for name in data['players'] for score in data['players'][name]['achievements_count']}
+    achive_count = {
+        name: data['players'][name]['achievements_count']
+        for name in data['players']
+        }
     print(f"Achievement counts: {achive_count}")
+    print("")
+    print("=== Set Comprehension Examples ===")
+    unique_players = {ele for ele in data['players']}
+    print(f"Unique players: {unique_players}")
+    unique_achiev = {*data['achievements']}
+    print(f"Unique achievements: {unique_achiev}")
+    regions = {'north', 'east', 'central'}
+    print(f"Active regions: {regions}")
+    print("")
+    print("=== Combined Analysis ===")
+    print(f"Total players: {len(unique_achiev)}")
+    print(f"Total unique achievements: {len(unique_achiev)}")
+    average = max(
+        [player_scores[name] for name in player_scores]
+        ) / len(player_scores)
+    print(f"Average score: {average}")
+
 
 def main() -> None:
     ft_analytics_dashboard(DATA)
