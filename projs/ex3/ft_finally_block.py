@@ -24,6 +24,7 @@ def water_plants(plant_list: list[str]) -> None:
         regardless of whether the operation succeeded or failed.
     """
     print("Opening watering system")
+    err = 0
     try:
         for plant in plant_list:
             if (plant is None):
@@ -31,8 +32,11 @@ def water_plants(plant_list: list[str]) -> None:
             print(f"Watering {plant}")
     except WaterError as we:
         print(f"Error: {we}")
+        err = 1
     finally:
         print("Closing watering system (cleanup)")
+    if (not err):
+        print("Watering completed successfully!")
 
 
 def test_watering_system() -> None:
@@ -40,15 +44,19 @@ def test_watering_system() -> None:
     Tests the watering system with both valid and invalid plant lists to
     demonstrate custom exception handling and system cleanup.
     """
-    print("=== Garden Watering System ===\n")
+    print("=== Garden Watering System ===")
+    print("")
+
     print("Testing normal watering...")
     good_plants = ["tomato", "lettuce", "carrots"]
     water_plants(good_plants)
-    print("Watering completed successfully!")
+
     print("")
+
     print("Testing with error...")
     bad_plants = ["tomato", None]
     water_plants(bad_plants)
+
     print("")
     print("Cleanup always happens, even with errors!")
 

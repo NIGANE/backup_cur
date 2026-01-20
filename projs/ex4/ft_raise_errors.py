@@ -45,18 +45,27 @@ def test_plant_checks() -> None:
     Runs automated tests against check_plant_health to verify boundary
         validation and error message formatting.
     """
-    print("=== Garden Plant Health Checker ===\n")
+    print("=== Garden Plant Health Checker ===")
+    print("")
+
     print("Testing good values...")
     check_plant_health("tomato", 2, 2)
+
     print("")
+
     print("Testing empty plant name...")
     check_plant_health(None, 2, 2)
+
     print("")
+
     print("Testing bad water level...")
     check_plant_health("tomato", 15, 2)
+
     print("")
+
     print("Testing bad sunlight hours...")
     check_plant_health("tomato", 2, 0)
+
     print("")
     print("All error raising tests completed!")
 

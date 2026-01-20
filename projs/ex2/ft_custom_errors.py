@@ -5,8 +5,9 @@ class GardenError(Exception):
 
 class PlantError(GardenError):
     """Exception raised for errors related to plants in the garden."""
-    def __init__(self, message="issue with the plant."):
-        super().__init__(f"{message}")
+    # def __init__(self, message="issue with the plant."):
+    #     super().__init__(f"{message}")
+    pass
 
 
 class WaterError(GardenError):
@@ -16,18 +17,20 @@ class WaterError(GardenError):
 
 def ft_custom_errors() -> None:
     """Function to demonstrate custom error handling in a garden context."""
-    plant = {"name": "tomato", "status": "wiltintg"}
+    plant = {"name": "tomato", "status": "wilting"}
     water_level = 0
+
     print("=== Custom Garden Errors Demo ===")
     print("")
     print("Testing PlantError...")
     try:
-        if (plant["status"] == "wiltintg"):
+        if (plant["status"] == "wilting"):
             raise PlantError(
                 f"The {plant['name']} plant is wilting!"
                 )
     except (PlantError) as pe:
         print("Caught PlantError: " + str(pe))
+
     print("")
     print("Testing WaterError...")
     try:
@@ -35,11 +38,12 @@ def ft_custom_errors() -> None:
             raise WaterError("Not enough water in the tank!")
     except WaterError as we:
         print("Caught WaterError: " + str(we))
+
     print("")
     print("Testing catching all garden errors...")
 
     try:
-        if (plant["status"] == "wiltintg"):
+        if (plant["status"] == "wilting"):
             raise PlantError(
                 f"The {plant['name']} plant is wilting!"
                 )

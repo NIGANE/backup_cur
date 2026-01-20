@@ -38,7 +38,8 @@ def test_temperature_input() -> None:
     Tests include a valid temperature, a non-numeric string, and values
     exceeding the high and low safety boundaries.
     """
-    print("=== Garden Temperature Checker ===\n")
+    print("=== Garden Temperature Checker ===")
+    print("")
     print("Testing temperature: 25")
     check_temperature("25")
     print("")

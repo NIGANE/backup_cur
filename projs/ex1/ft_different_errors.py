@@ -1,4 +1,4 @@
-def garden_operations(err_type: str) -> int:
+def garden_operations(err_type: str) -> None:
     """
     Triggers specific Python exceptions based
         on the provided error type string.
@@ -22,14 +22,15 @@ def garden_operations(err_type: str) -> int:
         (accessing a missing dictionary key).
     """
     if err_type == "value":
-        return int("abc")
+        int("abc")
     elif err_type == "zero":
-        return 4 / 0
+        x = 4 / 0
+        print(x)
     elif err_type == "file":
-        return open("missing.txt")
+        open("missing.txt")
     elif err_type == "key":
         d: dict[str, str] = {"name": "achraf"}
-        return d['missing_plant']
+        d['missing_plant']
 
 
 def test_error_types() -> None:
@@ -40,7 +41,8 @@ def test_error_types() -> None:
     Each operation is wrapped in a try-except-finally block to ensure that
         the program flow continues even after an error is encountered.
     """
-    print("=== Garden Error Types Demo ===\n")
+    print("=== Garden Error Types Demo ===")
+    print("")
     print("Testing ValueError...")
     try:
         garden_operations("value")
