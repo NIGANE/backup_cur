@@ -32,7 +32,7 @@ def ft_score_analytics() -> None:
             while (i < count):
                 if (not valid_integer(args[i])):
                     raise ValueError(
-                        "oops, I typed 'banana' instead of '1000'"
+                        f"oops, I typed '{args[i]}' instead of '1000'"
                         )
                 data.append(int(args[i]))
                 i += 1

@@ -114,6 +114,7 @@ def ft_inventory_system() -> None:
                 )
             print(f"Unique item types: {ne_count(ele for ele in data.keys())}")
         print("")
+
         print("=== Current Inventory ===")
         for key, value in data.items():
             print(
@@ -121,6 +122,7 @@ def ft_inventory_system() -> None:
                 f"({round(value, data):.1f}%)"
                 )
         print("")
+
         print("=== Inventory Statistics ===")
         print(f"Most abundant: {ne_max(data)} ({data[ne_max(data)]} units)")
         print(
@@ -128,13 +130,16 @@ def ft_inventory_system() -> None:
             f"{'units' if data.get(ne_min(data), 0) >= 2 else 'unit'})"
             )
         print("")
+
         print("=== Item Categories ===")
         print(f"Moderate: {modern(data)}")
         print(f"Scarce: {scare(data)}")
         print("")
+
         print("=== Management Suggestions ===")
         print(f"Restock needed: {needed(data)}")
         print("")
+
         print("=== Dictionary Properties Demo ===")
         print(f"Dictionary keys: {[*data.keys()]}")
         print(f"Dictionary values: {[*data.values()]}")

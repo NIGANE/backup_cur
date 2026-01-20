@@ -53,6 +53,7 @@ def ft_achievement_tracker(data: dict) -> None:
     for key, value in data.items():
         print(f"Player {key} achievements: {set(value)}")
     print("")
+
     print("=== Achievement Analytics ===")
     for key in data:
         my_set = my_set.union(set(data[key]))
@@ -61,9 +62,11 @@ def ft_achievement_tracker(data: dict) -> None:
     print(f"All unique achievements: {my_set}")
     print(f"Total unique achievements: {len(my_set)}")
     print("")
+
     print(f"Common to all players: {inter}")
     print(f"Rare achievements (1 player): {rare_achivments(group)}")
     print("")
+
     print(
         f"Alice vs Bob common: "
         f"{set(data['alice']).intersection(set(data['bob']))}"
