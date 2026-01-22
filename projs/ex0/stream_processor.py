@@ -35,7 +35,7 @@ class NumericProcessor(DataProcessor):
             return True
 
     def format_output(self, result: str) -> str:
-        pass
+        print()
 
 
 class TextProcessor(DataProcessor):
