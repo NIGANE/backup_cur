@@ -6,7 +6,10 @@ def parsing_cordinates(data: str) -> tuple[int]:
     storing = []
     try:
         for ele in data.split(','):
-            storing.append(int(ele))
+            if "." in ele:
+                storing.append(float(ele))
+            else:
+                storing.append(int(ele))
         if ne_len(storing) > 3:
             raise ValueError("too many values to unpack (expected 3)")
         return (storing[0], storing[1], storing[2])
@@ -33,11 +36,14 @@ def ft_coordinate_system(data: tuple[int]) -> None:
         i = 0
         if ne_len(data) > 3:
             raise ValueError("too many values to unpack (expected 3)")
+        elif ne_len(data) < 3:
+            raise ValueError("not enough values to unpack (expected 3, got 2)")
         while i < ne_len(data):
             re = (*re, int(data[i]))
             i += 1
     except ValueError as e:
-        print(e)
+        print(f"invalid coordinates: \"{data}\"")
+        print(f"Error details - Type: {type(e).__name__}, Args: {e.args}")
     else:
         x2, y2, z2 = data
         x1, y1, z1 = (0, 0, 0)
@@ -56,11 +62,15 @@ def unpacke(data: tuple[int]) -> None:
         i = 0
         if ne_len(data) > 3:
             raise ValueError("too many values to unpack (expected 3)")
+        elif ne_len(data) < 3:
+            raise ValueError("not enough values to unpack (expected 3, got 2)")
         while i < ne_len(data):
             re = (*re, int(data[i]))
             i += 1
     except ValueError as e:
-        print(e)
+        print(f"unpacking invalid coordinates: \"{data}\"")
+        print(f"Error unpacking coordinates: {e}")
+        print(f"Error details - Type: {type(e).__name__}, Args: {e.args}")
     else:
         print(f"Playser at x={data[0]}, y={data[1]}, z={data[2]}")
         print(f"Coordinates: X={data[0]}, Y={data[1]}, Z={data[2]}")

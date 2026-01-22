@@ -1,15 +1,5 @@
 #!/usr/bin/python3
-def count(ele: str, data: list[str]) -> int:
-    """
-    Counts the occurrences of a specific string within a list.
-
-    Args:
-        ele: The string achievement to look for.
-        data: A list of achievement strings to search through.
-
-    Returns:
-        The total number of times the achievement appears in the data.
-    """
+def count(ele: str, data: set[str]) -> int:
     count = 0
     for item in data:
         if (ele == item):
@@ -18,38 +8,20 @@ def count(ele: str, data: list[str]) -> int:
 
 
 def rare_achivments(data: list[str]) -> set[str]:
-    """
-    Identifies achievements that appear exactly once across all players.
-
-    Args:
-        data: A flattened list of all achievements from all players.
-
-    Returns:
-        A set of achievement strings that are unique to a single player.
-    """
-    rare = []
+    rare = set()
     for ele in data:
         if count(ele, data) == 1:
-            rare.append(ele)
-    return set(rare)
+            rare = {*rare, ele}
+    return rare
 
 
 def ft_achievement_tracker(data: dict) -> None:
-    """
-    Processes and displays analytics for player achievements.
-
-    Calculates universal unique achievements, common achievements across all
-        players, rare achievements, and specific comparisons between Alice
-        and Bob.
-
-    Args:
-        data: A dictionary where keys are player names and values are
-            lists of their achievement strings.
-    """
     my_set = set()
-    group = []
+    group = list()
     inter = set(data[[*data][0]])
     print("=== Achievement Tracker System ===")
+    print("")
+
     for key, value in data.items():
         print(f"Player {key} achievements: {set(value)}")
     print("")
@@ -76,9 +48,6 @@ def ft_achievement_tracker(data: dict) -> None:
 
 
 def main() -> None:
-    """
-    Entry point of the script to initialize sample data and run the tracker.
-    """
     data = {
         'alice': ['first_kill', 'level_10', 'treasure_hunter', 'speed_demon'],
         'bob': ['first_kill', 'level_10', 'boss_slayer', 'collector'],
