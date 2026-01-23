@@ -154,7 +154,7 @@ DATA = {'players': {
 }
 
 
-def ft_analytics_dashboard(data: dict):
+def ft_analytics_dashboard(data: dict) -> None:
     print("=== Game Analytics Dashboard ===\n")
     print("=== List Comprehension Examples ===")
     high_scored = [
@@ -211,7 +211,7 @@ def ft_analytics_dashboard(data: dict):
     average = max(
         [player_scores[name] for name in player_scores]
         ) / len(player_scores)
-    print(f"Average score: {average}")
+    print(f"Average score: {average:.2f}")
     performer_player = [name for name in data['players'] if name == 'alice']
     print(f"Top performer: {performer_player[0]} "
           f"({data['players'][performer_player[0]]['total_score']} points, "
@@ -220,9 +220,5 @@ def ft_analytics_dashboard(data: dict):
           )
 
 
-def main() -> None:
-    ft_analytics_dashboard(DATA)
-
-
 if __name__ == "__main__":
-    main()
+    ft_analytics_dashboard(DATA)

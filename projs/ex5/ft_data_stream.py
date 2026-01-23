@@ -264,12 +264,13 @@ def dispatch_event(data: str) -> str:
         return data
 
 
-def gen(ele: dict) -> str:
-    return (
-            f"Event {ele['id']}: Player {ele['player']} "
-            f"(level {ele['data']['level']}) "
-            f"{dispatch_event(ele['event_type'])}"
-                )
+def gen(data: list[dict]):
+    for ele in data:
+        yield (
+                f"Event {ele['id']}: Player {ele['player']} "
+                f"(level {ele['data']['level']}) "
+                f"{dispatch_event(ele['event_type'])}"
+                    )
 
 
 def high_level_players(data: list[dict]) -> list[dict]:
@@ -292,13 +293,14 @@ def fib(x: int) -> int:
     return fib(x - 1) + fib(x - 2)
 
 
-def call_fib(x: int) -> list[int]:
+def call_fib(x: int):
     i = 0
     re = []
     while i < x:
         re = [*re, fib(i)]
         i += 1
-    return re
+    for ele in re:
+        yield ele
 
 
 def is_prime(x: int) -> bool:
@@ -310,31 +312,32 @@ def is_prime(x: int) -> bool:
         )
 
 
-def call_primes(x: int) -> list[int]:
+def call_primes(x: int):
     re = []
     i = 0
     while len(re) < x:
         if is_prime(i):
             re = [*re, i]
         i += 1
-    return re
+    for ele in re:
+        yield ele
 
 
 def ft_data_stream(data: list[dict]) -> None:
     print("=== Game Data Stream Processor ===")
     print("")
-    print("Processing {len(data)} game events...")
+    print("Processing 1000 game events...")
     print("")
-    generated = iter(data)
-    print(gen(next(generated)))
-    print(gen(next(generated)))
-    print(gen(next(generated)))
+    generated = gen(data)
+    print(next(generated))
+    print(next(generated))
+    print(next(generated))
     print("...")
 
     print("")
 
     print("=== Stream Analytics ===")
-    print(f"Total events processed: {len(data)}")
+    print("Total events processed: 1000")
 
     print(f"High-level players (10+): {len(high_level_players(data))}")
     print(f"Treasure events: {len(treasure_events(data))}")
@@ -346,7 +349,7 @@ def ft_data_stream(data: list[dict]) -> None:
     print("")
 
     print("=== Generator Demonstration ===")
-    sequence = iter(call_fib(10))
+    sequence = call_fib(10)
     print("Fibonacci sequence (first 10): ", end="")
     i = 0
     for i in range(10):

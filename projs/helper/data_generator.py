@@ -145,7 +145,7 @@ class PixelDataGenerator:
             'catalog': self.items
         }
 
-    def _events_for_stream(self, count: int = 50) -> List[Dict[str, Any]]:
+    def _events_for_stream(self, count: int = 1000) -> List[Dict[str, Any]]:
         """Generate game events for generator/streaming practice."""
         event_types = [
             'login',
