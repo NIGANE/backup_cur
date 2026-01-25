@@ -4,11 +4,11 @@ from abc import ABCMeta, abstractmethod
 
 class DataStream(metaclass=ABCMeta):
 
-    def __init__(self, id):
+    def __init__(self, id: str):
         self.stream_id = id
 
     @abstractmethod
-    def process_batch(s, data_batch: List[Any]) -> str:
+    def process_batch(self, data_batch: List[Any]) -> str:
         pass
 
     def filter_data(
@@ -31,20 +31,20 @@ class SensorStream(DataStream):
         print("Initializing Sensor Stream...")
         print(f"Stream ID: {self.stream_id}, Type: {self.type}")
 
-    def process_batch(s, data_batch: List[Any]) -> str:
+    def process_batch(self, data_batch: List[Any]) -> str:
         temps = []
         for ele in data_batch:
             if isinstance(ele, str) and ":" in ele:
                 key, value = ele.split(":")
                 if key.strip() == "temp":
-                    s.records.append(ele)
+                    self.records.append(ele)
                     temps.append(float(value))
                 elif key.strip() == "humidity":
-                    s.records.append(ele)
+                    self.records.append(ele)
                 elif key.strip() == "pressure":
-                    s.records.append(ele)
+                    self.records.append(ele)
 
-        return (f"Sensor analysis: {len(s.records)} "
+        return (f"Sensor analysis: {len(self.records)} "
                 f"readings processed, avg temp: {sum(temps) / len(temps)}°C")
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
@@ -62,7 +62,7 @@ class TransactionStream(DataStream):
         print("Initializing Transaction Stream...")
         print(f"Stream ID: {self.stream_id}, Type: {self.type}")
 
-    def process_batch(s, data_batch: List[Any]) -> str:
+    def process_batch(self, data_batch: List[Any]) -> str:
         bought = []
         sold = []
 
@@ -70,12 +70,12 @@ class TransactionStream(DataStream):
             if isinstance(ele, str) and ":" in ele:
                 key, value = ele.split(":")
                 if key.strip().startswith("buy"):
-                    s.records.append(ele)
+                    self.records.append(ele)
                     bought.append(int(value))
                 elif key.strip().startswith("sell"):
-                    s.records.append(ele)
+                    self.records.append(ele)
                     sold.append(int(value))
-        print(f"Processing transaction batch: {s.records}")
+        print(f"Processing transaction batch: {self.records}")
         total_units = sum(bought) - sum(sold)
         return (
             f"Transaction analysis: {len(bought) + len(sold)} operations, "
@@ -97,12 +97,12 @@ class EventStream(DataStream):
         print("Initializing Event Stream...")
         print(f"Stream ID: {self.stream_id}, Type: {self.type}")
 
-    def process_batch(s, data_batch: List[Any]) -> str:
-        s.records = [ele for ele in data_batch if ":" not in ele]
-        print(f"Processing event batch: {s.records}")
-        count_err = len([ele for ele in s.records if ele == "error"])
+    def process_batch(self, data_batch: List[Any]) -> str:
+        self.records = [ele for ele in data_batch if ":" not in ele]
+        print(f"Processing event batch: {self.records}")
+        count_err = len([ele for ele in self.records if ele == "error"])
         return (
-            f"Event analysis: {len(s.records)} events, "
+            f"Event analysis: {len(self.records)} events, "
             f"{count_err} error detected"
             )
 
