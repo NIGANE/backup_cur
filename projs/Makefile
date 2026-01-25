@@ -8,3 +8,6 @@ main:
 
 1:
 	@$(PY) ex1/data_stream.py
+
+2:
+	@$(PY) ex2/nexus_pipeline.py
