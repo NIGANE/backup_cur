@@ -18,7 +18,8 @@ class DataStream(metaclass=ABCMeta):
 class SensorStream():
     def __init__(self, id):
         self.stream_id = id
-        print("")
+        print("Initializing Sensor Stream...")
+
     def process_batch(s, data_batch: List[Any]) -> str:
         pass
     pass
