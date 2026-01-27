@@ -1,14 +1,6 @@
-import pdb; 
-pdb.pm()
-def main():
-    breakpoint()
-    print("hello orld")
-    x = [1, 2, 3].__str__()
-    print(x)
-    print(type(int))
-    print(int)
 
+__all__ = "hello world"
 
 if __name__ == "__main__":
-    main()
+    print(__all__)
     pass
