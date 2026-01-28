@@ -4,7 +4,7 @@ from alchemy.transmutation import (
     )
 
 
-def main():
+def main() -> None:
     print()
     print("=== Pathway Debate Mastery ===")
     print()
