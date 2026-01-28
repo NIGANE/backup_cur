@@ -12,6 +12,8 @@ main:
 3:
 	@$(PY) ft_pathway_debate.py
 
+4:
+	@$(PY) ft_circular_curse.py
 
 clean:
 	@rm -rf */__pycache__
