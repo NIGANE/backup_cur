@@ -4,8 +4,7 @@ def read_data(file_name: str) -> None:
         print("Inscribing preservation data...")
         data = open(file_name, "r")
         if (data is False):
-            print("Error")
-            return
+            raise Exception()
     except Exception:
         print(" ERROR: Storage vault not found")
     else:
@@ -19,8 +18,8 @@ def ft_archive_creation(file_name: str) -> None:
     try:
         print(f"Initializing new storage unit: {file_name}")
         file = open(file_name, "w")
-    except Exception as e:
-        print(e)
+    except Exception:
+        print("ERROR: Storage vault not found")
     else:
         file.write("[ENTRY 001] New quantum algorithm discovered\n")
         file.write("[ENTRY 002] Efficiency increased by 347%\n")
