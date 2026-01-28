@@ -1,6 +1,5 @@
-from typing import Any, List, Union, Optional, Dict, Protocol
+from typing import Any, List, Protocol
 from abc import ABC, abstractmethod
-
 
 
 class ProcessingStage(Protocol):
@@ -20,7 +19,6 @@ class ProcessingPipeline(ABC):
     @abstractmethod
     def process(self, data: Any) -> Any:
         pass
-
 
 
 class InputStage:
@@ -48,8 +46,7 @@ class OutputStage:
                 )
         if isinstance(data, list):
             return f"User activity logged: {len(data) - 1} actions processed"
-        return (f"Stream summary: 5 readings, avg: 22.1°C")
-
+        return ("Stream summary: 5 readings, avg: 22.1°C")
 
 
 class JSONAdapter(ProcessingPipeline):
@@ -74,7 +71,6 @@ class StreamAdapter(ProcessingPipeline):
         for stage in self.stages:
             curr = stage.process(curr)
         return curr
-
 
 
 class NexusManager:
