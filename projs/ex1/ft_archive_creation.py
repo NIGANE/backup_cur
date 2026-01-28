@@ -6,8 +6,8 @@ def read_data(file_name: str) -> None:
         if (data is False):
             print("Error")
             return
-    except (FileNotFoundError, PermissionError) as e:
-        print(e)
+    except Exception:
+        print(" ERROR: Storage vault not found")
     else:
         print(data.read())
         data.close()
@@ -19,7 +19,7 @@ def ft_archive_creation(file_name: str) -> None:
     try:
         print(f"Initializing new storage unit: {file_name}")
         file = open(file_name, "w")
-    except (FileNotFoundError, PermissionError) as e:
+    except Exception as e:
         print(e)
     else:
         file.write("[ENTRY 001] New quantum algorithm discovered\n")

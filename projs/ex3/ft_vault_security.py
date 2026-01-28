@@ -18,7 +18,7 @@ def ft_vault_security(file_name: str, file_name2: str) -> None:
                 f_to.write("\n" + text)
             print("Vault automatically sealed upon completion")
         print("")
-    except (FileNotFoundError, PermissionError) as e:
+    except Exception as e:
         print(e)
     print("All vault operations completed with maximum security.")
 

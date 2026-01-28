@@ -1,4 +1,5 @@
 
+
 def ft_ancient_text(file_name: str) -> None:
     print("=== CYBER ARCHIVES - DATA RECOVERY SYSTEM ===")
     print("")
@@ -9,8 +10,8 @@ def ft_ancient_text(file_name: str) -> None:
         if (data is False):
             print("Error")
             return
-    except FileNotFoundError as e:
-        print(e)
+    except Exception:
+        print(" ERROR: Storage vault not found")
     else:
         print("Connection established...")
         print("")
