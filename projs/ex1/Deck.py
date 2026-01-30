@@ -1,5 +1,6 @@
 from ex0 import Card, CreatureCard
-from ex1 import ArtifactCard, SpellCard
+from ex1.ArtifactCard import ArtifactCard
+from ex1.SpellCard import SpellCard
 
 
 class Deck:
@@ -43,8 +44,8 @@ class Deck:
         avg_cost = sum([ele.cost for ele in self.cards]) / len(self.cards)
         return {
             "total_cards": len(self.cards),
-            "creatures": len(crea),
-            "spells": len(spells),
-            "artifacts": len(art),
+            "creatures": crea,
+            "spells": spells,
+            "artifacts": art,
             "avg_cost": avg_cost
         }
