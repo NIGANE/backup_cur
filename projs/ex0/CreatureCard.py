@@ -12,7 +12,6 @@ class CreatureCard(Card):
 
     def play(self, game_state: dict) -> dict:
         playable = self.is_playable(game_state['mana'])
-        print(f"Playable: {playable}")
         if playable:
             return {
                 "card_played": self.name,

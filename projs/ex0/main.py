@@ -14,11 +14,13 @@ def main() -> None:
     print()
 
     print("Playing Fire Dragon with 6 mana available:")
-    re = new_card.play({
+    data = {
         "name": "Mana Crystal",
         "cost": 2, "rarity": "Common", "durability": 5,
         "effect": "Permanent: +1 mana per turn", "mana": 6
-        })
+        }
+    re = new_card.play(data)
+    print(f"Playable: {new_card.is_playable(data['mana'])}")
     print(f"Play result: {re}")
     print()
 
@@ -30,11 +32,15 @@ def main() -> None:
     print()
 
     print("Testing insufficient mana (3 available):")
-    new_card.play({
+    fault_data = {
         "name": "Mana Crystal",
         "cost": 2, "rarity": "Common", "durability": 5,
         "effect": "Permanent: +1 mana per turn", "mana": 3
-    })
+    }
+    new_card.play(fault_data)
+    print(f"Playable: {new_card.is_playable(fault_data['mana'])}")
+    print()
+    print("Abstract pattern successfully demonstrated!")
 
 
 if __name__ == "__main__":
