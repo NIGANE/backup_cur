@@ -30,7 +30,7 @@ def main() -> None:
     print(
             f"Playing {self.name} with "
             "6 mana available:"
-            )
+            )   
 
 if __name__ == "__main__":
     main()
