@@ -18,10 +18,14 @@ class Deck:
             print(e)
 
     def remove_card(self, card_name: str) -> bool:
-        pass
+        for ele in self.cards:
+            if ele.name == card_name:
+                self.cards.remove(ele)
+                return True
+        return False
 
     def shuffle(self) -> None:
-        pass
+        self.cards = [*{*self.cards}]
 
     def draw_card(self) -> Card:
         pass
@@ -36,7 +40,7 @@ class Deck:
         art = len(
             [ele for ele in self.cards if isinstance(ele, ArtifactCard)]
         )
-        avg_cost = max([ele.cost for ele in self.cards]) / len(self.cards)
+        avg_cost = sum([ele.cost for ele in self.cards]) / len(self.cards)
         return {
             "total_cards": len(self.cards),
             "creatures": len(crea),
