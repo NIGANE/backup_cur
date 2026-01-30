@@ -5,3 +5,6 @@ main:
 
 0:
 	@$(PY) -m ex0.main
+
+1:
+	@$(PY) -m ex1.main

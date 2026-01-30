@@ -14,5 +14,11 @@ def main() -> None:
     print("Drawing and playing cards:")
     print()
 
-    print("Drew: Ljightning Bolt (Spell)")
-    deck
+
+    
+
+    print()
+    print("Polymorphism in action: Same interface, different card behaviors!")
+
+if __name__ == "__main__":
+    main()
