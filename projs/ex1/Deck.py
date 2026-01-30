@@ -1,6 +1,12 @@
 from ex0 import Card, CreatureCard
 from ex1.ArtifactCard import ArtifactCard
 from ex1.SpellCard import SpellCard
+from typing import Generator
+
+
+def gen_card(data: list[Card]) -> Generator:
+    for e in data:
+        yield e
 
 
 class Deck:
@@ -29,7 +35,8 @@ class Deck:
         self.cards = [*{*self.cards}]
 
     def draw_card(self) -> Card:
-        pass
+        ele = gen_card(self.cards)
+        ele.play()
 
     def get_deck_stats(self) -> dict:
         crea = len(
