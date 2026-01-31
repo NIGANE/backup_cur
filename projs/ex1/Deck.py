@@ -36,7 +36,7 @@ class Deck:
 
     def draw_card(self) -> Card:
         ele = gen_card(self.cards)
-        ele.play()
+        return ele.play()
 
     def get_deck_stats(self) -> dict:
         crea = len(
