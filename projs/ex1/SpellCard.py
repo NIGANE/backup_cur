@@ -10,7 +10,7 @@ class SpellCard(Card):
 
     def play(self, game_state: dict) -> dict:
         return {
-             'card_played': self.name, 'mana_used': game_state['mana'],
+             'card_played': self.name, 'mana_used': self.cost,
              'effect': self.effect_type
             }
 

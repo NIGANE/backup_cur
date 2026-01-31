@@ -35,8 +35,8 @@ class Deck:
         self.cards = [*{*self.cards}]
 
     def draw_card(self) -> Card:
-        ele = gen_card(self.cards)
-        return ele.play()
+        ele = iter(self.cards)
+        return ele
 
     def get_deck_stats(self) -> dict:
         crea = len(
