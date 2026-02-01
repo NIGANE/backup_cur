@@ -14,3 +14,7 @@ main:
 
 3:
 	@$(PY) -m ex3.main
+
+
+clean:
+	rm -rf */__pycache__
