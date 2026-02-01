@@ -1,7 +1,6 @@
-from ex3.SupportedCards import SupportedCards
+from enum import Enum
 from ex1.Deck import Deck
 from ex3.CardFactory import CardFactory
-from ex3.CardTypes import CardTypes
 from ex0.CreatureCard import CreatureCard
 from ex1.SpellCard import SpellCard
 from ex1.ArtifactCard import ArtifactCard
@@ -26,6 +25,18 @@ cards = {
         "effect_type": "damage"
         },
 }
+
+
+class SupportedCards(Enum):
+    CREATURE = ['dragon', 'goblin']
+    SPELL = ["fireball"]
+    ARTIFACT = ["mana_ring"]
+
+
+class CardTypes(Enum):
+    CREATURE = "Creature"
+    SPELL = "Spell"
+    ARTIFACT = "Artifact"
 
 
 class FantasyCardFactory(CardFactory):

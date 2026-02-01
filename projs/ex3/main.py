@@ -1,7 +1,7 @@
 from ex3.GameEngine import GameEngine
 from ex3.AggressiveStrategy import AggressiveStrategy
 from ex3.FantasyCardFactory import FantasyCardFactory
-from ex3.CardTypes import CardTypes
+from ex3.FantasyCardFactory import CardTypes
 
 
 def format_hand(data: list) -> None:
