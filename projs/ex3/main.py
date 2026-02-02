@@ -44,9 +44,8 @@ def main() -> None:
     format_hand([f"{ele.name} ({ele.cost})" for ele in hand])
     print()
     battlefield = []
-    strategy.execute_turn(hand, battlefield)
-    turn2 = strategy.execute_turn(hand, battlefield)
-    format_turn(turn2)
+    turn = strategy.execute_turn(hand, battlefield)
+    format_turn(turn)
     print()
 
     print("Game Report: ")

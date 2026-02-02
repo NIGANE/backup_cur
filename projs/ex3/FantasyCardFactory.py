@@ -24,6 +24,11 @@ cards = {
         "rarity": "rare",
         "effect_type": "damage"
         },
+    "Ice Wizard": {
+        "cost": 2,
+        "rarity": "Common",
+        "effect_type": "damage"
+    }
 }
 
 

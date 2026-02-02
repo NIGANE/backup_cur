@@ -8,7 +8,7 @@ class AggressiveStrategy(GameSrategy):
         s.damage = 8
 
     def execute_turn(self, hand: list, battlefield: list) -> dict:
-        if len(hand) > 0:
+        while len(hand) > 0 and sum([card.cost for card in battlefield]) < 5:
             card = hand.pop()
             battlefield.append(card)
         return {
