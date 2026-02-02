@@ -10,10 +10,21 @@ def main() -> None:
     print()
 
     print("Registering Tournament Cards...")
-    card_ = FantasyCardFactory().get_card(CardTypes.CREATURE)("Fire Dragon")
-    tourn_card = TournamentCard("dragon_001", card, 1200)
+    card_1 = FantasyCardFactory().get_card(CardTypes.CREATURE)("Fire Dragon")
+    card_2 = FantasyCardFactory().get_card(CardTypes.SPELL)("Ice Wizard")
+    played_card1 = TournamentCard("dragon_001", card_1, 1200)
+    played_card2 = TournamentCard("wizard_001", card_2, 1150)
     platform = TournamentPlatform()
-    platform.register_card(tourn_card)
+
+    platform.register_card(played_card1)
+    print()
+
+    platform.register_card(played_card2)
+    print()
+
+    print("Creating tournament match...")
+    # print(played_card1.card_id)
+    platform.create_match(played_card1.card_id, played_card2.card_id)
 
 
 

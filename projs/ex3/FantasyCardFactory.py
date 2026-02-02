@@ -44,7 +44,7 @@ class CardTypes(Enum):
     ARTIFACT = "Artifact"
 
 
-class FantasyCardFactory(CardFactory):
+class wFantasyCardFactory(CardFactory):
 
     def __init__(s):
         s._register = {

@@ -9,13 +9,16 @@ class TournamentCard(Card, Combatable, Rankable):
         s.card_id = id_card
         s.interfaces = [Card, Combatable, Rankable]
         s.rating = rating
-        s.record = [0, 0]
+        s.wins = 0
+        s.losses = 0
+        s.record = [s.wins, s.losses]
 
     def play(self, game_state: dict) -> dict:
-        pass
+        return self.card.play()
 
-    def attack(s, target) -> dict:
-        pass
+    def attack(s, target: Card) -> dict:
+        
+        return {}
 
     def defend(s, incoming_damage: int) -> dict:
         pass
