@@ -17,7 +17,7 @@ class TournamentCard(Card, Combatable, Rankable):
         return self.card.play()
 
     def attack(s, target: Card) -> dict:
-        
+        while (target.cost > )
         return {}
 
     def defend(s, incoming_damage: int) -> dict:

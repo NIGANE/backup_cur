@@ -27,6 +27,4 @@ def main() -> None:
     platform.create_match(played_card1.card_id, played_card2.card_id)
 
 
-
-
 main() if __name__ == "__main__" else None

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class Combatable(ABC):
@@ -6,7 +7,7 @@ class Combatable(ABC):
         s.comb_type = comb_type
 
     @abstractmethod
-    def attack(s, target) -> dict:
+    def attack(s, target: Any) -> dict:
         pass
 
     @abstractmethod
