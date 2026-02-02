@@ -11,12 +11,12 @@ class Card(ABC):
     def play(self, game_state: dict) -> dict:
         pass
 
-    def get_card_info(s) -> dict:
+    def get_card_info(self) -> dict:
         return {
-            "name": s.name,
-            "cost": s.cost,
-            "rarity": s.rarity,
+            "name": self.name,
+            "cost": self.cost,
+            "rarity": self.rarity,
         }
 
-    def is_playable(s, available_mana: int) -> bool:
-        return available_mana >= s.cost
+    def is_playable(self, available_mana: int) -> bool:
+        return available_mana >= self.cost

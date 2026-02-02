@@ -25,8 +25,9 @@ class TournamentPlatform:
     def create_match(s, card1_id: str, card2_id: str) -> dict:
         card1 = [ele for ele in s.cards if ele.card_id == card1_id][0]
         card2 = [ele for ele in s.cards if ele.card_id == card2_id][0]
-        s.cards[0].attack(s.cards[1])
-        print(card1.card.name)
+        if (card1.rating > card2.rating):
+
+        print(card2.card.name)
         return {
 
         } 
