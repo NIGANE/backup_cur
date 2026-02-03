@@ -12,33 +12,27 @@ def main() -> None:
     print("CreatureCard info:")
     print(new_card.get_card_info())
     print()
-
-    print("Playing Fire Dragon with 6 mana available:")
-    data = {
-        "name": "Mana Crystal",
-        "cost": 2, "rarity": "Common", "durability": 5,
-        "effect": "Permanent: +1 mana per turn", "mana": 6
-        }
-    re = new_card.play(data)
-    print(f"Playable: {new_card.is_playable(data['mana'])}")
+    play_data = {"mana": 6, "effect": "Creature summoned to battlefield"}
+    print(f"Playing {new_card.name} with {play_data['mana']} mana available:")
+    re = new_card.play(play_data)
+    print(f"Playable: {new_card.is_playable(play_data['mana'])}")
     print(f"Play result: {re}")
     print()
-
-    result_attack = new_card.attack_target({
-        'target': 'Goblin Warrior',
-        'damage_dealt': 7, 'combat_resolved': True,
-        })
-    print(f"Attack result: {result_attack}")
+    card_target = CreatureCard("Goblin Warrior", 5, "rare", 7, 5)
+    print(f"{new_card.name} attacks {card_target.name}")
+    res_attack = new_card.attack_target(card_target)
+    print(f"Attack result: {res_attack}")
     print()
 
-    print("Testing insufficient mana (3 available):")
     fault_data = {
-        "name": "Mana Crystal",
-        "cost": 2, "rarity": "Common", "durability": 5,
         "effect": "Permanent: +1 mana per turn", "mana": 3
     }
-    new_card.play(fault_data)
-    print(f"Playable: {new_card.is_playable(fault_data['mana'])}")
+    print(f"Testing insufficient mana ({fault_data['mana']} available):")
+    try:
+        card_target.play(fault_data)
+    except ValueError:
+        pass
+    print(f"Playable: {card_target.is_playable(fault_data['mana'])}")
     print()
     print("Abstract pattern successfully demonstrated!")
 

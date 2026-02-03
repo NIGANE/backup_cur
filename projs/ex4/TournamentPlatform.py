@@ -13,6 +13,8 @@ def format_interfaces(data: list) -> None:
 class TournamentPlatform:
     def __init__(s) -> None:
         s.cards = []
+        s.last_winer = None
+        s.last_loser = None
 
     def register_card(s, card: TournamentCard) -> None:
         print(f"{card.card.name} (ID: {card.card_id})")
@@ -26,10 +28,15 @@ class TournamentPlatform:
         card1 = [ele for ele in s.cards if ele.card_id == card1_id][0]
         card2 = [ele for ele in s.cards if ele.card_id == card2_id][0]
         if (card1.rating > card2.rating):
+            card1.attack(card2)
 
-        print(card2.card.name)
+        else:
+            card2.attack(card1)
         return {
-
+            "winner": "win",
+            "loser": "loser",
+            "winner_rating": winer.rating,
+            "loser_rating": loser.rating
         } 
 
     def get_leaderboard() -> None:

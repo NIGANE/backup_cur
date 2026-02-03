@@ -6,20 +6,17 @@ def main() -> None:
     print()
     print("=== DataDeck Ability System ===")
     print()
-    capable = {
-        "card": ['play', 'get_card_info', 'is_playable'],
-        "Combatable": ['attack', 'defend', 'get_combat_stats'],
-        "Magical": ['attack', 'defend', 'get_combat_stats']
-        }
-
-    print("EliteCard capabilities:")
-    for card_type, methods in capable.items():
-        print(f"- {card_type}: {methods}")
-    print()
-
     card = ElitCard("Arcane Warrior", 5, "melee", 9)
 
-    print("Playing Arcane Warrior (Elite Card):")
+    print("EliteCard capabilities:")
+    for card_type, methods in card.capable.items():
+        print(f"- {card_type}: {methods}")
+    print()
+    played = card.play({})
+    print(
+        f"Playing {played['name'].title()} "
+        f"({played["type"].title()} Card):"
+        )
     print()
 
     print("Combat phase:")

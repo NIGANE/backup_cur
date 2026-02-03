@@ -13,7 +13,6 @@ class TournamentCard(Card, Combatable, Rankable):
         s.losses = 0
         s.record = [s.wins, s.losses]
 
-
     def play(self, game_state: dict) -> dict:
         return self.card.play()
 
@@ -24,7 +23,7 @@ class TournamentCard(Card, Combatable, Rankable):
         return {
             "attacker": s.card.name,
             "target": target,
-            "damage": s.cost,
+            "damage": s.card.cost,
         }
 
     def defend(s, incoming_damage: int) -> dict:
@@ -32,7 +31,7 @@ class TournamentCard(Card, Combatable, Rankable):
         return {
             "defender": s.card.name,
             "damage_taken": incoming_damage,
-            "damage_blocked": s.rating - incoming_damage,
+            "rating": s.rating - incoming_damage,
         }
 
     def get_combat_stats(s) -> dict:

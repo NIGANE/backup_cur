@@ -23,7 +23,6 @@ def main() -> None:
     print()
 
     print("Creating tournament match...")
-    # print(played_card1.card_id)
     platform.create_match(played_card1.card_id, played_card2.card_id)
 
 

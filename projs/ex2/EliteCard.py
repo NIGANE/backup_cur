@@ -7,7 +7,14 @@ class ElitCard(Card, Magical, Combatable):
     def __init__(s, name: str, cost: int, comb_type: str, mana: int) -> None:
         Card.__init__(s, name, cost, "")
         Combatable.__init__(s, comb_type)
-        Magical.__init__(s, mana)
+        s.capable = {
+            "card": ['play', 'get_card_info', 'is_playable'],
+            "Combatable": ['attack', 'defend', 'get_combat_stats'],
+            "Magical": ['cast_spell', 'channel_mana', 'get_magic_stats']
+            }
+        s.type = "Elite"
+        s.health = s.cost
+        s.mana = s.cost
 
     def attack(s, target: str) -> dict:
         return {
@@ -18,13 +25,14 @@ class ElitCard(Card, Magical, Combatable):
         }
 
     def defend(s, incoming_damage: int) -> dict:
-        s.mana -= incoming_damage
-        return {
+        re = {
             "defender": s.name,
             "damage_taken": incoming_damage,
-            "damage_blocked": s.cost - incoming_damage,
-            "still_alive": bool(s.mana)
+            "damage_blocked": s.health - incoming_damage,
+            "still_alive": bool(s.health - incoming_damage)
         }
+        s.health -= incoming_damage
+        return re
 
     def get_combat_stats(s) -> dict:
         pass
@@ -34,10 +42,12 @@ class ElitCard(Card, Magical, Combatable):
             "caster": s.name,
             "spell": spell_name,
             "targets": targets,
-            "still_alive": bool(s.mana)
+            "still_alive": bool(s.cost),
+            "mana_used": s.mana
         }
 
     def channel_mana(s, amount: int) -> dict:
+        s.mana += amount
         return {
             "channeled": amount,
             "total_mana": s.mana
@@ -47,4 +57,8 @@ class ElitCard(Card, Magical, Combatable):
         pass
 
     def play(s, game_state: dict) -> dict:
-        pass
+        s.mana -= 1
+        return {
+            "name": s.name,
+            "type": s.type
+        }
