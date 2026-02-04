@@ -1,6 +1,18 @@
-from typing import Any, List, Union, Optional, Dict, Protocol
+from typing import Any, List, Protocol, Dict
 from abc import ABC, abstractmethod
 
+
+def format_json(data: Dict) -> None:
+    print("{", end="")
+    i = 0
+    for el in data.items():
+        print(
+            f"\"{el[0]}\": {"\"" if isinstance(el[1], str) else ""}"
+            f"{el[1]}{"\"" if isinstance(el[1], str) else ""}",
+            end=f"{"" if i + 1 == len(data) else ", "}"
+            )
+        i += 1
+    print("}")
 
 
 class ProcessingStage(Protocol):
@@ -20,7 +32,6 @@ class ProcessingPipeline(ABC):
     @abstractmethod
     def process(self, data: Any) -> Any:
         pass
-
 
 
 class InputStage:
@@ -48,8 +59,9 @@ class OutputStage:
                 )
         if isinstance(data, list):
             return f"User activity logged: {len(data) - 1} actions processed"
-        return (f"Stream summary: 5 readings, avg: 22.1°C")
-
+        return (
+            "Stream summary: 5 readings, avg: 22.1°C"
+            )
 
 
 class JSONAdapter(ProcessingPipeline):
@@ -76,11 +88,11 @@ class StreamAdapter(ProcessingPipeline):
         return curr
 
 
-
 class NexusManager:
     def __init__(self) -> None:
         print("Initializing Nexus Manager...")
         print("Pipeline capacity: 1000 streams/second")
+        print()
         print("Creating Data Processing Pipeline...")
         print("Stage 1: Input validation and parsing")
         print("Stage 2: Data transformation and enrichment")
@@ -89,11 +101,13 @@ class NexusManager:
 
     def run_multi_format_demo(self):
         print("=== Multi-Format Data Processing ===")
+        print()
         stages = [InputStage(), TransformStage(), OutputStage()]
 
         json_input = {"sensor": "temp", "value": 23.5, "unit": "C"}
         print("Processing JSON data through pipeline...")
-        print(f"Input: {json_input}")
+        print("Input: ", end="")
+        format_json(json_input)
         print("Transform: Enriched with metadata and validation")
         print(f"Output: {JSONAdapter(stages).process(json_input)}")
 

@@ -106,10 +106,14 @@ class TextProcessor(DataProcessor):
             )
 
     def validate(self, data: Any) -> bool:
-        if isinstance(data, str):
-            print("Validation: Text data verified")
-            return True
-        else:
+        try:
+            if isinstance(data, str):
+                print("Validation: Text data verified")
+                return True
+            else:
+                raise ValueError("Error: Text data Not verified")
+        except ValueError as e:
+            print(e)
             return False
 
 
@@ -136,7 +140,7 @@ class LogProcessor(DataProcessor):
 
     def validate(self, data: Any) -> bool:
         try:
-            for ele in ["ERROR: ", "INFO: ", "WARNING: ", "SUCCESS"]:
+            for ele in ["ERROR: ", "INFO: ", "WARNING: "]:
                 if in_string(ele, data):
                     print("Validation: Log entry verified")
                     return True
@@ -174,11 +178,11 @@ def main() -> None:
 
     print("=== Polymorphic Processing Demo ===")
     print("Processing multiple data types through same interface...")
-    re = [[1, 2, 3], "Hello  world", "INFO: system ready"]
+    re = [[1, 2, 3], "Hello worlds", "INFO: system ready"]
     obj = [num_process, text_process, log_process]
     i = 0
     while (i < ne_len(re)):
-        print(f"Result {i}: {obj[i].process(re[i])}")
+        print(f"Result {i + 1}: {obj[i].process(re[i])}")
         i += 1
     print("")
     print("Foundation systems online. Nexus ready for advanced streams.")

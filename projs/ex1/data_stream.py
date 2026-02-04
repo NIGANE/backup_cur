@@ -75,7 +75,6 @@ class TransactionStream(DataStream):
                 elif key.strip().startswith("sell"):
                     self.records.append(ele)
                     sold.append(int(value))
-        print(f"Processing transaction batch: {self.records}")
         total_units = sum(bought) - sum(sold)
         return (
             f"Transaction analysis: {len(bought) + len(sold)} operations, "
@@ -99,7 +98,6 @@ class EventStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         self.records = [ele for ele in data_batch if ":" not in ele]
-        print(f"Processing event batch: {self.records}")
         count_err = len([ele for ele in self.records if ele == "error"])
         return (
             f"Event analysis: {len(self.records)} events, "
@@ -149,6 +147,15 @@ class StreamProcessor():
                 f"sensor alerts, {trans} large transaction")
 
 
+def format_arr(data: list) -> None:
+    print("[", end="")
+    i = 0
+    while i < len(data):
+        print(f"{data[i]}", end=f"{"" if i + 1 == len(data) else ", "}")
+        i += 1
+    print("]")
+
+
 def ft_data_stream() -> None:
     print("=== CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
     print("")
@@ -157,19 +164,24 @@ def ft_data_stream() -> None:
     event_records = ["login", "error", "logout"]
 
     sensor_stream = SensorStream("SENSOR_001")
-    print(f"Processing sensor batch:{sensor_records}")
+    print("Processing sensor batch: ", end="")
+    format_arr(sensor_records)
     re = sensor_stream.process_batch(sensor_records)
     print(re)
 
     print("")
 
     trans_stream = TransactionStream("TRANS_001")
+    print("Processing transaction batch: ", end="")
+    format_arr(trans_records)
     re = trans_stream.process_batch(trans_records)
     print(re)
 
     print("")
 
     event_stream = EventStream("EVENT_001")
+    print("Processing event batch: ", end="")
+    format_arr(event_records)
     re = event_stream.process_batch(event_records)
     print(re)
 
