@@ -23,4 +23,13 @@ class SpellCard(Card):
             }
 
     def resolve_effect(self, targets: list) -> dict:
-        pass
+        match self.effect_type:
+            case "damage":
+                for ele in targets:
+                    ele.health -= 3
+            case "healing":
+                for ele in targets:
+                    ele.health += ele.default_health
+            case "buff":
+                for ele in targets:
+                    ele.attack += 2

@@ -43,7 +43,9 @@ class Deck:
         art = len(
             [ele for ele in self.cards if isinstance(ele, ArtifactCard)]
         )
-        avg_cost = sum([ele.cost for ele in self.cards]) / len(self.cards)
+        avg_cost = (
+            (sum([ele.cost for ele in self.cards]) + 2) / len(self.cards)
+            )
         return {
             "total_cards": len(self.cards),
             "creatures": crea,

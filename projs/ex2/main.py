@@ -15,7 +15,7 @@ def main() -> None:
     played = card.play({})
     print(
         f"Playing {played['name'].title()} "
-        f"({played["type"].title()} Card):"
+        f"({played['type'].title()} Card):"
         )
     print()
 

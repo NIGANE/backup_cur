@@ -23,7 +23,13 @@ def main() -> None:
     print()
 
     print("Creating tournament match...")
-    platform.create_match(played_card1.card_id, played_card2.card_id)
+    res = platform.create_match(played_card1.card_id, played_card2.card_id)
+    print(f"Match results: {res}")
+    print()
+
+    print("Tournament Leaderboard:")
+    print(platform.get_leaderboard())
+
 
 
 main() if __name__ == "__main__" else None

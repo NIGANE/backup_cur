@@ -8,6 +8,7 @@ class CreatureCard(Card):
             ) -> None:
         super().__init__(name, cost, rarity)
         self.attack = attack
+        self.default_health = health
         self.health = health
         self.type = "Creature"
 
