@@ -67,35 +67,49 @@ class DataProcessor(metaclass=ABCMeta):
 
 class NumericProcessor(DataProcessor):
 
-    def __init__(self):
+    def __init__(self) -> None:
         print("Initializing Numeric Processor...")
 
     def process(self, data: Any) -> str:
-        try:
-            sum = ne_sum(data)
-            avg = sum / ne_len(data)
+        if isinstance(data, int):
             return (
-                f"Processed {ne_len(data)} "
-                f"numeric values, sum={sum}, avg={avg}"
+                f"Processed 1 "
+                f"numeric value, sum={data}, avg={data}"
                 )
-        except ValueError:
-            return data
+        elif isinstance(data, list):
+            try:
+                sum = ne_sum(data)
+                avg = sum / ne_len(data)
+                return (
+                    f"Processed {ne_len(data)} "
+                    f"numeric values, sum={sum}, avg={avg}"
+                    )
+            except ValueError:
+                return data
+        else:
+            raise ValueError("Error: incorect form for gived data")
 
     def validate(self, data: Any) -> bool:
-        try:
-            for ele in data:
-                int(ele)
-        except ValueError:
-            print("Validation: Numeric data not verified")
-            return False
-        else:
+        if isinstance(data, int):
             print("Validation: Numeric data verified")
             return True
+        elif isinstance(data, list):
+            try:
+                for ele in data:
+                    int(ele)
+            except ValueError:
+                print("Validation: Numeric data not verified")
+                return False
+            else:
+                print("Validation: Numeric data verified")
+                return True
+        else:
+            raise ValueError("Validation: Numeric data not verified")
 
 
 class TextProcessor(DataProcessor):
 
-    def __init__(self):
+    def __init__(self) -> None:
         print("Initializing Text Processor...")
 
     def process(self, data: Any) -> str:
@@ -119,7 +133,7 @@ class TextProcessor(DataProcessor):
 
 class LogProcessor(DataProcessor):
 
-    def __init__(self):
+    def __init__(self) -> None:
         print("Initializing Log Processor...")
 
     def process(self, data: Any) -> str:
@@ -158,8 +172,11 @@ def main() -> None:
     num_data = [1, 2, 3, 4, 5]
     num_process = NumericProcessor()
     print(f"Processing data: {num_data}")
-    num_process.validate(num_data)
-    print(num_process.format_output(num_process.process(num_data)))
+    try:
+        num_process.validate(num_data)
+        print(num_process.format_output(num_process.process(num_data)))
+    except ValueError as e:
+        print(e)
     print("")
 
     text_data = "Hello Nexus World"

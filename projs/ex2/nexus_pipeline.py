@@ -1,16 +1,16 @@
-from typing import Any, List, Protocol, Dict
+from typing import Any, List, Protocol
 from abc import ABC, abstractmethod
 
 
-def format_json(data: Dict) -> None:
+def format_json(data: dict) -> None:
     print("{", end="")
     i = 0
-    for el in data.items():
+    for k, v in data.items():
+        quote = '"' if isinstance(v, str) else ''
         print(
-            f"\"{el[0]}\": {"\"" if isinstance(el[1], str) else ""}"
-            f"{el[1]}{"\"" if isinstance(el[1], str) else ""}",
-            end=f"{"" if i + 1 == len(data) else ", "}"
-            )
+            f'"{k}": {quote}{v}{quote}',
+            end='' if i + 1 == len(data) else ', '
+        )
         i += 1
     print("}")
 
@@ -18,7 +18,7 @@ def format_json(data: Dict) -> None:
 class ProcessingStage(Protocol):
     """Structural Protocol for pipeline stages (Static Duck Typing)."""
     def process(self, data: Any) -> Any:
-        ...
+        return data
 
 
 class ProcessingPipeline(ABC):
@@ -36,18 +36,35 @@ class ProcessingPipeline(ABC):
 
 class InputStage:
     def process(self, data: Any) -> Any:
+        if isinstance(data, dict):
+            print("Input: ", end="")
+            format_json(data)
+        elif isinstance(data, str):
+            print(f"Input: \"{data}\"")
+        elif isinstance(data, List):
+            print("Input: Real-time sensor stream")
         return data
 
 
 class TransformStage:
     def process(self, data: Any) -> Any:
-        if isinstance(data, dict) and data.get("sensor") == "temp":
-            val = data.get("value", 0)
-            data["status"] = "Normal range" if 18 <= val <= 25 else "Alert"
-            return data
-        if isinstance(data, str) and "," in data:
-            return data.split(",")
-        return data
+        try:
+            if isinstance(data, dict) and data.get("sensor") == "temp":
+                print("Transform: Enriched with metadata and validation")
+                val = data.get("value", 0)
+                data["status"] = "Normal range" if 18 <= val <= 25 else "Alert"
+                return data
+            if isinstance(data, str) and "," in data:
+                print("Transform: Parsed and structured data")
+                return data.split(",")
+            elif isinstance(data, list):
+                print("Transform: Aggregated and filtered")
+                return data
+            raise ValueError("Error detected in Stage 2: Invalid data format")
+        except ValueError as e:
+            print(e)
+        finally:
+            print("Recovery initiated: Switching to backup processor")
 
 
 class OutputStage:
@@ -58,10 +75,22 @@ class OutputStage:
                 f"{data['value']}°C ({data['status']})"
                 )
         if isinstance(data, list):
-            return f"User activity logged: {len(data) - 1} actions processed"
-        return (
-            "Stream summary: 5 readings, avg: 22.1°C"
-            )
+            if len(data) > 0 and isinstance(data[0], str):
+                return (
+                    f"User activity logged: {len(data) - 1} actions processed"
+                    )
+            elif (
+                len(data) > 0
+                and (
+                    isinstance(data[0], int)
+                    or isinstance(data[0], float)
+                )
+            ):
+                return (
+                    f"Stream summary: {len(data)} readings, "
+                    f"avg: {sum(data) / len(data)}°C"
+                )
+        return data
 
 
 class JSONAdapter(ProcessingPipeline):
@@ -98,29 +127,23 @@ class NexusManager:
         print("Stage 2: Data transformation and enrichment")
         print("Stage 3: Output formatting and delivery")
         print("")
+        self.stages = [InputStage(), TransformStage(), OutputStage()]
 
     def run_multi_format_demo(self):
         print("=== Multi-Format Data Processing ===")
         print()
-        stages = [InputStage(), TransformStage(), OutputStage()]
 
         json_input = {"sensor": "temp", "value": 23.5, "unit": "C"}
         print("Processing JSON data through pipeline...")
-        print("Input: ", end="")
-        format_json(json_input)
-        print("Transform: Enriched with metadata and validation")
-        print(f"Output: {JSONAdapter(stages).process(json_input)}")
+        print(f"Output: {JSONAdapter(self.stages).process(json_input)}")
 
         csv_input = "user,action,timestamp"
         print("\nProcessing CSV data through same pipeline...")
-        print(f"Input: \"{csv_input}\"")
-        print("Transform: Parsed and structured data")
-        print(f"Output: {CSVAdapter(stages).process(csv_input)}")
+        print(f"Output: {CSVAdapter(self.stages).process(csv_input)}")
 
+        stream_input = [21.0, 22.5, 23.0, 22.0, 22.0]
         print("\nProcessing Stream data through same pipeline...")
-        print("Input: Real-time sensor stream")
-        print("Transform: Aggregated and filtered")
-        print(f"Output: {StreamAdapter(stages).process(None)}")
+        print(f"Output: {StreamAdapter(self.stages).process(stream_input)}")
         print("")
 
     def run_chaining_demo(self):
@@ -134,10 +157,7 @@ class NexusManager:
     def run_error_recovery(self):
         print("=== Error Recovery Test ===")
         print("Simulating pipeline failure...")
-
-        print("Error detected in Stage 2: Invalid data format")
-        print("Recovery initiated: Switching to backup processor")
-
+        JSONAdapter(self.stages).process(None)
         print("Recovery successful: Pipeline restored, processing resumed")
         print("")
 

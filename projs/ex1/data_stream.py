@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 
 class DataStream(metaclass=ABCMeta):
 
-    def __init__(self, id: str):
+    def __init__(self, id: str) -> None:
         self.stream_id = id
 
     @abstractmethod
@@ -17,7 +17,12 @@ class DataStream(metaclass=ABCMeta):
         if not criteria:
             return data_batch
         else:
-            return [ele for ele in data_batch if ele.startswith(criteria)]
+            if (len(data_batch) > 0):
+                if isinstance(data_batch[0], str):
+                    return [
+                        ele for ele in data_batch if ele.startswith(criteria)
+                        ]
+        return data_batch
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         return ({"stream_id": self.stream_id, "type": self.type})
@@ -78,7 +83,7 @@ class TransactionStream(DataStream):
         total_units = sum(bought) - sum(sold)
         return (
             f"Transaction analysis: {len(bought) + len(sold)} operations, "
-            f"net flow: {"+" if total_units > 0 else "-"}{total_units} units"
+            f"net flow: {'+' if total_units > 0 else '-'}{total_units} units"
             )
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
@@ -116,7 +121,7 @@ class EventStream(DataStream):
 
 class StreamProcessor():
 
-    def __init__(self, *obj: DataStream):
+    def __init__(self, *obj: DataStream) -> None:
         er = ("error: found 1 object not belongs to the Data Stream Hierarchy")
         self.obj = []
         try:
@@ -124,7 +129,6 @@ class StreamProcessor():
                 if (isinstance(ele, DataStream)):
                     self.obj.append(ele)
                 else:
-                    print(ele)
                     raise ValueError(er)
         except ValueError as err:
             print(err)
@@ -151,7 +155,7 @@ def format_arr(data: list) -> None:
     print("[", end="")
     i = 0
     while i < len(data):
-        print(f"{data[i]}", end=f"{"" if i + 1 == len(data) else ", "}")
+        print(f"{data[i]}", end=f"{'' if i + 1 == len(data) else ', '}")
         i += 1
     print("]")
 
@@ -192,7 +196,10 @@ def ft_data_stream() -> None:
     print("Processing mixed stream types through unified interface...")
     print("")
 
-    new_stream = StreamProcessor(sensor_stream, trans_stream, event_stream)
+    try:
+        new_stream = StreamProcessor(sensor_stream, trans_stream, event_stream)
+    except ValueError as e:
+        print(e)
     new_stream.batch()
     print("")
 
