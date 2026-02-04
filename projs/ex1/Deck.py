@@ -1,12 +1,6 @@
 from ex0 import Card, CreatureCard
 from ex1.ArtifactCard import ArtifactCard
 from ex1.SpellCard import SpellCard
-from typing import Generator
-
-
-def gen_card(data: list[Card]) -> Generator:
-    for e in data:
-        yield e
 
 
 class Deck:
@@ -14,15 +8,12 @@ class Deck:
         self.cards = []
 
     def add_card(self, card: Card) -> None:
-        try:
-            if (isinstance(card, Card)):
-                self.cards.append(card)
-            else:
-                raise ValueError(
-                    "Error: the provided card not belongs to Card items"
-                    )
-        except ValueError as e:
-            print(e)
+        if (isinstance(card, Card)):
+            self.cards.append(card)
+        else:
+            raise ValueError(
+                "Error: the provided card not belongs to Card items"
+                )
 
     def remove_card(self, card_name: str) -> bool:
         for ele in self.cards:
@@ -35,8 +26,12 @@ class Deck:
         self.cards = [*{*self.cards}]
 
     def draw_card(self) -> Card:
-        ele = iter(self.cards)
-        return ele
+        if len(self.cards) > 0:
+            re = self.cards[0]
+            self.remove_card(re.name)
+            return re
+        else:
+            raise ValueError("Error: Deck is empty")
 
     def get_deck_stats(self) -> dict:
         crea = len(

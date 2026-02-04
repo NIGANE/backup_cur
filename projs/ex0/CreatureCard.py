@@ -9,6 +9,7 @@ class CreatureCard(Card):
         super().__init__(name, cost, rarity)
         self.attack = attack
         self.health = health
+        self.type = "Creature"
 
     def play(self, game_state: dict) -> dict:
         playable = self.is_playable(game_state['mana'])
@@ -16,22 +17,25 @@ class CreatureCard(Card):
             return {
                 "card_played": self.name,
                 "mana_used": self.cost,
-                "effect": game_state['effect']
+                "effect": 'Creature summoned to battlefield'
             }
+        else:
+            raise ValueError(
+                f"Error: No mana available to play card {self.name}"
+                )
 
-    def attack_target(self, target) -> dict:
-        print(f"{self.name} attacks {target['target']}")
+    def attack_target(self, target: Card) -> dict:
         return {
             "attacker": self.name,
-            "target": target["target"],
-            "damage_dealt": target["damage_dealt"],
-            "combat_resolved": target["combat_resolved"]
+            "target": target.name,
+            "damage_dealt": self.attack,
+            "combat_resolved": self.attack > target.health
         }
 
     def get_card_info(s) -> dict:
         return {
             **super().get_card_info(),
-            "type": "Creature",
+            "type": s.type,
             "attack": s.attack,
             "health": s.health
             }

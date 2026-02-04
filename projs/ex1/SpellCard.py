@@ -9,9 +9,17 @@ class SpellCard(Card):
         s.effect_type = effect_type
 
     def play(self, game_state: dict) -> dict:
+        if self.effect_type == 'damage':
+            effect = 'Deal 3 damage to target'
+        elif self.effect_type == 'heal':
+            effect = "healing"
+        elif self.effect_type == "buff":
+            effect = "+2 attack to equipped creature"
+        else:
+            effect = self.effect_type
         return {
              'card_played': self.name, 'mana_used': self.cost,
-             'effect': self.effect_type
+             'effect': effect
             }
 
     def resolve_effect(self, targets: list) -> dict:

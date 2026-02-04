@@ -13,7 +13,7 @@ class ArtifactCard(Card):
     def play(self, game_state: dict) -> dict:
         return {
             'card_played': self.name, 'mana_used': self.cost,
-            'effect': self.effect
+            'effect': f"{self.durability}: {self.effect}"
                 }
 
     def activate_ability(self) -> dict:

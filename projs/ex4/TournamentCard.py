@@ -16,12 +16,23 @@ class TournamentCard(Card, Combatable, Rankable):
     def play(self, game_state: dict) -> dict:
         return self.card.play()
 
-    def attack(s, target: Card) -> dict:
-        while (target.cost > )
-        return {}
+    def attack(s, target: "TournamentCard") -> dict:
+        diff = 16
+        s.rating += diff
+        target.defend(diff)
+        return {
+            "attacker": s.card.name,
+            "target": target,
+            "damage": s.card.cost,
+        }
 
     def defend(s, incoming_damage: int) -> dict:
-        pass
+        s.rating -= incoming_damage
+        return {
+            "defender": s.card.name,
+            "damage_taken": incoming_damage,
+            "rating": s.rating - incoming_damage,
+        }
 
     def get_combat_stats(s) -> dict:
         pass

@@ -3,7 +3,6 @@ from ex3.GameStrategy import GameSrategy
 
 class AggressiveStrategy(GameSrategy):
     def __init__(s) -> None:
-        s.mana = 10
         s.target = 'Enemy Player'
         s.damage = 8
 
