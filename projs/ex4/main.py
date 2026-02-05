@@ -28,8 +28,22 @@ def main() -> None:
     print()
 
     print("Tournament Leaderboard:")
-    print(platform.get_leaderboard())
+    leader_bord = platform.get_leaderboard()
+    i = 0
+    for ele in leader_bord:
+        i += 1
+        print(
+            f"{i}. ",
+            ele.card.name,
+            f" - Rating: {ele.rating} ({ele.wins}-{ele.losses})")
 
+    print()
+    print("Platform Report: ")
+    print(platform.generate_tournament_report())
+    print()
+
+    print("=== Tournament Platform Successfully Deployed! ===")
+    print("All abstract patterns working together harmoniously!")
 
 
 main() if __name__ == "__main__" else None

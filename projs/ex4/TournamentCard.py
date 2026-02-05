@@ -11,12 +11,17 @@ class TournamentCard(Card, Combatable, Rankable):
         s.rating = rating
         s.wins = 0
         s.losses = 0
+        s.attacks = 0
+        s.defends = 0
+        s.palyed = 0
         s.record = [s.wins, s.losses]
 
     def play(self, game_state: dict) -> dict:
+        self.played += 1
         return self.card.play()
 
     def attack(s, target: "TournamentCard") -> dict:
+        s.attacks += 1
         diff = 16
         s.rating += diff
         target.defend(diff)
@@ -27,6 +32,7 @@ class TournamentCard(Card, Combatable, Rankable):
         }
 
     def defend(s, incoming_damage: int) -> dict:
+        s.defends += 1
         s.rating -= incoming_damage
         return {
             "defender": s.card.name,
@@ -34,17 +40,27 @@ class TournamentCard(Card, Combatable, Rankable):
             "rating": s.rating - incoming_damage,
         }
 
-    def get_combat_stats(s) -> dict:
-        pass
+    def get_combat_stats(self) -> dict:
+        return {
+            "attacks": self.attacks,
+            "defends": self.defends,
+            "wins": self.wins,
+            "losses": self.losses,
+            "rating": self.rating
+        }
 
-    def calculate_rating(self) -> None:
-        pass
+    def calculate_rating(self) -> int:
+        return self.rating
 
     def update_wins(self, wins: int) -> None:
-        pass
+        self.wins += wins
 
     def update_losses(self, losses: int) -> None:
-        pass
+        self.losses += losses
 
-    def get_rank_info(self) -> None:
-        pass
+    def get_rank_info(self) -> dict:
+        return {
+            "rating": self.rating,
+            "wins": self.wins,
+            "loses": self.losses
+        }

@@ -15,8 +15,11 @@ class ElitCard(Card, Magical, Combatable):
         s.type = "Elite"
         s.health = s.cost
         s.mana = s.cost
+        s.attacks = 0
+        s.defends = 0
 
     def attack(s, target: str) -> dict:
+        s.attacks += 1
         return {
             "attacker": s.name,
             "target": target,
@@ -25,6 +28,7 @@ class ElitCard(Card, Magical, Combatable):
         }
 
     def defend(s, incoming_damage: int) -> dict:
+        s.defends += 1
         re = {
             "defender": s.name,
             "damage_taken": incoming_damage,
@@ -35,7 +39,12 @@ class ElitCard(Card, Magical, Combatable):
         return re
 
     def get_combat_stats(s) -> dict:
-        pass
+        return {
+            "mana": s.mana,
+            "health": s.health,
+            "attacks": s.attacks,
+            "defends": s.defends
+        }
 
     def cast_spell(s, spell_name: str, targets: list) -> dict:
         return {
@@ -54,7 +63,9 @@ class ElitCard(Card, Magical, Combatable):
         }
 
     def get_magic_stats(s) -> dict:
-        pass
+        return {
+            **s.channel_mana(0),
+        }
 
     def play(s, game_state: dict) -> dict:
         s.mana -= 1
