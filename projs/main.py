@@ -1,14 +1,14 @@
-import pdb; 
-pdb.pm()
-def main():
-    breakpoint()
-    print("hello orld")
-    x = [1, 2, 3].__str__()
-    print(x)
-    print(type(int))
-    print(int)
+from pydantic import BaseModel, ValidationError
 
 
-if __name__ == "__main__":
-    main()
-    pass
+class User(BaseModel):
+    name: str
+    email: str
+    accound_id: int
+user: User = None
+try:
+    user = User(name=32, email="mail.com", accound_id=3224)
+except ValidationError as e:
+    print("Error: ", e.errors()[0]['msg'])
+else:
+    print(user)

@@ -3,5 +3,7 @@
         "stddef.h": "c",
         "stdio.h": "c",
         "libft.h": "c"
-    }
+    },
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python-envs.pythonProjects": []
 }
