@@ -2,5 +2,5 @@
 main:
 	python3 main.py
 
-0:
-	python3 ex0/construct.py
+2:
+	python3 ex2/oracle.py
