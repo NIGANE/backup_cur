@@ -1,20 +1,6 @@
-import matplotlib.pyplot as plt
+import requests
+import pandas
 
-# Your data records
-data = [
-    ["Dragon", 2500, "Fire"],
-    ["Kraken", 2200, "Water"],
-    ["Golem",  3000, "Earth"]
-]
-columns = ("Card Name", "Attack", "Element")
-
-fig, ax = plt.subplots()
-ax.axis('tight')
-ax.axis('off')
-
-# Creating the table record visualization
-table = ax.table(cellText=data, colLabels=columns, loc='center', cellLoc='center')
-table.set_fontsize(14)
-table.scale(1, 2) # Makes the rows taller for readability
-
-plt.show()
+url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd"
+data = requests.get(url).json()
+df = pandas.Dataframe(data)
