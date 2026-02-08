@@ -1,10 +1,14 @@
 from dotenv import dotenv_values
+import os
 
 
 def output_mess(conf: dict) -> None:
     print(f"Mode: {conf['MATRIX_MODE']}")
-    print("Database: Connected to local instance")
-    print("API Access: Authenticated")
+    print(f"Database: {conf['DATABASE_URL']}")
+    print(
+        f"API Access: "
+        f"{"Authenticated" if conf['API_KEY'] else 'Not Authenticated'}"
+        )
     print(f"Log Level: {conf['LOG_LEVEL']}")
     print(f"Zion Network: {conf['ZION_ENDPOINT']}")
     print()
@@ -19,7 +23,7 @@ def output_mess(conf: dict) -> None:
 
 
 def main() -> None:
-    values = dotenv_values(".env")
+    values = {**dotenv_values(), **os.environ}
     targets = [
         {
             'MATRIX_MODE': "default Mode"
