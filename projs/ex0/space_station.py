@@ -39,7 +39,7 @@ class SpaceStation(BaseModel):
     )
 
 
-def output_mess(station) -> None:
+def output_mess(station: SpaceStation) -> None:
     print("Valid station created")
     print(f"ID: {station.station_id}")
     print(f"Name: {station.name}")
@@ -52,27 +52,44 @@ def output_mess(station) -> None:
           )
 
 
-# def main() -> None:
-#     print("Space Station Data Validation")
-#     print("========================================")
-#     station = None
-#     now = datetime.datetime.now()
-#     try:
-#         station = SpaceStation(
-#             station_id="ISS001",
-#             name="International Space Station",
-#             crew_size=6,
-#             power_level=85.5,
-#             oxygen_level=92.3,
-#             last_maintenence=now,
-#             is_operational=True,
-#             notes=""
-#             )
-#     except ValidationError as e:
-#         print(e)
-#     else:
-#         output_mess(station)
-
+def main() -> None:
+    print("Space Station Data Validation")
+    print("========================================")
+    station = None
+    now = datetime.datetime.now()
+    try:
+        station = SpaceStation(
+            station_id="ISS001",
+            name="International Space Station",
+            crew_size=6,
+            power_level=85.5,
+            oxygen_level=92.3,
+            last_maintenence=now,
+            is_operational=True,
+            notes=""
+            )
+    except ValidationError as e:
+        print(e)
+    else:
+        output_mess(station)
+    print()
+    print("========================================")
+    print("Expected validation error:")
+    fault_station = None
+    now = datetime.datetime.now()
+    try:
+        fault_station = SpaceStation(
+            station_id="ISS001",
+            name="International Space Station",
+            crew_size=6,
+            power_level=85.5,
+            oxygen_level=92.3,
+            last_maintenence=now,
+            is_operational=True,
+            notes=""
+            )
+    except ValidationError as e:
+        print(e)
 
 
 # main() if __name__ == "__main__" else ""
