@@ -8,3 +8,6 @@ main:
 
 1:
 	@python3 ex1/alien_contact.py
+
+2:
+	@python3 ex2/space_crew.py

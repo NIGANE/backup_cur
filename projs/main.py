@@ -1,14 +1,9 @@
-from pydantic import BaseModel, ValidationError
+from enum import Enum
 
+class Test(Enum):
+    A = 'a'
+    B = 'b'
 
-class User(BaseModel):
-    name: str
-    email: str
-    accound_id: int
-user: User = None
-try:
-    user = User(name=32, email="mail.com", accound_id=3224)
-except ValidationError as e:
-    print("Error: ", e.errors()[0]['msg'])
-else:
-    print(user)
+print(Test.A)
+print(Test.A.name)
+print(Test.A.value)
