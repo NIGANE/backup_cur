@@ -97,10 +97,6 @@ def create_new_Contact(data: dict) -> None:
     except ValidationError as e:
         print('Expected validation error:')
         print(f'{e.errors()[0]['ctx']['error']}')
-    except ValueError as e:
-        print('Expected validation error:')
-        print(f"{e}")
-        print("value")
     else:
         publish_data(alien_contact)
 
