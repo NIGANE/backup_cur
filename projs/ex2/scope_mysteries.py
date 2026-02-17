@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 
 def mage_counter() -> callable:
@@ -30,22 +30,41 @@ def enchantment_factory(enchantment_type: str) -> callable:
 def memory_vault() -> dict[str, callable]:
     database = {}
 
-    def store(key: Union[str, tuple, int, ], val: Any) -> None:
-        print("called")
-        if isinstance(key, (list, dict)):
-            print("true")
+    def store(key: Any, val: Any) -> None:
+        if (isinstance(key, (list, dict, set))):
+            raise ValueError(
+                f"could not accept {type(key).__name__} as key for dict type")
         nonlocal database
-        # database[key] = val
+        database[key] = val
 
-    def recall() -> Any:
-        pass
+    def recall(key: Any) -> Any:
+        if (isinstance(key, (list, dict, set))):
+            raise ValueError(
+                f"could not accept {type(key).__name__} as key for dict type")
+        return database.get(key, "Memory not found")
 
     return {
         'store': store,
         'recall': recall
     }
 
-mem = memory_vault()
-mem['store'](2, "ahcraf")
+
+def main() -> None:
+    print()
+    print("Testing mage counter...")
+    cn = mage_counter()
+    for e in range(1, 4):
+        print("Call ", e, ": ", cn())
+    print()
+
+    print("Testing enchantment factory...")
+    falmin = enchantment_factory("Falming")
+    falmin_clone = falmin("Sword")
+    print(falmin_clone.title())
+
+    frozen = enchantment_factory("Frozen")
+    frozen_clone = frozen("Shield")
+    print(frozen_clone.title())
 
 
+main() if __name__ == "__main__" else None

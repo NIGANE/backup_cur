@@ -10,3 +10,6 @@ main:
 
 2:
 	@python3 ex2/scope_mysteries.py
+
+3:
+	@python3 ex3/functools_artifacts.py
