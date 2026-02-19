@@ -1,5 +1,5 @@
-import alchemy
-from alchemy import create_water
+import alchemy.elements
+from alchemy.elements import create_fire
 from alchemy import healing_potion as heal
 from alchemy.potions import create_earth, strength_potion, create_fire
 
@@ -10,11 +10,11 @@ def main() -> None:
     print()
 
     print("Method 1 - Full module import:")
-    print(f"alchemy.elements.create_fire(): {alchemy.elements.create_fire()}")
+    print(f"alchemy.elements.create_fire(): {create_fire()}")
     print()
 
     print("Method 2 - Specific function import:")
-    print(f"create_water(): {create_water()}")
+    print(f"create_water(): {alchemy.elements.create_water()}")
     print()
 
     print("Method 3 - Aliased import:")

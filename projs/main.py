@@ -1,1 +1,2 @@
-print(" str " in "hello world str ")
+import sys
+print(sys.path)
