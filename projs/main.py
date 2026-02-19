@@ -1,11 +1,18 @@
-from typing import TypeVar, List
+from typing import Any
 
-T = TypeVar('int')
+def greeting_wrapper(fn: callable) -> callable:
+    def wrapper(*ar: Any, **key: Any) -> None:
+        print("before executing")
+        print(ar)
+        print(key)
+        fn(*ar, key) if key else fn(*ar)
+        print("after executing")
+    return wrapper
 
-def element(items: List[T]) -> T:
-    return items[0]
+# @greeting_wrapper
+def say_hi(name: str) -> None:
+    print("hi:", name)
 
-# Usage
-print(element([1, 2, 3])) 
-print(element(['a', 'b', 'c']))
-print(T)
+say_hi = greeting_wrapper(say_hi)
+
+say_hi("achraf")

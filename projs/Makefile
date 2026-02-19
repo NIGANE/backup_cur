@@ -13,3 +13,6 @@ main:
 
 3:
 	@python3 ex3/functools_artifacts.py
+
+4:
+	@python3 ex4/decorator_mastery.py

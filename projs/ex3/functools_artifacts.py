@@ -1,6 +1,6 @@
 from typing import Any
 from functools import reduce, partial, lru_cache, singledispatch
-from operator import add, sub, pow, truediv, mul, floordiv, mod
+from operator import add, mul
 
 
 def spell_reducer(spells: list[int], operation: str) -> int:
@@ -19,12 +19,6 @@ def spell_reducer(spells: list[int], operation: str) -> int:
         case "min":
             return reduce(min, spells)
     raise ValueError(f"none defined operation '{operation}'")
-
-
-def base_ench(power, element, target):
-    print("power: ", power)
-    print("ele: ", element)
-    print("target: ", target)
 
 
 def partial_enchanter(base_enchantment: callable) -> dict[str, callable]:
@@ -47,6 +41,7 @@ def memoized_fibonacci(n: int) -> int:
         return 1
     return memoized_fibonacci(n - 1) + memoized_fibonacci(n - 2)
 
+
 def spell_dispatcher() -> callable:
     @singledispatch
     def dispatch(n: Any) -> Any:
@@ -58,12 +53,31 @@ def spell_dispatcher() -> callable:
 
     @dispatch.register(list)
     def multi_cast(n: list) -> None:
-        return n.join()
+        for ele in n:
+            print("cast: ", ele)
 
     @dispatch.register(str)
     def enchantment(s: str) -> None:
         return f"enchantement {s}"
     return dispatch
-dis = spell_dispatcher()
-# print(dis(["hello", "world"]))
-print(("hello", "world").join())
+
+
+def main() -> None:
+    print()
+    print("Testring spell reducer...")
+    data = [40, 30, 20, 10]
+    sum = spell_reducer(data, "add")
+    print("Sum: ", sum)
+
+    print("Product: ")
+
+    max = spell_reducer(data, "max")
+    print("Max: ", max)
+    print()
+
+    print("Testing momoized fibonacci...")
+    print("FIB(10): ", memoized_fibonacci(10))
+    print("FIB(15): ", memoized_fibonacci(15))
+
+
+main() if __name__ == "__main__" else None
