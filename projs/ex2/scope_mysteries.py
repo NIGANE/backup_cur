@@ -34,7 +34,6 @@ def memory_vault() -> dict[str, callable]:
         if (isinstance(key, (list, dict, set))):
             raise ValueError(
                 f"could not accept {type(key).__name__} as key for dict type")
-        nonlocal database
         database[key] = val
 
     def recall(key: Any) -> Any:
