@@ -1,10 +1,11 @@
 from enum import Enum
-# from ex1.Deck import Deck
 from ex3.CardFactory import CardFactory
 from ex0.CreatureCard import CreatureCard
 from ex1.SpellCard import SpellCard
 from ex1.ArtifactCard import ArtifactCard
 from ex0.Card import Card
+from typing import Callable
+
 
 global_creatures = [
             {
@@ -173,7 +174,7 @@ class FantasyCardFactory(CardFactory):
         s.hand = []
         s.total_cards = 0
 
-    def get_card(s, card_type: str) -> Card:
+    def get_card(s, card_type: str) -> Callable:
         if card_type in s._register:
             return s._register[card_type]
         else:

@@ -1,8 +1,8 @@
 from ex3.GameEngine import GameEngine
-from ex3.AggressiveStrategy import AggressiveStrategy
 from ex3.FantasyCardFactory import FantasyCardFactory
 from ex3.FantasyCardFactory import CardTypes
-
+from ex3.GameEngine import StrategyTypes
+from ex3.GameEngine import FactoryType
 
 def format_hand(data: list) -> None:
     print("[", end="")
@@ -25,17 +25,17 @@ def main() -> None:
     print("Configuring Fantasy Card Game...")
 
     engine = GameEngine()
-    strategy = AggressiveStrategy()
-    fantasyCard = FantasyCardFactory()
-    re = engine.configure_engine(fantasyCard, strategy)
+    strategy = engine.take_strategy(StrategyTypes.AGGRESSIVE)
+    factory = engine.take_factory(FactoryType.FANTASY)
+    re = engine.configure_engine(factory, strategy)
     for k, v in re.items():
         print(f"{k}: {v}")
     print()
-    add = fantasyCard.get_card(CardTypes.CREATURE)
+    add = engine.take_card(CardTypes.CREATURE, factory)
     add("Fire Dragon")
-    add = fantasyCard.get_card(CardTypes.CREATURE)
+    add = engine.take_card(CardTypes.CREATURE, factory)
     add("Goblin Warrior")
-    add = fantasyCard.get_card(CardTypes.SPELL)
+    add = engine.take_card(CardTypes.SPELL, factory)
     add("Lightning Bolt")
 
     print("Simulating aggressive turn...")

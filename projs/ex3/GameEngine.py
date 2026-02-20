@@ -1,6 +1,16 @@
+from ex3.FantasyCardFactory import FantasyCardFactory
+from ex3.AggressiveStrategy import AggressiveStrategy
 from ex3.CardFactory import CardFactory
 from ex3.GameStrategy import GameSrategy
+from enum import Enum
+from typing import Callable
 
+
+class StrategyTypes(Enum):
+    AGGRESSIVE = AggressiveStrategy
+
+class FactoryType(Enum):
+    FANTASY = FantasyCardFactory
 
 class GameEngine:
     def __init__(s):
@@ -8,6 +18,18 @@ class GameEngine:
         s.factory = None
         s.battlefield = []
         s.turns = 0
+
+    @staticmethod
+    def take_factory(str: FactoryType) -> CardFactory:
+        return str.value()
+
+    @staticmethod
+    def take_card(str: str, factory: CardFactory) -> Callable:
+        return factory.get_card(str)
+
+    @staticmethod
+    def take_strategy(str: StrategyTypes) -> GameSrategy:
+        return str.value()
 
     def configure_engine(
             s, factory: CardFactory, strategy: GameSrategy

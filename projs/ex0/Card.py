@@ -1,13 +1,13 @@
-from abc import ABC, abstractmethod
+import abc
 
 
-class Card(ABC):
+class Card(abc.ABC):
     def __init__(self, name: str, cost: int, rarity: str) -> None:
         self.name = name
         self.cost = cost
         self.rarity = rarity
 
-    @abstractmethod
+    @abc.abstractmethod
     def play(self, game_state: dict) -> dict:
         pass
 
