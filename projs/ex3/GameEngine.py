@@ -9,8 +9,10 @@ from typing import Callable
 class StrategyTypes(Enum):
     AGGRESSIVE = AggressiveStrategy
 
+
 class FactoryType(Enum):
     FANTASY = FantasyCardFactory
+
 
 class GameEngine:
     def __init__(s):
