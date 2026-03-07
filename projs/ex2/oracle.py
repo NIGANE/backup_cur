@@ -1,17 +1,17 @@
-from dotenv import dotenv_values
-
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 
 def output_mess(conf: dict) -> None:
-    print(f"Mode: {conf['MATRIX_MODE']}")
-    print(f"Database: {conf['DATABASE_URL']}")
+    print(f"Mode: {conf['matrix_mode']}")
+    print(f"Database: {conf['database_url']}")
     print(
         f"API Access: "
-        f"{"Authenticated" if conf['API_KEY'] else 'Not Authenticated'}"
+        f"{"Authenticated" if conf['api_key'] else 'Not Authenticated'}"
         )
-    print(f"Log Level: {conf['LOG_LEVEL']}")
-    print(f"Zion Network: {conf['ZION_ENDPOINT']}")
+    print(f"Log Level: {conf['log_level']}")
+    print(f"Zion Network: {conf['endpoint']}")
     print()
 
     print("Environment security check:")
@@ -24,40 +24,25 @@ def output_mess(conf: dict) -> None:
 
 
 def main() -> None:
-    values = {**dotenv_values(), **os.environ}
-    targets = [
-        {
-            'MATRIX_MODE': "default Mode"
-            },
-        {
-            'DATABASE_URL': "default url"
-            },
-        {
-            'API_KEY': "default key"
-            },
-        {
-            'LOG_LEVEL': "default log"
-            },
-        {
-            'ZION_ENDPOINT': "default endpoint"
-            }
-        ]
-
+    matrix_mode=os.getenv("MATRIX_MODE")
+    database_url=os.getenv("DATABASE_URL")
+    api_key = os.getenv("API_KEY")
+    log_level = os.getenv("LOG_LEVEL")
+    endpoint = os.getenv("ZION_ENDPOINT")
+    
     print("ORACLE STATUS: Reading the Matrix...")
     print()
-    conf = {}
+    conf = {
+        "matrix_mode": matrix_mode,
+        "database_url": database_url,
+        "api_key": api_key,
+        "log_level": log_level,
+        "endpoint": log_level,
+    }
     try:
-        if (len(values)) == 0:
+        if not all([matrix_mode, database_url, api_key, log_level, endpoint]):
             raise ValueError("check if the conf file exists or empy")
-        for ele in targets:
-            key = [*ele.keys()][0]
-            try:
-                values[key]
-            except KeyError as e:
-                print(f"Warning: missing configuration variable {e}")
-                print()
-            value = values.get(key, ele[key])
-            conf = {**conf, key: value}
+        
     except (ValueError) as e:
         print(f"Error: {e}")
         return
