@@ -1,7 +1,7 @@
-from typing import Any
+from typing import Any, Callable
 
 
-def mage_counter() -> callable:
+def mage_counter() -> Callable:
     x = 0
 
     def counter() -> int:
@@ -11,7 +11,7 @@ def mage_counter() -> callable:
     return counter
 
 
-def spell_accumulator(initial_power: int) -> callable:
+def spell_accumulator(initial_power: int) -> Callable:
     x = initial_power
 
     def accumilate(pw: int = 0) -> int:
@@ -21,13 +21,13 @@ def spell_accumulator(initial_power: int) -> callable:
     return accumilate
 
 
-def enchantment_factory(enchantment_type: str) -> callable:
+def enchantment_factory(enchantment_type: str) -> Callable:
     def re(n: str) -> str:
         return f"{enchantment_type} {n}"
     return re
 
 
-def memory_vault() -> dict[str, callable]:
+def memory_vault() -> dict[str, Callable]:
     database = {}
 
     def store(key: Any, val: Any) -> None:

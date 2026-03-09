@@ -1,12 +1,12 @@
 from functools import wraps
 from datetime import datetime
-from typing import Any
+from typing import Any, Callable
 import time
 
 
-def spell_timer(func: callable) -> callable:
+def spell_timer(func: Callable) -> Callable:
     if (not callable(func)):
-        raise ValueError(f"expected callable not {type(func).__name__}")
+        raise ValueError(f"expected Callable not {type(func).__name__}")
 
     @wraps(func)
     def wp(*ar: Any, **key: Any) -> Any:
@@ -22,8 +22,8 @@ def spell_timer(func: callable) -> callable:
     return wp
 
 
-def power_validator(min_power: int) -> callable:
-    def decorator(fn: callable) -> callable:
+def power_validator(min_power: int) -> Callable:
+    def decorator(fn: Callable) -> Callable:
         def wp(*ar: Any, **key: Any) -> Any:
             pw = key.get('power', min_power - 1)
             if (isinstance(pw, int) and pw >= min_power):
@@ -34,8 +34,8 @@ def power_validator(min_power: int) -> callable:
     return decorator
 
 
-def retry_spell(max_attempts: int) -> callable:
-    def decor(fn: callable) -> callable:
+def retry_spell(max_attempts: int) -> Callable:
+    def decor(fn: Callable) -> Callable:
         def wp(*ar: Any, **key: Any) -> Any:
             for tr in range(1, max_attempts):
                 try:

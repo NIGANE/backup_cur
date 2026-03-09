@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Callable
 from functools import reduce, partial, lru_cache, singledispatch
 from operator import add, mul
 
@@ -21,7 +21,7 @@ def spell_reducer(spells: list[int], operation: str) -> int:
     raise ValueError(f"none defined operation '{operation}'")
 
 
-def partial_enchanter(base_enchantment: callable) -> dict[str, callable]:
+def partial_enchanter(base_enchantment: Callable) -> dict[str, partial]:
     my_dict = {}
 
     my_dict['fire_enchant'] = partial(
@@ -42,24 +42,28 @@ def memoized_fibonacci(n: int) -> int:
     return memoized_fibonacci(n - 1) + memoized_fibonacci(n - 2)
 
 
-def spell_dispatcher() -> callable:
+def spell_dispatcher() -> Callable:
     @singledispatch
     def dispatch(n: Any) -> Any:
         return n
 
     @dispatch.register(int)
-    def damage_spell(n: int) -> None:
-        pass
+    def damage_spell(n: int) -> int:
+        return n - 1
 
     @dispatch.register(list)
     def multi_cast(n: list) -> None:
         for ele in n:
-            print("cast: ", ele)
+            print(f"cast: {ele}")
 
     @dispatch.register(str)
-    def enchantment(s: str) -> None:
+    def enchantment(s: str) -> str:
         return f"enchantement {s}"
     return dispatch
+
+
+# def enchanter(pw, ele, tar):
+#     print(f"{ele} attack {tar} with {pw} power points")
 
 
 def main() -> None:

@@ -1,7 +1,7 @@
-from typing import Any
+from typing import Any, Callable
 
 
-def spell_combiner(spell1: callable, spell2: callable) -> callable:
+def spell_combiner(spell1: Callable, spell2: Callable) -> Callable:
     if callable(spell1) and callable(spell2):
         def fun(*args: Any, **d: Any) -> tuple:
             return (spell1(*args, **d), spell2(*args, **d))
@@ -13,21 +13,21 @@ def spell_combiner(spell1: callable, spell2: callable) -> callable:
     else:
         raise (ValueError(f"{spell1} ({type(spell1).__name__}) and "
                           f"{spell2} ({type(spell2).__name__}) "
-                          f"are not callable"))
+                          f"are not Callable"))
 
 
-def power_amplifier(base_spell: callable, multiplier: int) -> callable:
+def power_amplifier(base_spell: Callable, multiplier: int) -> Callable:
     if (not callable(base_spell)):
         raise ValueError(f"{base_spell} "
-                         f"({type(base_spell)}) is not a callable")
+                         f"({type(base_spell)}) is not a Callable")
 
     return lambda: base_spell() * multiplier
 
 
-def conditional_caster(condition: callable, spell: callable) -> callable:
+def conditional_caster(condition: Callable, spell: Callable) -> Callable:
     if (not callable(condition) or not callable(spell)):
         raise ValueError(f"args ({condition} and {spell}) "
-                         f"must be of type callable")
+                         f"must be of type Callable")
 
     def tty(*args: Any, **ke: Any) -> Any:
         if condition(*args, **ke):
@@ -37,10 +37,10 @@ def conditional_caster(condition: callable, spell: callable) -> callable:
     return tty
 
 
-def spell_sequence(spells: list[callable]) -> callable:
+def spell_sequence(spells: list[Callable]) -> Callable:
     for ele in spells:
         if not callable(ele):
-            raise ValueError(f"{ele} ({type(ele)}) is not callable")
+            raise ValueError(f"{ele} ({type(ele)}) is not Callable")
 
     def cast(*ar: Any, **av: Any) -> Any:
         re = []
