@@ -3,16 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/03/10 15:16:56 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/03/11 02:06:01 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
+#include "./tree/tree.h"
 
-int main(int ac, char **av)
+
+int main()
 {
-    printf("hello world");
+    int data[5] = {1, 2, 3, 4, 5};
+    Node *head;
+
+    head = insert(head, data);
+    printf("head: %d\n", *(head->data));
+    if (head->left)
+        printf("left %d\n", *(head->left->data));
 }
