@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/03/12 15:20:53 by negane           ###   ########.fr       */
+/*   Updated: 2026/03/12 17:33:51 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,17 +23,17 @@ void print_nodes(Node *node)
 
 int main()
 {
-    int data[5] = {4, 2, 8, 1, 3};
+    int data[] = {4, 2, 8, 1, 3, 9};
     Node *head = NULL;
 
     int i = 0;
-    while (i < 5)
+    while (i < 6)
     {
         head = insert(head, data[i]);
         i++;
     }
-    inOrder(head);
-    printf("\n");
-    printf("is balanced :%d\n", is_balanced(head));
+    printf("is balanced: %d\n", is_balanced(head));
+    // printf("search: %d\n", bfs(head, -1));
+    bfs(head, 3);
 
 }

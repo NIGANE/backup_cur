@@ -24,3 +24,7 @@ void preOrder(Node* root);
 //  balance
 int is_balanced(Node *n);
 int get_height(Node *n);
+
+//  search
+int dfs(Node *node, int data);
+int bfs(Node *node, int data);

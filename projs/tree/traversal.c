@@ -27,16 +27,18 @@ void preOrder(Node* root)
     preOrder(root->right);
 }
 
+int max(int a, int b)
+{
+    if (a == b)
+        return (a);
+    return ((a > b) * a + (a < b) + b);
+}
+
 int get_height(Node *n)
 {
-    int l;
-    int r;
-
-    if (!n)
+    if (n == NULL)
         return (0);
-    l = ( 1 + get_height(n->left) );
-    r = (1 + get_height(n->right));
-    return ((l > r) * l + r * (r > l));
+    return (max(get_height(n->left), get_height(n->right)) + 1);
 }
 
 int is_balanced(Node *n)
