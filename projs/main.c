@@ -6,20 +6,34 @@
 /*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/03/11 02:06:01 by negane           ###   ########.fr       */
+/*   Updated: 2026/03/12 15:20:53 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./tree/tree.h"
-
+void print_nodes(Node *node)
+{
+    printf("   P(%d)\n", (node->data));
+    if (node->left)
+        printf("L(%d)/\\", (node->left->data));
+    if (node->right)
+        printf("R(%d)", (node->right->data));
+    printf("\n");
+}
 
 int main()
 {
-    int data[5] = {1, 2, 3, 4, 5};
-    Node *head;
+    int data[5] = {4, 2, 8, 1, 3};
+    Node *head = NULL;
 
-    head = insert(head, data);
-    printf("head: %d\n", *(head->data));
-    if (head->left)
-        printf("left %d\n", *(head->left->data));
+    int i = 0;
+    while (i < 5)
+    {
+        head = insert(head, data[i]);
+        i++;
+    }
+    inOrder(head);
+    printf("\n");
+    printf("is balanced :%d\n", is_balanced(head));
+
 }

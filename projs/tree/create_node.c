@@ -1,7 +1,7 @@
 
 #include "./tree.h"
 
-Node* create_node(int *n)
+Node* create_node(int n)
 {
     Node* new_node = malloc(sizeof(Node));
     if (!new_node)
