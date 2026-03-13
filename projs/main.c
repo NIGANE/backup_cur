@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/03/12 17:33:51 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/03/13 01:40:13 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ int main()
         i++;
     }
     printf("is balanced: %d\n", is_balanced(head));
-    // printf("search: %d\n", bfs(head, -1));
     bfs(head, 3);
 
 }

@@ -42,25 +42,30 @@ int dfs(Node *node, int data)
 //     if (node->left)
 // }
 
-int bfs(Node *node)
+int bfs(Node *node, int data)
 {
     Node* process_queu[100];
-    size_t reader_num = 0;
-    size_t add_num = 0;
-    Node *cur;
+    size_t reader_num;
+    size_t add_num;
+    Node*   cur;
 
+    reader_num = 0;
+    add_num = 0;
+    cur = node;
     process_queu[add_num++] = node;
     while(add_num > reader_num){
+        printf("process queu: %d vs %d\n", process_queu[])
         if (process_queu[reader_num]->data == data)
         {
-            printf("founded: %d\n", process_queu[reader_num]->data == data);
+            printf("founded: %d\n", process_queu[reader_num]->data);
             return (1);
         }
-        if(curr->left != NULL){
-            process_queu[add_num++] = curr->left;
+        cur = process_queu[reader_num++];
+        if(!cur->left){
+            process_queu[add_num++] = cur->left;
         }
-        if(curr->right != NULL){
-            process_queu[add_num++] = curr->right;
+        if(!cur->right){
+            process_queu[add_num++] = cur->right;
         }
     }
     return (0);
