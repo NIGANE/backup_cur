@@ -6,33 +6,38 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/03/13 01:40:13 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/03/14 18:20:07 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./tree/tree.h"
-void print_nodes(Node *node)
+#include "./heap/heap.h"
+
+void print_arr(int *arr, int len)
 {
-    printf("   P(%d)\n", (node->data));
-    if (node->left)
-        printf("L(%d)/\\", (node->left->data));
-    if (node->right)
-        printf("R(%d)", (node->right->data));
-    printf("\n");
+    int i;
+    
+    i = 0;
+    while (i < len)
+    {
+        printf("(%d) : %d\n", i, arr[i]);
+        i++;    
+    }
+
 }
 
 int main()
 {
-    int data[] = {4, 2, 8, 1, 3, 9};
-    Node *head = NULL;
-
-    int i = 0;
-    while (i < 6)
-    {
-        head = insert(head, data[i]);
-        i++;
-    }
-    printf("is balanced: %d\n", is_balanced(head));
-    bfs(head, 3);
-
+    t_heap *heap = NULL;
+    int arr[] = {10, 20, 15, 30};
+    size_t len = sizeof(arr) / sizeof(arr[0]);
+    size_t i;
+    
+    i = 0;
+    while (i < len)
+       heap = insert_max_heap(heap, arr[i++]);
+    print_arr(heap->data, heap->len);
+    pop_max_heap(heap);
+    printf("/////////\n");
+    print_arr(heap->data, heap->len);
+    free_heap(&heap);
 }
