@@ -12,8 +12,8 @@ typedef struct s_heap {
 } t_heap;
 
 #define P(i) ((i - 1) / 2)
-#define L(i) (2 * i)
-#define R(i) (2 * (i + 1))
+#define L(i) (i == 0 ? i + 1 : (2 * (i + 1)))
+#define R(i) (i == 0 ? i + 2 : (2 * (i + 1)))
 #define max(a, b) (a > b ? a : b)
 
 //  heap

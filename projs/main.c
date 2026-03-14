@@ -12,32 +12,31 @@
 
 #include "./heap/heap.h"
 
-void print_arr(int *arr, int len)
+void	print_arr(int *arr, int len)
 {
-    int i;
-    
-    i = 0;
-    while (i < len)
-    {
-        printf("(%d) : %d\n", i, arr[i]);
-        i++;    
-    }
+	int	i;
 
+	i = 0;
+	while (i < len)
+	{
+		printf("(%d) : %d\n", i, arr[i]);
+		i++;
+	}
 }
 
-int main()
+int	main(void)
 {
-    t_heap *heap = NULL;
-    int arr[] = {10, 20, 15, 30};
-    size_t len = sizeof(arr) / sizeof(arr[0]);
-    size_t i;
-    
-    i = 0;
-    while (i < len)
-       heap = insert_max_heap(heap, arr[i++]);
-    print_arr(heap->data, heap->len);
-    pop_max_heap(heap);
-    printf("/////////\n");
-    print_arr(heap->data, heap->len);
-    free_heap(&heap);
+	t_heap *heap = NULL;
+	int arr[] = {10, 20, 15, 30};
+	size_t len = sizeof(arr) / sizeof(arr[0]);
+	size_t i;
+
+	i = 0;
+	while (i < len)
+		heap = insert_max_heap(heap, arr[i++]);
+	print_arr(heap->data, heap->len);
+	pop_max_heap(heap);
+	printf("/////////\n");
+	print_arr(heap->data, heap->len);
+	free_heap(&heap);
 }
