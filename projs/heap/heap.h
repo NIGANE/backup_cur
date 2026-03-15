@@ -13,7 +13,7 @@ typedef struct s_heap {
 
 #define P(i) ((i - 1) / 2)
 #define L(i) (i == 0 ? i + 1 : (2 * (i + 1)))
-#define R(i) (i == 0 ? i + 2 : (2 * (i + 1)))
+#define R(i) (i == 0 ? i + 2 : (2 * (i + 2)))
 #define max(a, b) (a > b ? a : b)
 
 //  heap

@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/14 19:52:36 by amerkht           #+#    #+#             */
-/*   Updated: 2026/03/14 19:53:33 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/03/15 07:15:00 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,9 +110,6 @@ t_heap	*pop_max_heap(t_heap *heap)
 	{
 		if (L(i) >= len || R(i) >= len)
 			break ;
-		printf("main cell: %d\n", new[i]);
-		printf("left cell: %d\n", new[L(i)]);
-		printf("right cell: %d\n", new[R(i)]);
 		biggest = max(new[L(i)], new[R(i)]);
 		if (new[i] < biggest)
 		{
