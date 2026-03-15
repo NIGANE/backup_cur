@@ -33,3 +33,17 @@ int indexof(int *list , int len, int e)
     }
     return (-1);
 }
+
+void	print_arr(int *arr, int len)
+{
+	int	i;
+
+	if (!arr)
+		return;
+	i = 0;
+	while (i < len)
+	{
+		printf("(%d) : %d\n", i, arr[i]);
+		i++;
+	}
+}

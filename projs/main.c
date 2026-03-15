@@ -6,38 +6,24 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/03/15 07:20:15 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/03/15 23:48:20 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./heap/heap.h"
 #define sep "//////////\n"
+#include <pthread.h>
 
 
-void	print_arr(int *arr, int len)
+void *fn(void *)
 {
-	int	i;
-
-	if (!arr)
-		return;
-	i = 0;
-	while (i < len)
-	{
-		printf("(%d) : %d\n", i, arr[i]);
-		i++;
-	}
+	printf("hello inside the thread");
 }
 
 int	main(void)
 {
-	t_heap *heap = NULL;
-
-	heap = insert_max_heap(heap, 10);
-	heap = insert_max_heap(heap, 20);
-	heap = insert_max_heap(heap, 15);
-	print_arr(heap->data, heap->len);
-	printf(sep);
-	heap = insert_max_heap(heap, 30);
-	print_arr(heap->data, heap->len);		
-	free_heap(&heap);
+	pthread_t pth;
+	
+	pthread_create(pth, NULL, fn, NULL);
+	pthread_join(pth, NULL);
 }

@@ -27,3 +27,4 @@ t_heap *pop_max_heap(t_heap *heap);
 void swap(int *a, int *b);
 void free_heap(t_heap **heap);
 int indexof(int *list, int len, int ele);
+void print_arr(int *list, int len);
