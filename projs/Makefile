@@ -1,17 +1,23 @@
 CC = cc -Wall -Wextra -Werror
 OUT = tt
-SRC = main.c ./heap/*.c
+SRC = main.c ./heap/*.c ./helpers/*.c
+
+ARGS = 4 400 10 10 10 4 2 2 2 2
+
+arg:run
+	@./$(OUT) $(ARGS)
+
+
 run:
 	@$(CC) $(SRC) -o $(OUT)
-	@./$(OUT)
 cc:
 	@cc $(SRC) -o $(OUT)
-	@./$(OUT)
 
 gdb:
 	@$(CC) $(SRC) -o $(OUT) -g
-	@gdb ./$(OUT)
+	@gdb --args ./$(OUT) $(ARGS)
 clean:
 	@rm -rf $(OUT)
 
-
+tes:
+	./$(OUT)
