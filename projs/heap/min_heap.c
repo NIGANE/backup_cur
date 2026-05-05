@@ -1,40 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   max_heap.c                                         :+:      :+:    :+:   */
+/*   min_heap.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/14 19:52:36 by amerkht           #+#    #+#             */
-/*   Updated: 2026/04/05 16:42:51 by negane           ###   ########.fr       */
+/*   Created: 2026/04/04 16:41:29 by negane            #+#    #+#             */
+/*   Updated: 2026/04/06 14:46:17 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "heap.h"
 
-int	is_max_sorted(int *list, int len)
+int is_min_sorted(int *list, int len)
 {
 	while (--len > 0)
 	{
-		if (list[len] > list[(len - 1) / 2])
+		if (list[len] < list[(len - 1) / 2])
 			return (0);
 	}
 	return (1);
 }
 
-int	*sort_max_heap(int *list, int len)
+int	*sort_min_heap(int *list, int len)
 {
 	int	i;
 	int	tmp;
 
 	if (!list)
 		return (NULL);
-	if (is_max_sorted(list, len))
+	if (is_min_sorted(list, len))
 		return (list);
 	i = len - 1;
 	while (i > 0)
 	{
-		if (list[i] > list[(i - 1) / 2])
+		if (list[i] < list[(i - 1) / 2])
 		{
 			tmp = list[i];
 			list[i] = list[(i - 1) / 2];
@@ -42,11 +42,10 @@ int	*sort_max_heap(int *list, int len)
 		}
 		i--;
 	}
-	return (sort_max_heap(list, len));
+	return (sort_min_heap(list, len));
 }
 
-
-t_heap	*insert_max_heap(t_heap *heap, int data)
+t_heap	*insert_min_heap(t_heap *heap, int data)
 {
 	int	i;
 	int	*new_list;
@@ -62,8 +61,9 @@ t_heap	*insert_max_heap(t_heap *heap, int data)
 		new_list[i] = heap->data[i];
 		i++;
 	}
+	//	insert the new record...
 	new_list[i] = data;
-	while (i != 0 && new_list[i] > new_list[(i - 1) / 2])
+	while (i != 0 && new_list[i] < new_list[(i - 1) / 2])
 	{
 		swap(new_list + i, new_list + ((i - 1) / 2));
 		i = (i - 1) / 2;
@@ -74,10 +74,10 @@ t_heap	*insert_max_heap(t_heap *heap, int data)
 	return (heap);
 }
 
-t_heap	*pop_max_heap(t_heap *heap)
+t_heap	*pop_min_heap(t_heap *heap)
 {
 	int index;
-	int biggest;
+	int minimum;
 	int i;
 	int *new;
 	int len;
@@ -97,10 +97,10 @@ t_heap	*pop_max_heap(t_heap *heap)
 	{
 		if (L(i) >= len || R(i) >= len)
 			break ;
-		biggest = max(new[L(i)], new[R(i)]);
-		if (new[i] < biggest)
+		minimum = min(new[L(i)], new[R(i)]);
+		if (new[i] > minimum)
 		{
-			index = indexof(new, len, biggest);
+			index = indexof(new, len, minimum);
 			swap(new + i, new + index);
 		}
 		else

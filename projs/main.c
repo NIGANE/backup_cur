@@ -6,7 +6,7 @@
 /*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/03/29 22:08:07 by negane           ###   ########.fr       */
+/*   Updated: 2026/04/12 21:34:25 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void suspend(long s)
     usleep(s * 1000);
 }
 
+
 t_env *extract_args(char **av)
 {
     t_env *env;
@@ -54,6 +55,12 @@ t_env *extract_args(char **av)
         || !env->t_cooldown)
         return (NULL);
     return (env);
+}
+
+void *life_cycle(void * arg)
+{
+    // t_coder *coders = (t_coder *) arg;
+    printf("Executing thread:\n");
 }
 
 t_coder *create_coders(t_env *env)
@@ -98,8 +105,6 @@ int main(int ac, char **av) {
     coders = create_coders(env);
     if (!coders)
         return (free(env), 0);
-    pthread_mutex_init(&(env->dongles[0]), NULL);
-    pthread_mutex_init(&(env->dongles[1]), NULL);
     i = 0;
     while (i < env->nb_coders)
     {

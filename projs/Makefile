@@ -4,6 +4,10 @@ SRC = main.c ./heap/*.c ./helpers/*.c
 
 ARGS = 4 400 10 10 10 4 2 2 2 2
 
+tt:
+	@cc test.c
+	@./a.out
+
 arg:run
 	@./$(OUT) $(ARGS)
 
