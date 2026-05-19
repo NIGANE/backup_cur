@@ -4,7 +4,9 @@ from typing import List
 
 
 class Agent():
-    def __init__(self, model: Small_LLM_Model, prompt: str, functions_definitions: List[str]):
+    def __init__(
+            self, model: Small_LLM_Model, prompt: str,
+            functions_definitions: List[str]):
         self.fns = functions_definitions
         self.model = model
         self.prompt = prompt
@@ -16,9 +18,12 @@ class Agent():
         self.generate(["name"])
         self.generate(['"'])
         self.generate([":"])
-        self.generate(['"'])
+        self.generate([' "'])
         self.generate(['func'])
         self.generate(['"'])
+        self.generate([","])
+        self.generate([' "'])
+
         # self.complext_generation([*self.fns])
         self.generate(["}"])
         # while (self.res[-1] != "}"):
@@ -32,7 +37,7 @@ class Agent():
 
         allowed_ids = []
         for word in authorized_strings:
-            word_ids = self.model.encode(" " + word)[0].tolist()
+            word_ids = self.model.encode(word)[0].tolist()
             if len(word_ids) == 1:
                 allowed_ids.append(word_ids[0])
                 mask[word_ids[0]] = 0.0
@@ -48,11 +53,9 @@ class Agent():
         pass
 
 
-def prompting():
-    prompt = "What is the sum of 2 and 3?"
-    agent = Agent(Small_LLM_Model(), prompt, ["fn_add", "fn_subtract", "fn_multiply", "fn_divide"])
-    agent.generate_json_valid()
-    print(f"res: {agent.res}")
+# def prompting():
+#     agent.generate_json_valid()
+#     print(f"res: {agent.res}")
     # authorized_strings = ["fn_add", "fn_subtract", "fn_multiply", "fn_divide"]
 
 

@@ -1,9 +1,11 @@
 import sys
 from json import JSONDecodeError, load as json_load
 from typing import Dict, List, Optional
+
+from torch import func
 from src.models.FunctionDefinition import FunctionDefinition
 from src.models.PromptValidation import PromptValidation
-from src.models.ValidData import ValidData
+from src.models.ValidData import ValidData, InvalidData
 
 
 def error_usage_func():
@@ -69,7 +71,24 @@ def parse():
             validated_prompts.append(PromptValidation(**row_data))
     except Exception as e:
         print(f"Validation failed: {e}")
-    return ValidData(validated_functions, validated_prompts)
+        return InvalidData()
+    filtered_functions = []
+    # print(validated_functions)
+
+    pomp = {}
+    for fn in validated_functions:
+        pomp["name"] = fn.name
+        if fn.__dict__.get("parameters") is not None:
+            params = {}
+            for param in fn.__dict__["parameters"]:
+                params[param] = fn.__dict__["parameters"][param].type
+            pomp["parameters"] = params
+        else:
+            pomp["parameters"] = None
+        filtered_functions.append(pomp)
+        pomp = {}
+
+    return ValidData(filtered_functions, validated_prompts)
 
 
 def parse_propt():

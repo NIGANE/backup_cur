@@ -2,5 +2,10 @@
 
 class ValidData():
     def __init__(self, functions_definitions, input_prompts):
-        self.functions_definitions = functions_definitions
-        self.input_prompts = input_prompts
+        self.funcs = functions_definitions
+        self.promts = input_prompts
+
+
+class InvalidData():
+    def __init__(self):
+        return None
