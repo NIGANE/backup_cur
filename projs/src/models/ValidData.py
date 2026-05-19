@@ -3,7 +3,7 @@
 class ValidData():
     def __init__(self, functions_definitions, input_prompts):
         self.funcs = functions_definitions
-        self.promts = input_prompts
+        self.prompts = input_prompts
 
 
 class InvalidData():
