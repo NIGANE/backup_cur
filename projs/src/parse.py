@@ -71,13 +71,13 @@ def parse():
             validated_prompts.append(PromptValidation(**row_data))
     except Exception as e:
         print(f"Validation failed: {e}")
-        return InvalidData()
+        return None
     filtered_functions = []
-    # print(validated_functions)
 
     pomp = {}
     for fn in validated_functions:
         pomp["name"] = fn.name
+        pomp["description"] = fn.description
         if fn.__dict__.get("parameters") is not None:
             params = {}
             for param in fn.__dict__["parameters"]:
@@ -85,6 +85,7 @@ def parse():
             pomp["parameters"] = params
         else:
             pomp["parameters"] = None
+        pomp["returns"] = fn.returns.type
         filtered_functions.append(pomp)
         pomp = {}
 

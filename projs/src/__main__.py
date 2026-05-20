@@ -16,10 +16,10 @@ def main():
     agent = Agent(
         Small_LLM_Model(),
         valid_data.prompts[0].prompt,
-        [fn['name'] for fn in valid_data.funcs]
+        valid_data.funcs
         )
     agent.generate_json_valid()
-    print(agent.res)
+    # print(agent.res)
 
 
 if __name__ == "__main__":

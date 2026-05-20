@@ -6,34 +6,47 @@ from typing import List
 class Agent():
     def __init__(
             self, model: Small_LLM_Model, prompt: str,
-            functions_definitions: List[str]):
+            functions_definitions):
         self.fns = functions_definitions
+        self.fn_names = [fn['name'] for fn in self.fns]
         self.model = model
         self.prompt = prompt
+        self.constrained_prompt = prompt
+        self.encoded_prompt = self.model.encode(self.prompt)[0].tolist()
         self.res = ""
+        self.fn_name_res = ""
 
     def generate_json_valid(self):
-        self.generate(["{"])
-        self.generate(['"'])
-        self.generate(["name"])
-        self.generate(['"'])
-        self.generate([":"])
-        self.generate([' "'])
-        self.generate(['func'])
-        self.generate(['"'])
-        self.generate([","])
-        self.generate([' "'])
+        # constrained decoding the function name
+        # self.res += '{"name": "'
+        self.generate_function_name()
 
-        # self.complext_generation([*self.fns])
-        self.generate(["}"])
-        # while (self.res[-1] != "}"):
+        selected_fn = [
+            fn for fn in self.fns if fn['name'] == self.fn_name_res][0]
+        # self.res += '"'
+        # if (self.fn_name_res in self.fn_names):
+        #     self.res += self.fn_name_res
+        # else:
+        #     self.res += "undefined"
+        # self.res += '"'
+        # ///////////////
+
+        # generating the params
+        if (
+            self.fn_name_res in self.fn_names and
+            selected_fn['parameters'] is not None
+        ):
+            self.res += ', "parameters": {'
+            self.generate_params()
+            self.res += '}'
+        elif selected_fn['parameters'] is None:
+            self.res += ', "parameters": None'
+        self.res += "}"
 
     def generate(self, authorized_strings: List[str]):
-        prompt_ids = self.model.encode(self.prompt)[0].tolist()
-
-        logits = self.model.get_logits_from_input_ids(prompt_ids)
-        logits = torch.tensor(logits)
-        mask = torch.full(logits.shape, float('-inf'))
+        logits = self.model.get_logits_from_input_ids(self.encoded_prompt)
+        torch_logits = torch.tensor(logits)
+        mask = torch.full(torch_logits.shape, float('-inf'))
 
         allowed_ids = []
         for word in authorized_strings:
@@ -44,76 +57,41 @@ class Agent():
             else:
                 print("warning encoding produces more than one token!!")
 
-        filtered_logits = logits + mask
+        filtered_logits = torch_logits + mask
         next_token_id = torch.argmax(filtered_logits).item()
-        print(f"Predicted word:{self.model.decode([next_token_id])}")
-        self.res = self.res + self.model.decode([next_token_id])
+        self.res = self.res + self.model.decode(torch.tensor(next_token_id))
 
-    def complext_generation(self, authorized_strings: List[str]):
-        pass
+    def generate_function_name(self) -> str:
+        authorized_ids = [
+            self.model.encode(fn_name).tolist()[0]
+            for fn_name in self.fn_names
+            ]
+        self.constrained_prompt += ", the name of the function is "
+        for i in range(len(authorized_ids[0])):
+            res = self.prompting_by_token([ele[i] for ele in authorized_ids])
+            self.fn_name_res += res
+            self.constrained_prompt += res
+        # self.res += self.fn_name_res
+        return self.fn_name_res
 
+    def prompting_by_token(self, tokens: List[int]):
+        prompt_ids = self.model.encode(self.constrained_prompt)[0].tolist()
+        logits = self.model.get_logits_from_input_ids(prompt_ids)
+        torch_logits = torch.tensor(logits)
+        mask = torch.full(torch_logits.shape, float('-inf'))
+        for ele in tokens:
+            mask[ele] = 0.0
+        filtered_logits = torch_logits + mask
+        next_token_id = torch.argmax(filtered_logits).item()
+        return self.model.decode(torch.tensor(next_token_id))
 
-# def prompting():
-#     agent.generate_json_valid()
-#     print(f"res: {agent.res}")
-    # authorized_strings = ["fn_add", "fn_subtract", "fn_multiply", "fn_divide"]
+    def generate_params(self):
+        params = [
+            fn for fn in self.fns
+            if fn['name'] == self.fn_name_res][0]['parameters']
+        for key in params:
+            print(f"{key} : {params[key]}")
+            self.prompting_params(key, params[key])
 
-
-
-
-    # prompt = "What is the sum of 2 and 3?"
-    # authorized_strings = ["fn_add", "fn_subtract", "fn_multiply", "fn_divide"]
-
-    # # encode each authorized string as a sequence of tokens
-    # authorized_token_sequences = []
-    # for s in authorized_strings:
-    #     tokens = model.encode(" " + s)   # e.g. [24944, 62, 2860]
-    #     authorized_token_sequences.append(tokens)
-    #     print(f"'{s}' → {tokens}  (len: {len(tokens)})")
-
-    # # now do prefix-guided decoding
-    # input_ids = model.encode(prompt)
-    # generated = []   # tokens generated so far
-
-    # # keep going until all sequences are eliminated or one is fully matched
-    # candidates = list(range(len(authorized_strings)))  # indices of still-valid strings
-
-    # for position in range(max(len(s) for s in authorized_token_sequences)):
-
-    #     # which first tokens are still valid at this position?
-    #     allowed_at_position = set()
-    #     for i in candidates:
-    #         seq = authorized_token_sequences[i]
-    #         if position < len(seq):
-    #             allowed_at_position.add(seq[position])
-
-    #     # get logits for current input
-    #     logits = torch.tensor(model.get_logits_from_input_ids(input_ids[0].tolist() + generated))
-
-    #     # mask everything except allowed tokens at this position
-    #     mask = torch.full(logits.shape, float('-inf'))
-    #     for token_id in allowed_at_position:
-    #         mask[token_id] = 0
-
-    #     # pick best token
-    #     constrained_logits = logits + mask
-    #     next_token = torch.argmax(constrained_logits).item()
-    #     generated.append(next_token)
-
-    #     # eliminate candidates that don't match what we just picked
-    #     candidates = [
-    #         i for i in candidates
-    #         if position < len(authorized_token_sequences[i])
-    #         and authorized_token_sequences[i][position] == next_token
-    #     ]
-
-    #     # if only one candidate left and it's fully generated → done
-    #     if len(candidates) == 1:
-    #         seq = authorized_token_sequences[candidates[0]]
-    #         if len(generated) >= len(seq):
-    #             break
-
-    #     # decode result
-    #     result = model.decode(input_ids + generated)
-    #     print(result)
-    #     # → "What is the sum of 2 and 3? fn_add"
+    def prompting_params(self, key, value):
+        print(self.constrained_prompt)
