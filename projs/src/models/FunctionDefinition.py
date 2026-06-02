@@ -1,9 +1,20 @@
 from pydantic import BaseModel
+from enum import Enum
 from typing import Dict, Optional
 
 
+class ValidTypes(Enum):
+    STRING = "string"
+    NUMBER = "number"
+    BOOL = "boolean"
+    INT = "integer"
+    NONE = "None"
+
+
 class TypeProperty(BaseModel):
-    type: str = "string" or "number" or "boolean" or "integer" or "None" or "array"
+    type: ValidTypes = (ValidTypes.STRING.value
+                        or ValidTypes.NUMBER.value or ValidTypes.BOOL.value
+                        or ValidTypes.INT.value or ValidTypes.NONE.value)
 
 
 class FunctionDefinition(BaseModel):
