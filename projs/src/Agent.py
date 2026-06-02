@@ -21,27 +21,25 @@ class Agent():
     def generate_json_valid(self):
         # constrained decoding the function name
         self.generate_function_name()
-        print(f"generated_func : {self.fn_name_res}")
         selected_fn = [
             fn for fn in self.fns if fn['name'] == self.fn_name_res][0]
-        print(selected_fn)
 
-        # if (self.fn_name_res in self.fn_names):
-        #     self.res["name"] = self.fn_name_res
-        # else:
-        #     self.res["name"] = "undefined"
-        # # ///////////////
+        if (self.fn_name_res in self.fn_names):
+            self.res["name"] = self.fn_name_res
+        else:
+            self.res["name"] = "undefined"
+        # ///////////////
 
         # # generating the params
-        # if (
-        #     self.fn_name_res in self.fn_names and
-        #     selected_fn['parameters'] is not None
-        # ):
-        #     self.generate_params()
-        #     self.res["parameters"] = self.params
-        # elif selected_fn['parameters'] is None:
-        #     self.res["parameters"] = "None"
-        # return ({"prompt": self.prompt, **self.res})
+        if (
+            self.fn_name_res in self.fn_names and
+            selected_fn['parameters'] is not None
+        ):
+            self.generate_params()
+            self.res["parameters"] = self.params
+        elif selected_fn['parameters'] is None:
+            self.res["parameters"] = "None"
+        return ({"prompt": self.prompt, **self.res})
 
     def generate(self, authorized_strings: List[str]):
         logits = self.model.get_logits_from_input_ids(self.encoded_prompt)
@@ -107,23 +105,49 @@ class Agent():
         return self.model.decode(torch.tensor(next_token_id))
 
     def generate_params(self):
+        target_func = [ele for ele in self.fns if ele["name"] == self.fn_name_res][0]
+        self.constrained_prompt = f"""You are a parameter extraction engine.
+Function: {self.fn_name_res}
+Description: {target_func["description"]}
+User prompt: '{self.prompt}'
+paramters:
+"""
         params = [
             fn for fn in self.fns
             if fn['name'] == self.fn_name_res][0]['parameters']
         for key in params:
-            # print(f"{key} : {params[key]}")
+            self.constrained_prompt += f"{key} ({params[key].value}): [value] is "
             self.prompting_params(key, params[key].value)
 
     def prompting_params(self, key, tp):
+        prompt = """
+You are a parameter extraction engine.
+Function: fn_greet
+User prompt: 'greet shrek'
+name (string): [extract the full name, end with ###]
+"""
 
-        self.constrained_prompt += f', the value of the parameter {key} is '
-        input_ids = self.model.encode(self.constrained_prompt).tolist()[0]
-        logits = self.model.get_logits_from_input_ids(input_ids)
-        next_word_id = (torch.argmax(torch.tensor(logits)).item())
-        next_word = self.model.decode(next_word_id)
-        if tp == ValidTypes.INT.value:
-            next_word = (next_word)
-        elif tp == ValidTypes.NUMBER.value:
-            next_word = float(next_word)
-        self.params[key] = next_word
-        self.constrained_prompt += str(next_word)
+        result = ""
+        while True:
+            next_token = model.generate(
+                prompt + result,
+                max_new_tokens=1,
+                allowed_tokens=ALPHANUM_TOKENS  # whitelist only a-z, A-Z, 0-9
+            )
+            
+            if next_token == "###" or next_token in EOS_TOKENS:
+                break
+            
+            result += next_token  # "s" → "sh" → "shr" → "shre" → "shrek"
+    
+        # input_ids = self.model.encode(self.constrained_prompt).tolist()[0]
+        # logits = self.model.get_logits_from_input_ids(input_ids)
+        # next_word_id = (torch.argmax(torch.tensor(logits)).item())
+        # next_word = self.model.decode(next_word_id)
+        # if tp == ValidTypes.INT.value:
+        #     next_word = (next_word)
+        # elif tp == ValidTypes.NUMBER.value:
+        #     next_word = float(next_word)
+        # self.params[key] = next_word
+        # self.constrained_prompt += str(next_word) + "\n"
+        # print(self.constrained_prompt)

@@ -6,10 +6,10 @@ from llm_sdk import Small_LLM_Model
 from typing import Dict, Any
 
 
-def prompting_visualizer(valid_data, res):
-    for prompt in valid_data.prompts:
-        print(f"- {prompt} ")
-        print(f"|\n|--> {"answer"}\n")
+def prompting_visualizer(agents):
+    for agent in agents:
+        print(f"- {agent.prompt} ")
+        print(f"|\n|--> {agent.res} \n")
 
 
 def main():
@@ -22,16 +22,16 @@ def main():
     # prompting_visualizer(valid_data, None)
     # res: list[Dict] = []
     # buffer: dict[str, Any] = {}
+    # for pt in valid_data.prompts:
+
     agent = Agent(
         Small_LLM_Model(),
-        valid_data.prompts[0].prompt,
+        valid_data.prompts[2].prompt,
         valid_data.funcs
         )
-    agent.generate_function_name()
-    print("prompt: ", valid_data.prompts[0].prompt)
-    print("fn_name: ", agent.fn_name_res)
-    # print([ele["name"] for ele in agent.fns])
-    # buffer = agent.generate_json_valid()
+    agent.generate_json_valid()
+    
+    prompting_visualizer([agent])
     # res.append(buffer)
     # buffer = {}
     # print(res)
