@@ -67,17 +67,5 @@
     "returns": {
       "type": "string"
     }
-  },
-  {
-    "name": "fn_replace_subtitle",
-    "description": "Replace all occurences in string with given string",
-    "parameters": {
-      "replacement": {
-        "type": "string"
-      }
-    },
-    "returns": {
-      "type": "string"
-    }
   }
 ]
