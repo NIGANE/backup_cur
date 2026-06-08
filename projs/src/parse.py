@@ -1,11 +1,12 @@
 import sys
-from json import JSONDecodeError, load as json_load
+import os
+from json import JSONDecodeError, load as json_load, dump
 from typing import Dict, List, Optional
 
-from torch import func
+from src.Agent import Prompt
 from src.models.FunctionDefinition import FunctionDefinition
 from src.models.PromptValidation import PromptValidation
-from src.models.ValidData import ValidData, InvalidData
+from src.models.ValidData import ValidData
 
 
 def error_usage_func():
@@ -49,10 +50,13 @@ def parse():
         sys.argv[sys.argv.index(input) + 1] if input in sys.argv else None)
     output_file = (
         sys.argv[sys.argv.index(output) + 1] if output in sys.argv else None)
+    outupt_folder = os.path.basename(os.path.dirname(output_file))
+    input_folder = os.path.basename(os.path.dirname(input_file))
     if (
         (input_file is None) or
         (fn_definition_file is None) or
         (output_file is None)
+
     ):
         error_usage_func()
         return
@@ -89,8 +93,13 @@ def parse():
         filtered_functions.append(pomp)
         pomp = {}
 
-    return ValidData(filtered_functions, validated_prompts)
+    return ValidData(filtered_functions, validated_prompts, output_file)
 
 
-def parse_propt():
-    pass
+def dump_json(outs: List[Prompt], out_file: str):
+    try:
+        with open(out_file, "w") as file:
+            dump(outs, file, indent=4)
+        print("Output file is ready.")
+    except BaseException:
+        print("error while dump into json output file")

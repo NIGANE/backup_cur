@@ -2,8 +2,10 @@ import sys
 from src.parse import error_usage_func
 from src.parse import parse
 from src.Agent import Agent, Prompt
-from llm_sdk import Small_LLM_Model
+from src.parse import dump_json
+
 from typing import Dict, List, Any
+from llm_sdk import Small_LLM_Model
 
 
 def prompting_visualizer(prompts: List[Prompt]):
@@ -21,14 +23,23 @@ def main() -> None:
         if not valid_data:
             print("invalid input")
             return
+
         #  instantiate the Model with Prompts and Functions
         agent = Agent(
             Small_LLM_Model(),
             [pt.prompt for pt in valid_data.prompts],
             valid_data.funcs
             )
-        # results: List[Prompt] = agent.resolve_prompts()
-        # prompting_visualizer(results)
+
+        results: List[Prompt] = agent.resolve_prompts()
+        dump_json(
+            [
+                {
+                    "prompt": ptt.prompt, "name": ptt.name,
+                    "parameters": ptt.parameters
+                }
+                for ptt in results],
+            valid_data.output_file)
     except BaseException as e:
         print(f"ERROR catched: {e}")
 

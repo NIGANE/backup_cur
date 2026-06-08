@@ -29,12 +29,11 @@ class Agent():
             self.generate_json_valid()
             self.prompts.append(self.prompt)
             self.empty()
-            res = {
-                "name": self.prompt.name,
-                "parameters": self.prompt.parameters
-                }
-            print(f"|-> {res}")
-            break
+            # res = {
+            #     "name": self.prompt.name,
+            #     "parameters": self.prompt.parameters
+            #     }
+            # print(f"|-> {res}")
 
     def empty(self):
         self.constrained_prompt = ""
@@ -42,11 +41,13 @@ class Agent():
     def generate_json_valid(self):
         # constrained decoding the function name
         self.generate_function_name()
-        selected_fn = [
-            fn for fn in self.fns if fn['name'] == self.prompt.name][0]
+        selected_fn = []
         if (self.prompt.name not in self.fn_names):
             self.prompt.name = "undefined"
             return
+        else:
+            selected_fn = [
+                fn for fn in self.fns if fn['name'] == self.prompt.name][0]
 
         # generating the params
         if selected_fn['parameters'] is not None:
@@ -75,11 +76,12 @@ class Agent():
             for fn_name in self.fn_names
             ]
         self.constrained_prompt = self.build_prompt()
+        # print(self.constrained_prompt)
         self.constrained_prompt += (
             f"the best function to traite "
             f"this user request: '{self.prompt.prompt}' is :")
 
-        i: int = 0
+        i = 0
         while (i < self.max_tokenized(authorized_ids)):
             res = self.prompting_by_token(
                 self.constrained_prompt, [ele[i] for ele in authorized_ids])
@@ -89,7 +91,7 @@ class Agent():
             i += 1
 
     @staticmethod
-    def max_tokenized(tokens: List[List[int]]):
+    def max_tokenized(tokens: List[List[int]]) -> int:
         if len(tokens) == 0:
             return 0
         max_size = len(tokens[0])
@@ -108,7 +110,7 @@ class Agent():
     def prompting_by_token(self, ppt: str, tokens: List[int]) -> str:
         prompt_ids = self.model.encode(ppt)[0].tolist()
         logits = self.model.get_logits_from_input_ids(prompt_ids)
-        torch_logits = tensor(logits)
+        torch_logits: Tensor = tensor(logits)
         mask = full(torch_logits.shape, float('-inf'))
         for ele in tokens:
             mask[ele] = 0.0
@@ -121,8 +123,7 @@ class Agent():
             ele for ele in self.fns if ele["name"] == self.prompt.name][0]
         self.constrained_prompt = (
             f"You are a parameter extraction engine.\n"
-            f"User prompt: '{self.prompt.prompt}'\n"
-            f"Function used: {self.prompt.name}")
+            f"Function to use: {self.prompt.name}")
         params = list(target_func["parameters"].keys())
         item = "("
         for i in range(len(params)):
@@ -132,27 +133,40 @@ class Agent():
                 item += ", "
         item += ")\n"
         item += f"Description: {target_func["description"]}\n"
+
         self.constrained_prompt += item
+        self.constrained_prompt += f"\n\nUser Prompt: {self.prompt.prompt}\n"
+
         params = [
             fn for fn in self.fns
             if fn['name'] == self.prompt.name][0]['parameters']
         for key in params:
-            self.constrained_prompt += f"{key} ({params[key].value}):"
+            self.constrained_prompt += f"{key} ({params[key].value}): '"
             if (params[key].value == ValidTypes.NUMBER.value):
                 self.prompting_number_params(key, params[key].value)
             else:
-                self.prompting_params(key, params[key].value)
+                self.prompting_str_params(key, params[key].value)
 
-    def prompting_params(self, key: str, type: str) -> None:
+    def prompting_str_params(self, key: str, type: str) -> None:
         i = 0
         founded = ""
-        print(self.constrained_prompt)
+        # alphabet = ("abcdefghijklmnopqrstuvwxyz"
+        #             + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' ")
+        # special = ".^$*+?}{[]|()-,\\"
+        # encodes = [
+        #     self.model.encode(ele)[0].tolist()[0]
+        #     for ele in (alphabet + special)]
+        # encodes.append(self.model.encode("'\n")[0].tolist()[0])
         while i < self.max_tokens:
             input_ids = self.model.encode(
                 self.constrained_prompt + founded).tolist()[0]
             logits = self.model.get_logits_from_input_ids(input_ids)
             next_word_id: Tensor = (argmax(tensor(logits)))
             next_word = self.model.decode(next_word_id)
+            # next_word = self.prompting_by_token(
+            #     self.constrained_prompt + founded,
+            #     encodes
+            # )
             if (next_word == "'\n"):
                 break
             if (
@@ -161,7 +175,6 @@ class Agent():
                     ):
                 founded += next_word
             i += 1
-        print("fnded: #", founded, "#")
         self.prompt.parameters[key] = founded
         self.constrained_prompt += str(founded) + "\n"
 
