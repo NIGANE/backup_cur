@@ -16,7 +16,7 @@ class Prompt():
 class Agent():
     def __init__(
             self, model: Small_LLM_Model, prompts: List[str],
-            functions_definitions):
+            functions_definitions: ):
         self.fns = functions_definitions
         self.fn_names = [fn['name'] for fn in self.fns]
         self.model = model
@@ -29,11 +29,8 @@ class Agent():
             self.generate_json_valid()
             self.prompts.append(self.prompt)
             self.empty()
-            # res = {
-            #     "name": self.prompt.name,
-            #     "parameters": self.prompt.parameters
-            #     }
-            # print(f"|-> {res}")
+            print({"name": self.prompt.name, "params": self.prompt.parameters})
+            break
 
     def empty(self):
         self.constrained_prompt = ""
@@ -76,7 +73,6 @@ class Agent():
             for fn_name in self.fn_names
             ]
         self.constrained_prompt = self.build_prompt()
-        # print(self.constrained_prompt)
         self.constrained_prompt += (
             f"the best function to traite "
             f"this user request: '{self.prompt.prompt}' is :")
@@ -150,23 +146,12 @@ class Agent():
     def prompting_str_params(self, key: str, type: str) -> None:
         i = 0
         founded = ""
-        # alphabet = ("abcdefghijklmnopqrstuvwxyz"
-        #             + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' ")
-        # special = ".^$*+?}{[]|()-,\\"
-        # encodes = [
-        #     self.model.encode(ele)[0].tolist()[0]
-        #     for ele in (alphabet + special)]
-        # encodes.append(self.model.encode("'\n")[0].tolist()[0])
         while i < self.max_tokens:
             input_ids = self.model.encode(
                 self.constrained_prompt + founded).tolist()[0]
             logits = self.model.get_logits_from_input_ids(input_ids)
             next_word_id: Tensor = (argmax(tensor(logits)))
             next_word = self.model.decode(next_word_id)
-            # next_word = self.prompting_by_token(
-            #     self.constrained_prompt + founded,
-            #     encodes
-            # )
             if (next_word == "'\n"):
                 break
             if (
@@ -199,7 +184,7 @@ class Agent():
                 founded += next_word
             i += 1
         self.constrained_prompt += founded
-        self.prompt.parameters[key] = int(founded)
+        self.prompt.parameters[key] = float(founded)
 
     def resolve_prompts(self) -> List[Prompt]:
         return self.prompts

@@ -1,9 +1,12 @@
 [
   {
-    "prompt": "Greet shrek"
+    "prompt": "Replace all vowels in 'Programming is fun' with asterisks"
   },
   {
-    "prompt": "What is the sum of 2 and 3?"
+    "prompt": "What is the sum of 2 And 3?"
+  },
+  {
+    "prompt": "Greet shrek"
   },
   {
     "prompt": "What is the sum of 265 and -345?"
@@ -25,9 +28,6 @@
   },
   {
     "prompt": "Replace all numbers in \"Hello 34 I'm 233 years old\" with NUMBERS"
-  },
-  {
-    "prompt": "Replace all vowels in 'Programming is fun' with asterisks"
   },
   {
     "prompt": "Substitute the word 'cat' with 'dog' in 'The cat sat on the mat with another cat'"

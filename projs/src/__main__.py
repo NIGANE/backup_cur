@@ -3,6 +3,7 @@ from src.parse import error_usage_func
 from src.parse import parse
 from src.Agent import Agent, Prompt
 from src.parse import dump_json
+from src.models.ErrorHandler import MyError
 
 from typing import Dict, List, Any
 from llm_sdk import Small_LLM_Model
@@ -21,8 +22,7 @@ def main() -> None:
             error_usage_func()
         valid_data = parse()
         if not valid_data:
-            print("invalid input")
-            return
+            raise MyError("invalid input")
 
         #  instantiate the Model with Prompts and Functions
         agent = Agent(
@@ -40,6 +40,8 @@ def main() -> None:
                 }
                 for ptt in results],
             valid_data.output_file)
+    except MyError as e:
+        print(f"# {e}")
     except BaseException as e:
         print(f"ERROR catched: {e}")
 

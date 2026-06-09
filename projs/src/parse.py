@@ -1,23 +1,19 @@
 import sys
-import os
+# import os
 from json import JSONDecodeError, load as json_load, dump
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
-from src.Agent import Prompt
 from src.models.FunctionDefinition import FunctionDefinition
 from src.models.PromptValidation import PromptValidation
 from src.models.ValidData import ValidData
+from src.models.ErrorHandler import MyError
+from pydantic import ValidationError
 
 
-def error_usage_func():
-    print("Error: Missing required arguments.", file=sys.stderr)
-    print(
-        "Usage: python main.py --functions_definition "
-        "<fn_definitions_file> --input <input_file> "
-        "--output <output_file>",
-        file=sys.stderr
-    )
-    sys.exit(1)
+def error_usage_func() -> str:
+    return ("Usage: uv run python -m src --functions_definition."
+            + " <fn_definitions_file>.json --input <input_file>.json "
+            + "--output <output_file>.json")
 
 
 def load_inputs(s: str) -> Optional[List[Dict]]:
@@ -26,22 +22,28 @@ def load_inputs(s: str) -> Optional[List[Dict]]:
         with open(s, 'r') as f:
             data = json_load(f)
     except FileNotFoundError as e:
-        print(f"Error: {e.filename} not found.")
-        return None
+        raise MyError(f"FileNotFoundError: {e.filename} not found.")
     except JSONDecodeError as e:
-        print(f"Error: {e} not vald json format")
-        return None
-    except Exception as e:
-        print(f"Error: {e.__class__.__name__}")
-        return None
+        raise MyError(f"JsonError: {e} not valid json format")
     else:
         return data
+
+
+def ends_with(src: str, sub: str):
+    i = 0
+    while i < len(sub):
+        if (sub[len(sub) - i - 1] != src[len(src) - i - 1]):
+            return False
+        i += 1
+    return True
 
 
 def parse():
     func_definitions = "--functions_definition"
     input = "--input"
     output = "--output"
+    if len(sys.argv) != 7:
+        raise MyError(f"Invalid arguments: {error_usage_func()}")
     fn_definition_file = (
         sys.argv[sys.argv.index(func_definitions) + 1]
         if func_definitions in sys.argv else None
@@ -50,22 +52,21 @@ def parse():
         sys.argv[sys.argv.index(input) + 1] if input in sys.argv else None)
     output_file = (
         sys.argv[sys.argv.index(output) + 1] if output in sys.argv else None)
-    outupt_folder = os.path.basename(os.path.dirname(output_file))
-    input_folder = os.path.basename(os.path.dirname(input_file))
+    if (not ends_with(output_file, ".json") or
+            not ends_with(input_file, ".json") or
+            not ends_with(fn_definition_file, ".json")):
+        raise MyError(f"Invalid arguments: {error_usage_func()}")
     if (
         (input_file is None) or
         (fn_definition_file is None) or
         (output_file is None)
 
     ):
-        error_usage_func()
-        return
+        raise MyError(
+            f"Error: Missing required arguments.\n{error_usage_func()}")
 
     fn_definitions = load_inputs(fn_definition_file)
     input_prompts = load_inputs(input_file)
-    if (fn_definitions is None) or (input_prompts is None):
-        print("Error: Failed to load input files.")
-        sys.exit(1)
     validated_functions = []
     validated_prompts = []
     try:
@@ -73,9 +74,10 @@ def parse():
             validated_functions.append(FunctionDefinition(**row_data))
         for row_data in input_prompts:
             validated_prompts.append(PromptValidation(**row_data))
-    except Exception as e:
-        print(f"Validation failed: {e}")
-        return None
+    except ValidationError as e:
+        raise MyError(
+            f"ValidationError ({e.errors()[0]['type']}, "
+            f"'{e.errors()[0]['loc'][0]}'): {e.errors()[0]['msg']} ")
     filtered_functions = []
 
     pomp = {}
@@ -96,10 +98,10 @@ def parse():
     return ValidData(filtered_functions, validated_prompts, output_file)
 
 
-def dump_json(outs: List[Prompt], out_file: str):
+def dump_json(outs: List[Dict[str, Any]], out_file: str):
     try:
         with open(out_file, "w") as file:
             dump(outs, file, indent=4)
         print("Output file is ready.")
-    except BaseException:
-        print("error while dump into json output file")
+    except FileNotFoundError:
+        raise MyError(f"Error: \"{out_file}\" is not a valid path")
