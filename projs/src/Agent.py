@@ -4,6 +4,7 @@ from typing import List, Any, Dict
 from src.models.FunctionDefinition import ValidTypes
 from src.tools.tools import in_string
 from functools import reduce
+from src.models.ErrorHandler import MyError
 
 
 class Prompt():
@@ -16,7 +17,7 @@ class Prompt():
 class Agent():
     def __init__(
             self, model: Small_LLM_Model, prompts: List[str],
-            functions_definitions: ):
+            functions_definitions: List[Dict]):
         self.fns = functions_definitions
         self.fn_names = [fn['name'] for fn in self.fns]
         self.model = model
@@ -28,7 +29,10 @@ class Agent():
             print(f"resolving prompt: {self.prompt.prompt}")
             self.generate_json_valid()
             self.prompts.append(self.prompt)
+            print()
+            print(self.constrained_prompt)
             self.empty()
+            print()
             print({"name": self.prompt.name, "params": self.prompt.parameters})
             break
 
@@ -117,55 +121,63 @@ class Agent():
     def generate_params(self):
         target_func = [
             ele for ele in self.fns if ele["name"] == self.prompt.name][0]
-        self.constrained_prompt = (
-            f"You are a parameter extraction engine.\n"
-            f"Function to use: {self.prompt.name}")
+        self.constrained_prompt = f"You are a parameter extraction engine.\n"
+
+        self.constrained_prompt += f"User Prompt: {self.prompt.prompt}\n"
+        self.constrained_prompt += f"Function to use: {self.prompt.name}"
         params = list(target_func["parameters"].keys())
         item = "("
         for i in range(len(params)):
             item += f"{params[i]}: "
-            item += f"{target_func.get("parameters")[params[i]].value}"
+            ttp = target_func.get("parameters")[params[i]].value
+            item += f"{"str" if ttp == "string" else ttp}"
             if i != len(params) - 1:
                 item += ", "
         item += ")\n"
-        item += f"Description: {target_func["description"]}\n"
+        item += "{"
+        item += f'"function": "{self.prompt.name}"'
 
         self.constrained_prompt += item
-        self.constrained_prompt += f"\n\nUser Prompt: {self.prompt.prompt}\n"
-
-        params = [
+        self.constrained_prompt += ', "parameters": {'
+        prompt = self.constrained_prompt
+        # next_word = ""
+        # while True:
+        #     prompt += next_word
+        #     next_word = self.generate(prompt)
+        #     print(prompt + next_word)
+        #     if "}" in next_word:
+        #         break
+        # raise MyError("done")
+        params: Dict[str, Any] = ([
             fn for fn in self.fns
-            if fn['name'] == self.prompt.name][0]['parameters']
+            if fn['name'] == self.prompt.name][0]['parameters'])
+        i = 0
         for key in params:
-            self.constrained_prompt += f"{key} ({params[key].value}): '"
+            self.constrained_prompt += f'"{key}": '
             if (params[key].value == ValidTypes.NUMBER.value):
                 self.prompting_number_params(key, params[key].value)
             else:
                 self.prompting_str_params(key, params[key].value)
+            i += 1
+            if (i != len(params)):
+                self.constrained_prompt += ", "
 
     def prompting_str_params(self, key: str, type: str) -> None:
         i = 0
         founded = ""
-        while i < self.max_tokens:
-            input_ids = self.model.encode(
-                self.constrained_prompt + founded).tolist()[0]
-            logits = self.model.get_logits_from_input_ids(input_ids)
-            next_word_id: Tensor = (argmax(tensor(logits)))
-            next_word = self.model.decode(next_word_id)
-            if (next_word == "'\n"):
+        self.constrained_prompt += '"'
+        while True:
+            next_word = self.generate(self.constrained_prompt + founded)
+            if '"' in next_word:
                 break
-            if (
-                in_string(
-                    (founded + next_word.strip()).strip(), self.prompt.prompt)
-                    ):
-                founded += next_word
-            i += 1
+            founded += next_word
         self.prompt.parameters[key] = founded
-        self.constrained_prompt += str(founded) + "\n"
+        self.constrained_prompt += str(founded) + '"'
 
     def prompting_number_params(self, key: str, type: str):
         i: int = 0
         founded: str = ""
+        self.constrained_prompt += '" '
         authorized_ids = [
             self.model.encode(ele)[0].tolist()[0] for ele in [" -", " "]]
         next_word = self.prompting_by_token(
@@ -183,8 +195,16 @@ class Agent():
                     ):
                 founded += next_word
             i += 1
-        self.constrained_prompt += founded
+        self.constrained_prompt += (founded + '"').strip()
         self.prompt.parameters[key] = float(founded)
 
     def resolve_prompts(self) -> List[Prompt]:
         return self.prompts
+
+    def generate(self, prompt: str) -> str:
+        tokens_id = self.model.encode(prompt)[0].tolist()
+        logits = self.model.get_logits_from_input_ids(tokens_id)
+        max_tokens = argmax(tensor(logits))
+
+        # print(f"{max_tokens.tolist()} : {vocab_int_sr[max_tokens.tolist()]}")
+        return self.model.decode(max_tokens)
