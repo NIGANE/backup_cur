@@ -1,10 +1,59 @@
 from llm_sdk import Small_LLM_Model
-from torch import Tensor, argmax, tensor, full
-from typing import List, Any, Dict
+from torch import torch, Tensor, argmax, tensor, full
+from typing import  List, Any, Dict
 from src.models.FunctionDefinition import ValidTypes
 from src.tools.tools import in_string
 from functools import reduce
+from json import load
 from src.models.ErrorHandler import MyError
+
+
+class Tokenization:
+    def __init__(self, model: Small_LLM_Model):
+        self.model = model
+        self.int_vocab = {}
+        self.str_vocab = {}
+        self.space_token_id: int = 220
+        self.get_vocab()
+
+    def get_vocab(self):
+        try:
+            file_path: str = self.model.get_path_to_vocab_file()
+            with open(file_path, "r") as f:
+                data = load(f)
+                self.str_vocab = data
+                self.int_vocab = {v: k for k, v in self.str_vocab.items()}
+        except BaseException:
+            raise print("ERROR: while on get_vocab method")
+    
+    def encode(self, prompt: str):
+        space: str = self.int_vocab[self.space_token_id]
+        s: List[str] = prompt.replace(" ", " " + space).split(" ")
+        token_ids = []
+        for ele in s:
+            i = len(ele)
+            sub = ele
+            while True:
+                if sub[:i] in self.str_vocab:
+                    token_ids.append(self.str_vocab[sub[:i]])
+                    if i == len(ele):
+                        break
+                    else:
+                        sub = sub[i:]
+                else:
+                    i -= 1
+                if i == 0:
+                    break
+        return torch.tensor([token_ids])
+    
+    def decode(self, token_ids: List[int] | Tensor):
+        tt: List[int] = token_ids.tolist() if type(token_ids) == Tensor else token_ids
+        re: str = ""
+        for ele in tt:
+            re += self.int_vocab[ele].replace(self.int_vocab[self.space_token_id], " ")
+
+        return [re] if type(token_ids) == Tensor else re
+        
 
 
 class Prompt():
@@ -24,17 +73,16 @@ class Agent():
         self.constrained_prompt = ""
         self.max_tokens: int = 5
         self.prompts: List[Prompt] = []
+        self.tokenizer = Tokenization(model)
         for prompt in prompts:
             self.prompt = Prompt(prompt)
             print(f"resolving prompt: {self.prompt.prompt}")
             self.generate_json_valid()
             self.prompts.append(self.prompt)
-            print()
-            print(self.constrained_prompt)
             self.empty()
-            print()
-            print({"name": self.prompt.name, "params": self.prompt.parameters})
-            break
+            # print()
+            # print({"name": self.prompt.name, "params": self.prompt.parameters})
+            # break
 
     def empty(self):
         self.constrained_prompt = ""
@@ -73,7 +121,7 @@ class Agent():
 
     def generate_function_name(self):
         authorized_ids = [
-            self.model.encode(fn_name).tolist()[0]
+            self.tokenizer.encode(fn_name).tolist()[0]
             for fn_name in self.fn_names
             ]
         self.constrained_prompt = self.build_prompt()
@@ -102,21 +150,21 @@ class Agent():
 
     def filter_authorized_ids(self, pattern: str) -> List[List[int]]:
         return [
-            self.model.encode(fn_name).tolist()[0]
+            self.tokenizer.encode(fn_name).tolist()[0]
             for fn_name in self.fn_names
             if fn_name.startswith(pattern)
         ]
 
     def prompting_by_token(self, ppt: str, tokens: List[int]) -> str:
-        prompt_ids = self.model.encode(ppt)[0].tolist()
+        prompt_ids = self.tokenizer.encode(ppt)[0].tolist()
         logits = self.model.get_logits_from_input_ids(prompt_ids)
         torch_logits: Tensor = tensor(logits)
         mask = full(torch_logits.shape, float('-inf'))
         for ele in tokens:
             mask[ele] = 0.0
         filtered_logits = torch_logits + mask
-        next_token_id = argmax(filtered_logits)
-        return self.model.decode(next_token_id)
+        next_token_id = [argmax(filtered_logits).tolist()]
+        return self.tokenizer.decode(next_token_id)
 
     def generate_params(self):
         target_func = [
@@ -179,14 +227,14 @@ class Agent():
         founded: str = ""
         self.constrained_prompt += '" '
         authorized_ids = [
-            self.model.encode(ele)[0].tolist()[0] for ele in [" -", " "]]
+            self.tokenizer.encode(ele)[0].tolist()[0] for ele in [" -", " "]]
         next_word = self.prompting_by_token(
                 self.constrained_prompt + founded, authorized_ids)
         founded += next_word
         while i < self.max_tokens:
             next_word = self.prompting_by_token(
                 self.constrained_prompt + founded,
-                self.model.encode("0123456789\n")[0].tolist())
+                self.tokenizer.encode("0123456789\n")[0].tolist())
             if (next_word == "'\n"):
                 break
             if (
@@ -202,9 +250,7 @@ class Agent():
         return self.prompts
 
     def generate(self, prompt: str) -> str:
-        tokens_id = self.model.encode(prompt)[0].tolist()
+        tokens_id = self.tokenizer.encode(prompt)[0].tolist()
         logits = self.model.get_logits_from_input_ids(tokens_id)
-        max_tokens = argmax(tensor(logits))
-
-        # print(f"{max_tokens.tolist()} : {vocab_int_sr[max_tokens.tolist()]}")
-        return self.model.decode(max_tokens)
+        max_tokens = [argmax(tensor(logits)).tolist()]
+        return self.tokenizer.decode(max_tokens)
