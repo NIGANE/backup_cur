@@ -20,16 +20,17 @@ class Tokenization:
         self.int_vocab = {}
         self.str_vocab = {}
         self.space_token_id: int = 220
-        # self.get_vocab()
+        self.get_vocab()
         self.get_merges()
+        self.priority: Dict[str, int] = {}
 
 
     def get_merges(self):
         file_path: str = self.model.get_path_to_merges_file()
         try:
-            with open(file_path, "r") as f:
-                data = f.read()
-                
+            with open("prio", "r") as f:
+                data = f.readlines()
+                self.priority = self.load_priority(data)
         except BaseException as e:
             print("err", e)
     def get_vocab(self):
@@ -44,23 +45,25 @@ class Tokenization:
     
     def encode(self, prompt: str):
         space: str = self.int_vocab[self.space_token_id]
-        s: List[str] = prompt.replace(" ", " " + space).split(" ")
-        token_ids = []
-        for ele in s:
-            i = len(ele)
-            sub = ele
-            while True:
-                if sub[:i] in self.str_vocab:
-                    token_ids.append(self.str_vocab[sub[:i]])
-                    if i == len(ele):
-                        break
-                    else:
-                        sub = sub[i:]
-                else:
-                    i -= 1
-                if i == 0:
-                    break
-        return torch.tensor([token_ids])
+        s: List[str] = [char for char in prompt.replace(" ",space)]
+        max_prio = -1
+        
+        # token_ids = []
+        # for ele in s:
+        #     i = len(ele)
+        #     sub = ele
+        #     while True:
+        #         if sub[:i] in self.str_vocab:
+        #             token_ids.append(self.str_vocab[sub[:i]])
+        #             if i == len(ele):
+        #                 break
+        #             else:
+        #                 sub = sub[i:]
+        #         else:
+        #             i -= 1
+        #         if i == 0:
+        #             break
+        # return torch.tensor([token_ids])
     
     def decode(self, token_ids: List[int] | Tensor):
         tt: List[int] = token_ids[0].tolist() if type(token_ids) == Tensor else token_ids
@@ -70,13 +73,26 @@ class Tokenization:
 
         return [re] if type(token_ids) == Tensor else re
         
+    def load_priority(self, lines: List[str]):
+        rank = 0
+        re: Dict[str, int] = {}
+        for line in lines:
+            line = line.strip()
+            if line.startswith("#"):
+                continue
+            if line is None:
+                continue
+            duo = tuple(ele for ele in line.split())
+            re[duo] = rank
+            rank += 1
+        return re
 
 
         
 tty = Tokenization(Small_LLM_Model())
 # print(tty)
 pt = "hello from Achraf AKA negane"
-# my_encode = tty.encode(pt).tolist()[0]
+my_encode = tty.encode(pt)
 # encode = tty.model.encode(pt).tolist()[0]
 # my_decode = tty.decode(my_encode[0])
 # decode = tty.model.decode(encode[0])
