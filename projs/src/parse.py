@@ -16,8 +16,8 @@ def error_usage_func() -> str:
             + "--output <output_file>.json")
 
 
-def load_inputs(s: str) -> Optional[List[Dict]]:
-    data = []
+def load_inputs(s: str) -> List[Dict[str, Any]]:
+    data: List[Dict[str, Any]] = []
     try:
         with open(s, 'r') as f:
             data = json_load(f)
@@ -29,8 +29,8 @@ def load_inputs(s: str) -> Optional[List[Dict]]:
         return data
 
 
-def ends_with(src: str, sub: str):
-    i = 0
+def ends_with(src: str, sub: str) -> bool:
+    i: int = 0
     while i < len(sub):
         if (sub[len(sub) - i - 1] != src[len(src) - i - 1]):
             return False
@@ -38,19 +38,19 @@ def ends_with(src: str, sub: str):
     return True
 
 
-def parse():
-    func_definitions = "--functions_definition"
-    input = "--input"
-    output = "--output"
+def parse() -> ValidData:
+    func_definitions: str = "--functions_definition"
+    input: str = "--input"
+    output: str = "--output"
     if len(sys.argv) != 7:
         raise MyError(f"Invalid arguments: {error_usage_func()}")
-    fn_definition_file = (
+    fn_definition_file: str = (
         sys.argv[sys.argv.index(func_definitions) + 1]
         if func_definitions in sys.argv else None
                          )
-    input_file = (
+    input_file: str = (
         sys.argv[sys.argv.index(input) + 1] if input in sys.argv else None)
-    output_file = (
+    output_file: str = (
         sys.argv[sys.argv.index(output) + 1] if output in sys.argv else None)
     if (not ends_with(output_file, ".json") or
             not ends_with(input_file, ".json") or
@@ -65,10 +65,10 @@ def parse():
         raise MyError(
             f"Error: Missing required arguments.\n{error_usage_func()}")
 
-    fn_definitions = load_inputs(fn_definition_file)
-    input_prompts = load_inputs(input_file)
-    validated_functions = []
-    validated_prompts = []
+    fn_definitions: List[Dict[str, Any]] = load_inputs(fn_definition_file)
+    input_prompts: List[Dict[str, Any]] = load_inputs(input_file)
+    validated_functions: List[FunctionDefinition] = []
+    validated_prompts: List[PromptValidation] = []
     try:
         for row_data in fn_definitions:
             validated_functions.append(FunctionDefinition(**row_data))
@@ -78,9 +78,11 @@ def parse():
         raise MyError(
             f"ValidationError ({e.errors()[0]['type']}, "
             f"'{e.errors()[0]['loc'][0]}'): {e.errors()[0]['msg']} ")
-    filtered_functions = []
+    except Exception as e:
+        raise MyError(f"GlobalError (validation): {e}")
+    filtered_functions: List[Dict[str, Any]]  = []
 
-    pomp = {}
+    pomp: Dict[str, Any] = {}
     for fn in validated_functions:
         pomp["name"] = fn.name
         pomp["description"] = fn.description
@@ -98,7 +100,7 @@ def parse():
     return ValidData(filtered_functions, validated_prompts, output_file)
 
 
-def dump_json(outs: List[Dict[str, Any]], out_file: str):
+def dump_json(outs: List[Dict[str, Any]], out_file: str) -> None:
     try:
         with open(out_file, "w") as file:
             dump(outs, file, indent=4)

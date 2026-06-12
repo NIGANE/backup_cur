@@ -20,6 +20,7 @@ class Tokenization:
         self.int_vocab = {}
         self.str_vocab = {}
         self.space_token_id: int = 220
+        self.new_line_token_id: int = 198
         self.priority: Dict[str, int] = {}
         self.encoding: List[str] = []
         self.token_ids: List[int] = []
@@ -47,7 +48,8 @@ class Tokenization:
     
     def encode(self, prompt: str):
         space: str = self.int_vocab[self.space_token_id]
-        self.encoding = [char for char in prompt.replace(" ",space)]
+        new_line: str = self.int_vocab[self.new_line_token_id]
+        self.encoding = [char for char in prompt.replace(" ",space).replace("\n", new_line)]
         i = 0
         while True:
             if not self.merge(self.get_next_max_prio()):
@@ -109,12 +111,11 @@ class Tokenization:
         
 
 tty = Tokenization(Small_LLM_Model())
-# print(tty)
-pt = "\n"
-# my_encode = tty.encode(pt)
-encode = tty.model.encode(pt)
-print("original", encode)
-print("Main: ", tty.str_vocab.get("\n"))
+pt = "What is the sum of 2 and 3?"
+static = tty.encode(pt)
+dynamic = tty.model.encode(pt)
+print("static: ", static)
+print("dynamic: ", dynamic)
 # print(encode)
 # print(decode)
 # print(my_decode)
@@ -144,13 +145,14 @@ print("Main: ", tty.str_vocab.get("\n"))
 
 
 
-# def generate(prompt: str) -> str:
-#     tokens_id = model.encode(prompt)[0].tolist()
-#     logits = model.get_logits_from_input_ids(tokens_id)
-#     max_tokens = torch.argmax(torch.tensor(logits))
+def generate(model: Small_LLM_Model, prompt: str) -> str:
+    tokens_id = model.encode(prompt)[0].tolist()
+    logits = model.get_logits_from_input_ids(tokens_id)
+    print("logits: ", logits)
+    max_tokens = torch.argmax(torch.tensor(logits))
 
-#     # print(f"{max_tokens.tolist()} : {vocab_int_sr[max_tokens.tolist()]}")
-#     return model.decode(max_tokens)
+    # print(f"{max_tokens.tolist()} : {vocab_int_sr[max_tokens.tolist()]}")
+    return model.decode(max_tokens)
 
 # prompt = """You are a parameter extraction engine.
 # User Prompt: Reverse the string 'hello'

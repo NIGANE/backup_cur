@@ -1,6 +1,6 @@
 from llm_sdk import Small_LLM_Model
 from torch import torch, Tensor, argmax, tensor, full
-from typing import  List, Any, Dict
+from typing import  List, Any, Dict, Optional, Union
 from src.models.FunctionDefinition import ValidTypes
 from src.tools.tools import in_string
 from functools import reduce
@@ -13,6 +13,7 @@ class Tokenization:
         self.int_vocab = {}
         self.str_vocab = {}
         self.space_token_id: int = 220
+        self.new_line_token_id: int = 198
         self.priority: Dict[str, int] = {}
         self.encoding: List[str] = []
         self.token_ids: List[int] = []
@@ -40,7 +41,8 @@ class Tokenization:
     
     def encode(self, prompt: str):
         space: str = self.int_vocab[self.space_token_id]
-        self.encoding = [char for char in prompt.replace(" ",space)]
+        new_line: str = self.int_vocab[self.new_line_token_id]
+        self.encoding = [char for char in prompt.replace(" ",space).replace("\n", new_line)]
         i = 0
         while True:
             if not self.merge(self.get_next_max_prio()):
@@ -112,30 +114,42 @@ class Agent():
     def __init__(
             self, model: Small_LLM_Model, prompts: List[str],
             functions_definitions: List[Dict]):
-        self.fns = functions_definitions
-        self.fn_names = [fn['name'] for fn in self.fns]
-        self.model = model
-        self.constrained_prompt = ""
+        self.fns: List[Dict[str, Any]] = functions_definitions
+        self.fn_names: List[str] = [fn['name'] for fn in self.fns]
+        self.model: Small_LLM_Model = model
+        self.constrained_prompt: str = ""
         self.max_tokens: int = 5
         self.prompts: List[Prompt] = []
-        self.tokenizer = Tokenization(model)
+        self.tokenizer = Tokenization(self.model)
+
+        
         for prompt in prompts:
             self.prompt = Prompt(prompt)
             print(f"resolving prompt: {self.prompt.prompt}")
             self.generate_json_valid()
             self.prompts.append(self.prompt)
-            self.empty()
-            # print()
-            # print({"name": self.prompt.name, "params": self.prompt.parameters})
-            # break
+            # self.empty()
+            print()
+            print({"name": self.prompt.name, "params": self.prompt.parameters})
+            break
 
-    def empty(self):
+    def empty(self) -> None:
         self.constrained_prompt = ""
 
-    def generate_json_valid(self):
+    def generate_json_valid(self) -> None:
+
+        # static = self.tokenizer.encode(self.prompt.prompt)
+        # dynamic = self.model.encode(self.prompt.prompt)
+        # print("static: ", static)
+        # print("dynamic: ", dynamic)
+        # # print("same: ", static == dynamic)
+        # print(self.prompt.prompt)
+        # i: int = 0
+        # raise MyError("done")
+
         # constrained decoding the function name
         self.generate_function_name()
-        selected_fn = []
+        selected_fn: Dict[str, Any] = {}
         if (self.prompt.name not in self.fn_names):
             self.prompt.name = "undefined"
             return
@@ -148,9 +162,9 @@ class Agent():
             self.generate_params()
 
     def build_prompt(self) -> str:
-        header = "starting point, avalaible functions:\n"
+        header: str = "starting point, avalaible functions:\n"
         preparing_list: List[str] = []
-        item = ""
+        item: str = ""
         for fn in self.fns:
             item += "- " + fn.get("name") + "("
             params = list(fn.get("parameters").keys())
@@ -164,8 +178,8 @@ class Agent():
             item = ""
         return reduce(lambda a, b: a + b, preparing_list, header)
 
-    def generate_function_name(self):
-        authorized_ids = [
+    def generate_function_name(self) -> None:
+        authorized_ids: List[List[int]] = [
             self.tokenizer.encode(fn_name).tolist()[0]
             for fn_name in self.fn_names
             ]
@@ -173,8 +187,15 @@ class Agent():
         self.constrained_prompt += (
             f"the best function to traite "
             f"this user request: '{self.prompt.prompt}' is :")
+        dynamic = self.model.encode(self.prompt.prompt)
+        static = self.tokenizer.encode(self.prompt.prompt)
+        print("static: ", self.tokenizer.decode(static))
+        print("dynamic: ", self.model.decode(dynamic))
 
-        i = 0
+        # print("same: ", static == dynamic)
+        print(self.prompt.prompt)
+        i: int = 0
+        raise MyError("done")
         while (i < self.max_tokenized(authorized_ids)):
             res = self.prompting_by_token(
                 self.constrained_prompt, [ele[i] for ele in authorized_ids])
@@ -201,28 +222,28 @@ class Agent():
         ]
 
     def prompting_by_token(self, ppt: str, tokens: List[int]) -> str:
-        prompt_ids = self.tokenizer.encode(ppt)[0].tolist()
-        logits = self.model.get_logits_from_input_ids(prompt_ids)
+        prompt_ids: List[int] = self.tokenizer.encode(ppt)[0].tolist()
+        logits: List[float] = self.model.get_logits_from_input_ids(prompt_ids)
         torch_logits: Tensor = tensor(logits)
-        mask = full(torch_logits.shape, float('-inf'))
+        mask: Tensor = full(torch_logits.shape, float('-inf'))
         for ele in tokens:
             mask[ele] = 0.0
-        filtered_logits = torch_logits + mask
-        next_token_id = [argmax(filtered_logits).tolist()]
+        filtered_logits: Tensor = torch_logits + mask
+        next_token_id: Tensor = [argmax(filtered_logits).tolist()]
         return self.tokenizer.decode(next_token_id)
 
-    def generate_params(self):
-        target_func = [
+    def generate_params(self) -> None:
+        target_func: Dict[str, Any] = [
             ele for ele in self.fns if ele["name"] == self.prompt.name][0]
         self.constrained_prompt = f"You are a parameter extraction engine.\n"
 
         self.constrained_prompt += f"User Prompt: {self.prompt.prompt}\n"
         self.constrained_prompt += f"Function to use: {self.prompt.name}"
-        params = list(target_func["parameters"].keys())
-        item = "("
+        params: List[str] = list(target_func["parameters"].keys())
+        item: str = "("
         for i in range(len(params)):
             item += f"{params[i]}: "
-            ttp = target_func.get("parameters")[params[i]].value
+            ttp: str = target_func.get("parameters")[params[i]].value
             item += f"{"str" if ttp == "string" else ttp}"
             if i != len(params) - 1:
                 item += ", "
@@ -232,19 +253,10 @@ class Agent():
 
         self.constrained_prompt += item
         self.constrained_prompt += ', "parameters": {'
-        prompt = self.constrained_prompt
-        # next_word = ""
-        # while True:
-        #     prompt += next_word
-        #     next_word = self.generate(prompt)
-        #     print(prompt + next_word)
-        #     if "}" in next_word:
-        #         break
-        # raise MyError("done")
         params: Dict[str, Any] = ([
             fn for fn in self.fns
             if fn['name'] == self.prompt.name][0]['parameters'])
-        i = 0
+        i: int = 0
         for key in params:
             self.constrained_prompt += f'"{key}": '
             if (params[key].value == ValidTypes.NUMBER.value):
@@ -256,24 +268,24 @@ class Agent():
                 self.constrained_prompt += ", "
 
     def prompting_str_params(self, key: str, type: str) -> None:
-        i = 0
-        founded = ""
+        i: int = 0
+        founded: str = ""
         self.constrained_prompt += '"'
         while True:
-            next_word = self.generate(self.constrained_prompt + founded)
+            next_word: str = self.generate(self.constrained_prompt + founded)
             if '"' in next_word:
                 break
             founded += next_word
         self.prompt.parameters[key] = founded
         self.constrained_prompt += str(founded) + '"'
 
-    def prompting_number_params(self, key: str, type: str):
+    def prompting_number_params(self, key: str, type: str) -> None:
         i: int = 0
         founded: str = ""
         self.constrained_prompt += '" '
-        authorized_ids = [
+        authorized_ids: List[int] = [
             self.tokenizer.encode(ele)[0].tolist()[0] for ele in [" -", " "]]
-        next_word = self.prompting_by_token(
+        next_word: str = self.prompting_by_token(
                 self.constrained_prompt + founded, authorized_ids)
         founded += next_word
         while i < self.max_tokens:
@@ -295,7 +307,7 @@ class Agent():
         return self.prompts
 
     def generate(self, prompt: str) -> str:
-        tokens_id = self.tokenizer.encode(prompt)[0].tolist()
-        logits = self.model.get_logits_from_input_ids(tokens_id)
-        max_tokens = [argmax(tensor(logits)).tolist()]
+        tokens_id: List[int] = self.tokenizer.encode(prompt)[0].tolist()
+        logits: List[float] = self.model.get_logits_from_input_ids(tokens_id)
+        max_tokens: Tensor = [argmax(tensor(logits)).tolist()]
         return self.tokenizer.decode(max_tokens)
