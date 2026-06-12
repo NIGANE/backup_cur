@@ -7,15 +7,27 @@ from functools import reduce
 from json import load
 from src.models.ErrorHandler import MyError
 
-
 class Tokenization:
     def __init__(self, model: Small_LLM_Model):
         self.model = model
         self.int_vocab = {}
         self.str_vocab = {}
         self.space_token_id: int = 220
+        self.priority: Dict[str, int] = {}
+        self.encoding: List[str] = []
+        self.token_ids: List[int] = []
         self.get_vocab()
+        self.get_merges()
 
+
+    def get_merges(self):
+        file_path: str = self.model.get_path_to_merges_file()
+        try:
+            with open(file_path, "r") as f:
+                data = f.readlines()
+                self.priority = self.load_priority(data)
+        except BaseException as e:
+            print("err", e)
     def get_vocab(self):
         try:
             file_path: str = self.model.get_path_to_vocab_file()
@@ -24,37 +36,70 @@ class Tokenization:
                 self.str_vocab = data
                 self.int_vocab = {v: k for k, v in self.str_vocab.items()}
         except BaseException:
-            raise print("ERROR: while on get_vocab method")
+            print("ERROR: while on get_vocab method")
     
     def encode(self, prompt: str):
         space: str = self.int_vocab[self.space_token_id]
-        s: List[str] = prompt.replace(" ", " " + space).split(" ")
-        token_ids = []
-        for ele in s:
-            i = len(ele)
-            sub = ele
-            while True:
-                if sub[:i] in self.str_vocab:
-                    token_ids.append(self.str_vocab[sub[:i]])
-                    if i == len(ele):
-                        break
-                    else:
-                        sub = sub[i:]
-                else:
-                    i -= 1
-                if i == 0:
-                    break
-        return torch.tensor([token_ids])
+        self.encoding = [char for char in prompt.replace(" ",space)]
+        i = 0
+        while True:
+            if not self.merge(self.get_next_max_prio()):
+                break
+        for ele in self.encoding:
+            self.token_ids.append(self.str_vocab[ele])
+        return torch.tensor([self.token_ids])
     
     def decode(self, token_ids: List[int] | Tensor):
-        tt: List[int] = token_ids.tolist() if type(token_ids) == Tensor else token_ids
+        tt: List[int] = token_ids[0].tolist() if type(token_ids) == Tensor else token_ids
         re: str = ""
         for ele in tt:
             re += self.int_vocab[ele].replace(self.int_vocab[self.space_token_id], " ")
 
         return [re] if type(token_ids) == Tensor else re
         
+    def load_priority(self, lines: List[str]):
+        rank = 0
+        re: Dict[str, int] = {}
+        for line in lines:
+            line = line.strip()
+            if line.startswith("#"):
+                continue
+            if line is None:
+                continue
+            duo = tuple(ele for ele in line.split())
+            re[duo] = rank
+            rank += 1
+        return re
+    
+    def get_next_max_prio(self):
+        i = 0
+        max_prio = float('+inf')
+        while i < len(self.encoding) - 1:
+            j = i + 1
+            pair = tuple([self.encoding[i], self.encoding[j]])
+            if (pair in self.priority and self.priority.get(pair) < max_prio):
+                max_prio = self.priority.get(pair)
+            i += 1
+        return max_prio
 
+    def merge(self, max_prio: int):
+        new: List[str] = []
+        merged: int = 0
+
+        i = 0
+        while i < len(self.encoding) - 1:
+            if (self.priority.get(tuple([self.encoding[i], self.encoding[i + 1]])) == max_prio):
+                new.append(self.encoding[i] + self.encoding[i + 1])
+                merged = 1
+                i += 2
+                continue
+            new.append(self.encoding[i])
+            i += 1
+        if i == len(self.encoding) - 1:
+            new.append(self.encoding[i])
+        self.encoding = new
+        return True if merged else False
+ 
 
 class Prompt():
     def __init__(self, prompt: str):

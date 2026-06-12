@@ -20,15 +20,17 @@ class Tokenization:
         self.int_vocab = {}
         self.str_vocab = {}
         self.space_token_id: int = 220
+        self.priority: Dict[str, int] = {}
+        self.encoding: List[str] = []
+        self.token_ids: List[int] = []
         self.get_vocab()
         self.get_merges()
-        self.priority: Dict[str, int] = {}
 
 
     def get_merges(self):
         file_path: str = self.model.get_path_to_merges_file()
         try:
-            with open("prio", "r") as f:
+            with open(file_path, "r") as f:
                 data = f.readlines()
                 self.priority = self.load_priority(data)
         except BaseException as e:
@@ -45,25 +47,14 @@ class Tokenization:
     
     def encode(self, prompt: str):
         space: str = self.int_vocab[self.space_token_id]
-        s: List[str] = [char for char in prompt.replace(" ",space)]
-        max_prio = -1
-        
-        # token_ids = []
-        # for ele in s:
-        #     i = len(ele)
-        #     sub = ele
-        #     while True:
-        #         if sub[:i] in self.str_vocab:
-        #             token_ids.append(self.str_vocab[sub[:i]])
-        #             if i == len(ele):
-        #                 break
-        #             else:
-        #                 sub = sub[i:]
-        #         else:
-        #             i -= 1
-        #         if i == 0:
-        #             break
-        # return torch.tensor([token_ids])
+        self.encoding = [char for char in prompt.replace(" ",space)]
+        i = 0
+        while True:
+            if not self.merge(self.get_next_max_prio()):
+                break
+        for ele in self.encoding:
+            self.token_ids.append(self.str_vocab[ele])
+        return torch.tensor([self.token_ids])
     
     def decode(self, token_ids: List[int] | Tensor):
         tt: List[int] = token_ids[0].tolist() if type(token_ids) == Tensor else token_ids
@@ -86,17 +77,44 @@ class Tokenization:
             re[duo] = rank
             rank += 1
         return re
+    
+    def get_next_max_prio(self):
+        i = 0
+        max_prio = float('+inf')
+        while i < len(self.encoding) - 1:
+            j = i + 1
+            pair = tuple([self.encoding[i], self.encoding[j]])
+            if (pair in self.priority and self.priority.get(pair) < max_prio):
+                max_prio = self.priority.get(pair)
+            i += 1
+        return max_prio
 
+    def merge(self, max_prio: int):
+        new: List[str] = []
+        merged: int = 0
 
+        i = 0
+        while i < len(self.encoding) - 1:
+            if (self.priority.get(tuple([self.encoding[i], self.encoding[i + 1]])) == max_prio):
+                new.append(self.encoding[i] + self.encoding[i + 1])
+                merged = 1
+                i += 2
+                continue
+            new.append(self.encoding[i])
+            i += 1
+        if i == len(self.encoding) - 1:
+            new.append(self.encoding[i])
+        self.encoding = new
+        return True if merged else False
         
+
 tty = Tokenization(Small_LLM_Model())
 # print(tty)
-pt = "hello from Achraf AKA negane"
-my_encode = tty.encode(pt)
-# encode = tty.model.encode(pt).tolist()[0]
-# my_decode = tty.decode(my_encode[0])
-# decode = tty.model.decode(encode[0])
-# # 
+pt = "\n"
+# my_encode = tty.encode(pt)
+encode = tty.model.encode(pt)
+print("original", encode)
+print("Main: ", tty.str_vocab.get("\n"))
 # print(encode)
 # print(decode)
 # print(my_decode)
