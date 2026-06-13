@@ -110,12 +110,12 @@ class Tokenization:
         return True if merged else False
         
 
-tty = Tokenization(Small_LLM_Model())
-pt = "What is the sum of 2 and 3?"
-static = tty.encode(pt)
-dynamic = tty.model.encode(pt)
-print("static: ", static)
-print("dynamic: ", dynamic)
+# tty = Tokenization(Small_LLM_Model())
+# pt = "What is the sum of 2 and 3?"
+# static = tty.encode(pt)
+# dynamic = tty.model.encode(pt)
+# print("static: ", static)
+# print("dynamic: ", dynamic)
 # print(encode)
 # print(decode)
 # print(my_decode)
@@ -148,7 +148,6 @@ print("dynamic: ", dynamic)
 def generate(model: Small_LLM_Model, prompt: str) -> str:
     tokens_id = model.encode(prompt)[0].tolist()
     logits = model.get_logits_from_input_ids(tokens_id)
-    print("logits: ", logits)
     max_tokens = torch.argmax(torch.tensor(logits))
 
     # print(f"{max_tokens.tolist()} : {vocab_int_sr[max_tokens.tolist()]}")
@@ -172,3 +171,13 @@ def generate(model: Small_LLM_Model, prompt: str) -> str:
 #     #     json.dump(f, my_json)
 # except BaseException as e:
 #     print(f"done : {e}")
+prompt = """You are a parameter extraction engine.
+User Prompt: what is the sum of five and six
+Function to use: fn_add_numbers(a: number, b: number)
+{"function": "fn_add_numbers", "parameters": {"a": " """
+re = ""
+model = Small_LLM_Model()
+while True:
+    re = generate(model, prompt)
+    prompt += re
+    print(prompt)

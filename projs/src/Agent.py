@@ -1,6 +1,6 @@
 from llm_sdk import Small_LLM_Model
 from torch import torch, Tensor, argmax, tensor, full
-from typing import  List, Any, Dict, Optional, Union
+from typing import  List, Any, Dict, Tuple, Optional, Union
 from src.models.FunctionDefinition import ValidTypes
 from src.tools.tools import in_string
 from functools import reduce
@@ -10,34 +10,34 @@ from src.models.ErrorHandler import MyError
 class Tokenization:
     def __init__(self, model: Small_LLM_Model):
         self.model = model
-        self.int_vocab = {}
-        self.str_vocab = {}
+        self.int_vocab: Dict[int, str] = {}
+        self.str_vocab: Dict[str, int] = {}
         self.space_token_id: int = 220
         self.new_line_token_id: int = 198
-        self.priority: Dict[str, int] = {}
+        self.priority: Dict[Tuple[str, str], int] = {}
         self.encoding: List[str] = []
         self.token_ids: List[int] = []
         self.get_vocab()
         self.get_merges()
 
 
-    def get_merges(self):
+    def get_merges(self) -> None:
         file_path: str = self.model.get_path_to_merges_file()
         try:
             with open(file_path, "r") as f:
                 data = f.readlines()
                 self.priority = self.load_priority(data)
         except BaseException as e:
-            print("err", e)
-    def get_vocab(self):
+            raise MyError(f"Error: {e}")
+    def get_vocab(self) -> None:
         try:
             file_path: str = self.model.get_path_to_vocab_file()
             with open(file_path, "r") as f:
                 data = load(f)
                 self.str_vocab = data
                 self.int_vocab = {v: k for k, v in self.str_vocab.items()}
-        except BaseException:
-            print("ERROR: while on get_vocab method")
+        except BaseException as e:
+            raise MyError(f"Error: {e}")
     
     def encode(self, prompt: str):
         space: str = self.int_vocab[self.space_token_id]
@@ -46,7 +46,8 @@ class Tokenization:
         i = 0
         self.token_ids = []
         while True:
-            if not self.merge(self.get_next_max_prio()):
+            re = self.get_next_max_prio()
+            if not self.merge(re if re == float("+inf") else int(re)):
                 break
         for ele in self.encoding:
             self.token_ids.append(self.str_vocab[ele])
@@ -63,36 +64,39 @@ class Tokenization:
         
     def load_priority(self, lines: List[str]):
         rank = 0
-        re: Dict[str, int] = {}
+        re: Dict[Tuple[str, str], int] = {}
+        
         for line in lines:
             line = line.strip()
             if line.startswith("#"):
                 continue
             if line is None:
                 continue
-            duo = tuple(ele for ele in line.split())
+            duo: Tuple[str, str] = (line.split()[0], line.split()[1])
             re[duo] = rank
             rank += 1
         return re
     
-    def get_next_max_prio(self):
+    def get_next_max_prio(self)-> float:
         i = 0
-        max_prio = float('+inf')
+        max_prio: float = float('+inf')
         while i < len(self.encoding) - 1:
             j = i + 1
-            pair = tuple([self.encoding[i], self.encoding[j]])
-            if (pair in self.priority and self.priority.get(pair) < max_prio):
-                max_prio = self.priority.get(pair)
+            pair: Tuple[str, str] = (self.encoding[i], self.encoding[j])
+            if (pair in self.priority and self.priority[pair] < max_prio):
+                max_prio = self.priority[pair]
             i += 1
-        return max_prio
+        return (max_prio)
 
-    def merge(self, max_prio: int):
+    def merge(self, max_prio: Union[int, float]):
         new: List[str] = []
         merged: int = 0
-
         i = 0
+        if max_prio == float("+inf"):
+            return False
         while i < len(self.encoding) - 1:
-            if (self.priority.get(tuple([self.encoding[i], self.encoding[i + 1]])) == max_prio):
+            exists: Optional[int] = self.priority.get((self.encoding[i], self.encoding[i + 1]))
+            if (exists and self.priority[(self.encoding[i], self.encoding[i + 1])] == max_prio):
                 new.append(self.encoding[i] + self.encoding[i + 1])
                 merged = 1
                 i += 2
@@ -117,6 +121,10 @@ class Agent():
             self, model: Small_LLM_Model, prompts: List[str],
             functions_definitions: List[Dict]):
         self.fns: List[Dict[str, Any]] = functions_definitions
+        self.fns.append({
+            "name": "fn_undefined",
+            "description": "choose if no other function is useable to resolve the prompt",
+            "parameters": {}})
         self.fn_names: List[str] = [fn['name'] for fn in self.fns]
         self.model: Small_LLM_Model = model
         self.constrained_prompt: str = ""
@@ -130,29 +138,21 @@ class Agent():
             print(f"resolving prompt: {self.prompt.prompt}")
             self.generate_json_valid()
             self.prompts.append(self.prompt)
-            # self.empty()
+            # print(self.constrained_prompt)
+            self.empty()
             print()
             print({"name": self.prompt.name, "params": self.prompt.parameters})
-            break
+            raise MyError("done")
 
     def empty(self) -> None:
         self.constrained_prompt = ""
 
     def generate_json_valid(self) -> None:
-
-        # static = self.tokenizer.encode(self.prompt.prompt)
-        # dynamic = self.model.encode(self.prompt.prompt)
-        # print("static: ", static)
-        # print("dynamic: ", dynamic)
-        # # print("same: ", static == dynamic)
-        # print(self.prompt.prompt)
-        # i: int = 0
-        # raise MyError("done")
-
         # constrained decoding the function name
         self.generate_function_name()
+        # print(self.prompt.name)
         selected_fn: Dict[str, Any] = {}
-        if (self.prompt.name not in self.fn_names):
+        if (self.prompt.name not in self.fn_names or self.prompt.name == "undefined"):
             self.prompt.name = "undefined"
             return
         else:
@@ -168,14 +168,14 @@ class Agent():
         preparing_list: List[str] = []
         item: str = ""
         for fn in self.fns:
-            item += "- " + fn.get("name") + "("
-            params = list(fn.get("parameters").keys())
+            item += "- " + fn["name"] + "("
+            params: List[str] = list(fn["parameters"].keys())
             for i in range(len(params)):
                 item += f"{params[i]}: "
-                item += f"{fn.get("parameters")[params[i]].value}"
+                item += f"{fn["parameters"][params[i]].value}"
                 if i != len(params) - 1:
                     item += ", "
-            item += ")\n"
+            item += f"): {fn["description"]}\n"
             preparing_list.append(item)
             item = ""
         return reduce(lambda a, b: a + b, preparing_list, header)
@@ -185,15 +185,7 @@ class Agent():
             self.tokenizer.encode(fn_name).tolist()[0]
             for fn_name in self.fn_names
             ]
-        # dynamic = self.model.encode(self.prompt.prompt)
-        # static = self.tokenizer.encode(self.prompt.prompt)
-        # print("static: ", self.tokenizer.decode(static))
-        # print("dynamic: ", self.model.decode(dynamic))
-
-        # # print("same: ", static == dynamic)
-        # print(self.prompt.prompt)
         i: int = 0
-        # raise MyError("done")
         self.constrained_prompt = self.build_prompt()
         self.constrained_prompt += (
             f"the best function to traite "
@@ -245,7 +237,7 @@ class Agent():
         item: str = "("
         for i in range(len(params)):
             item += f"{params[i]}: "
-            ttp: str = target_func.get("parameters")[params[i]].value
+            ttp: str = target_func["parameters"][params[i]].value
             item += f"{"str" if ttp == "string" else ttp}"
             if i != len(params) - 1:
                 item += ", "
@@ -255,18 +247,18 @@ class Agent():
 
         self.constrained_prompt += item
         self.constrained_prompt += ', "parameters": {'
-        params: Dict[str, Any] = ([
+        para: Dict[str, Any] = ([
             fn for fn in self.fns
             if fn['name'] == self.prompt.name][0]['parameters'])
-        i: int = 0
-        for key in params:
+        j: int = 0
+        for key in para:
             self.constrained_prompt += f'"{key}": '
-            if (params[key].value == ValidTypes.NUMBER.value):
-                self.prompting_number_params(key, params[key].value)
+            if (para[key].value == ValidTypes.NUMBER.value):
+                self.prompting_number_params(key, para[key].value)
             else:
-                self.prompting_str_params(key, params[key].value)
-            i += 1
-            if (i != len(params)):
+                self.prompting_str_params(key, para[key].value)
+            j += 1
+            if (j != len(para)):
                 self.constrained_prompt += ", "
 
     def prompting_str_params(self, key: str, type: str) -> None:
@@ -278,8 +270,8 @@ class Agent():
             if '"' in next_word:
                 break
             founded += next_word
-        self.prompt.parameters[key] = founded
-        self.constrained_prompt += str(founded) + '"'
+        self.prompt.parameters[key] = founded.strip()
+        self.constrained_prompt += str(founded).strip() + '"'
 
     def prompting_number_params(self, key: str, type: str) -> None:
         i: int = 0
@@ -293,8 +285,9 @@ class Agent():
         while i < self.max_tokens:
             next_word = self.prompting_by_token(
                 self.constrained_prompt + founded,
-                self.tokenizer.encode("0123456789\n")[0].tolist())
-            if (next_word == "'\n"):
+                self.tokenizer.encode(" 0123456789")[0].tolist())
+            print(next_word)
+            if (next_word == '"'):
                 break
             if (
                 in_string(
@@ -302,7 +295,10 @@ class Agent():
                     ):
                 founded += next_word
             i += 1
+        
         self.constrained_prompt += (founded + '"').strip()
+        print(self.constrained_prompt)
+        raise MyError("done")
         self.prompt.parameters[key] = float(founded)
 
     def resolve_prompts(self) -> List[Prompt]:
