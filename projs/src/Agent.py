@@ -44,11 +44,13 @@ class Tokenization:
         new_line: str = self.int_vocab[self.new_line_token_id]
         self.encoding = [char for char in prompt.replace(" ",space).replace("\n", new_line)]
         i = 0
+        self.token_ids = []
         while True:
             if not self.merge(self.get_next_max_prio()):
                 break
         for ele in self.encoding:
             self.token_ids.append(self.str_vocab[ele])
+        self.encoding = []
         return torch.tensor([self.token_ids])
     
     def decode(self, token_ids: List[int] | Tensor):
@@ -120,7 +122,7 @@ class Agent():
         self.constrained_prompt: str = ""
         self.max_tokens: int = 5
         self.prompts: List[Prompt] = []
-        self.tokenizer = Tokenization(self.model)
+        self.tokenizer: Tokenization = Tokenization(self.model)
 
         
         for prompt in prompts:
@@ -183,19 +185,19 @@ class Agent():
             self.tokenizer.encode(fn_name).tolist()[0]
             for fn_name in self.fn_names
             ]
+        # dynamic = self.model.encode(self.prompt.prompt)
+        # static = self.tokenizer.encode(self.prompt.prompt)
+        # print("static: ", self.tokenizer.decode(static))
+        # print("dynamic: ", self.model.decode(dynamic))
+
+        # # print("same: ", static == dynamic)
+        # print(self.prompt.prompt)
+        i: int = 0
+        # raise MyError("done")
         self.constrained_prompt = self.build_prompt()
         self.constrained_prompt += (
             f"the best function to traite "
             f"this user request: '{self.prompt.prompt}' is :")
-        dynamic = self.model.encode(self.prompt.prompt)
-        static = self.tokenizer.encode(self.prompt.prompt)
-        print("static: ", self.tokenizer.decode(static))
-        print("dynamic: ", self.model.decode(dynamic))
-
-        # print("same: ", static == dynamic)
-        print(self.prompt.prompt)
-        i: int = 0
-        raise MyError("done")
         while (i < self.max_tokenized(authorized_ids)):
             res = self.prompting_by_token(
                 self.constrained_prompt, [ele[i] for ele in authorized_ids])
