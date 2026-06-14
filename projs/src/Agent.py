@@ -180,10 +180,10 @@ class Agent():
                 params: List[str] = list(fn["parameters"].keys())
                 for i in range(len(params)):
                     item += f"{params[i]}: "
-                    item += f"{fn["parameters"][params[i]].value}"
+                    item += f"{fn['parameters'][params[i]].value}"
                     if i != len(params) - 1:
                         item += ", "
-            item += f"): {fn["description"]}\n"
+            item += f"): {fn['description']}\n"
             preparing_list.append(item)
             item = ""
         return reduce(lambda a, b: a + b, preparing_list, header)
@@ -198,7 +198,7 @@ class Agent():
         self.constrained_prompt += (
             f"the best function to traite "
             "this user request: "
-            f"'{self.prompt.prompt if self.prompt.prompt else "empty"}' is :")
+            f"'{self.prompt.prompt if self.prompt.prompt else 'empty'}' is :")
         while (i < self.max_tokenized(authorized_ids)):
             res = self.prompting_by_token(
                 self.constrained_prompt, [ele[i] for ele in authorized_ids])
@@ -248,7 +248,7 @@ class Agent():
         for i in range(len(params)):
             item += f"{params[i]}: "
             ttp: str = target_func["parameters"][params[i]].value
-            item += f"{"str" if ttp == "string" else ttp}"
+            item += f"{'str' if ttp == 'string' else ttp}"
             if i != len(params) - 1:
                 item += ", "
         item += ")\n"

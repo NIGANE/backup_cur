@@ -44,8 +44,10 @@ def parse() -> ValidData:
     func_definitions: str = "--functions_definition"
     input: str = "--input"
     output: str = "--output"
-    if len(sys.argv) != 7:
+    model_flag: str = "--model"
+    if len(sys.argv) < 7:
         raise MyError(f"Invalid arguments: {error_usage_func()}")
+
     fn_definition_file: Optional[str] = (
         sys.argv[sys.argv.index(func_definitions) + 1]
         if func_definitions in sys.argv else None
@@ -54,6 +56,10 @@ def parse() -> ValidData:
         sys.argv[sys.argv.index(input) + 1] if input in sys.argv else None)
     output_file: Optional[str] = (
         sys.argv[sys.argv.index(output) + 1] if output in sys.argv else None)
+    model: Optional[str] = (
+        sys.argv[sys.argv.index(model_flag) + 1] if model_flag in sys.argv
+        else None
+    )
     if (not ends_with(output_file, ".json") or
             not ends_with(input_file, ".json") or
             not ends_with(fn_definition_file, ".json")):
@@ -99,7 +105,7 @@ def parse() -> ValidData:
         filtered_functions.append(pomp)
         pomp = {}
 
-    return ValidData(filtered_functions, validated_prompts, output_file)
+    return ValidData(filtered_functions, validated_prompts, output_file, model)
 
 
 def dump_json(outs: List[Dict[str, Any]], out_file: str) -> None:

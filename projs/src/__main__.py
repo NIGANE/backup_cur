@@ -4,6 +4,7 @@ from src.parse import parse
 from src.Agent import Agent, Prompt
 from src.parse import dump_json
 from src.models.ErrorHandler import MyError
+from src.models.ValidData import ValidData
 
 from typing import List
 from llm_sdk import Small_LLM_Model
@@ -14,14 +15,18 @@ def main() -> None:
         if (len(sys.argv) < 7):
             error_usage_func()
         print("|-> Validating Prompts and Functions definitions...")
-        valid_data = parse()
+        valid_data: ValidData = parse()
         if not valid_data:
             raise MyError("invalid input")
-        print("|-> Downloading The Model LLM")
 
         #  instantiate the Model with Prompts and Functions
+        print("|-> Downloading The Model LLM",
+              (valid_data.model if valid_data.model else "Qwen/Qwen3-0.6B"))
+        model: Small_LLM_Model = (
+            Small_LLM_Model(valid_data.model) if valid_data.model
+            else Small_LLM_Model())
         agent = Agent(
-            Small_LLM_Model(),
+            model,
             [pt.prompt for pt in valid_data.prompts],
             valid_data.funcs
             )
