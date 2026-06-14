@@ -1,16 +1,19 @@
 
-run:
+all:
 	@echo "Running the application..."
 	@uv run python -m src --functions_definition data/input/functions_definition.json --input data/input/function_calling_tests.json --output data/output/function_calls.json
 
-test:
-	@echo "Running test..."
-	uv run python -m main
 
 install:
 	@echo "Installing dependencies..."
-	pip install --break-system-packages uv
 	uv sync
+
+debug:
+	@echo "debuging mode"
+
+lint:
+	flake8 .
+	mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 clean:
 	@echo "Cleaning up..."
@@ -18,3 +21,6 @@ clean:
 	@rm -rf */__pycache__/
 	@rm -rf __pycache__
 	@rm -rf */*/__pycache__/
+
+clean-all: clean
+	@rm -rf .venv

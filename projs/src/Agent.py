@@ -5,6 +5,7 @@ from src.models.FunctionDefinition import ValidTypes
 from functools import reduce
 from json import load
 from src.models.ErrorHandler import MyError
+from functools import lru_cache
 
 
 class Tokenization:
@@ -39,7 +40,7 @@ class Tokenization:
         except BaseException as e:
             raise MyError(f"Error: {e}")
 
-    def encode(self, prompt: str):
+    def encode(self, prompt: str) -> Tensor:
         space: str = self.int_vocab[self.space_token_id]
         new_line: str = self.int_vocab[self.new_line_token_id]
         self.encoding = [
@@ -55,7 +56,7 @@ class Tokenization:
         self.encoding = []
         return torch.tensor([self.token_ids])
 
-    def decode(self, token_ids: List[int] | Tensor):
+    def decode(self, token_ids: List[int] | Tensor) -> Union[List[str], str]:
         tt: Union[List[int], Tensor] = (
             token_ids[0].tolist() if isinstance(token_ids, Tensor)
             else token_ids)
@@ -66,7 +67,7 @@ class Tokenization:
 
         return [re] if isinstance(token_ids, Tensor) else re
 
-    def load_priority(self, lines: List[str]):
+    def load_priority(self, lines: List[str]) -> Dict[Tuple[str, str], int]:
         rank = 0
         re: Dict[Tuple[str, str], int] = {}
 
@@ -92,7 +93,7 @@ class Tokenization:
             i += 1
         return (max_prio)
 
-    def merge(self, max_prio: Union[int, float]):
+    def merge(self, max_prio: Union[int, float]) -> bool:
         new: List[str] = []
         merged: int = 0
         i = 0
@@ -140,17 +141,14 @@ class Agent():
         self.max_tokens: int = 5
         self.prompts: List[Prompt] = []
         self.tokenizer: Tokenization = Tokenization(self.model)
-
+        print("|-> start resolving prompts...")
         for prompt in prompts:
-            self.prompt = Prompt(prompt)
+            self.prompt: Prompt = fun(prompt.lower())
             print(f"resolving prompt: {self.prompt.prompt}")
-            self.generate_json_valid()
+            if (not self.prompt.name):
+                self.generate_json_valid()
             self.prompts.append(self.prompt)
-            # print(self.constrained_prompt)
             self.empty()
-            print()
-            print({"name": self.prompt.name, "params": self.prompt.parameters})
-            raise MyError("done")
 
     def empty(self) -> None:
         self.constrained_prompt = ""
@@ -178,12 +176,13 @@ class Agent():
         item: str = ""
         for fn in self.fns:
             item += "- " + fn["name"] + "("
-            params: List[str] = list(fn["parameters"].keys())
-            for i in range(len(params)):
-                item += f"{params[i]}: "
-                item += f"{fn["parameters"][params[i]].value}"
-                if i != len(params) - 1:
-                    item += ", "
+            if (fn.get("parameters")):
+                params: List[str] = list(fn["parameters"].keys())
+                for i in range(len(params)):
+                    item += f"{params[i]}: "
+                    item += f"{fn["parameters"][params[i]].value}"
+                    if i != len(params) - 1:
+                        item += ", "
             item += f"): {fn["description"]}\n"
             preparing_list.append(item)
             item = ""
@@ -198,7 +197,8 @@ class Agent():
         self.constrained_prompt = self.build_prompt()
         self.constrained_prompt += (
             f"the best function to traite "
-            f"this user request: '{self.prompt.prompt}' is :")
+            "this user request: "
+            f"'{self.prompt.prompt if self.prompt.prompt else "empty"}' is :")
         while (i < self.max_tokenized(authorized_ids)):
             res = self.prompting_by_token(
                 self.constrained_prompt, [ele[i] for ele in authorized_ids])
@@ -232,10 +232,9 @@ class Agent():
         for ele in tokens:
             mask[ele] = 0.0
         filtered_logits: Tensor = torch_logits + mask
-        next_token_id: List[int] = argmax(filtered_logits).item()
-        print(type(next_token_id))
-        raise MyError("done")
-        return self.tokenizer.decode(next_token_id)
+        next_token_id: List[int] = [int(argmax(filtered_logits).item())]
+        re: Union[List[str], str] = self.tokenizer.decode(next_token_id)
+        return re[0] if isinstance(re, List) else re
 
     def generate_params(self) -> None:
         target_func: Dict[str, Any] = [
@@ -310,5 +309,11 @@ class Agent():
     def generate(self, prompt: str) -> str:
         tokens_id: List[int] = self.tokenizer.encode(prompt)[0].tolist()
         logits: List[float] = self.model.get_logits_from_input_ids(tokens_id)
-        max_tokens: List[List[Any]] = [argmax(tensor(logits)).tolist()]
-        return self.tokenizer.decode(max_tokens)
+        max_tokens: List[int] = [int(argmax(tensor(logits)).item())]
+        re: Union[List[str], str] = self.tokenizer.decode(max_tokens)
+        return re[0] if isinstance(re, List) else re
+
+
+@lru_cache()
+def fun(prompt: str) -> Prompt:
+    return Prompt(prompt)

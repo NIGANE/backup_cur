@@ -6,6 +6,7 @@ class PromptValidation(BaseModel):
     prompt: str
 
     @model_validator(mode="after")
-    def preparing_prompt(self):
+    def preparing_prompt(self) -> 'PromptValidation':
         self.prompt = self.prompt.strip()
+
         return self

@@ -5,24 +5,19 @@ from src.Agent import Agent, Prompt
 from src.parse import dump_json
 from src.models.ErrorHandler import MyError
 
-from typing import Dict, List, Any
+from typing import List
 from llm_sdk import Small_LLM_Model
-
-
-def prompting_visualizer(prompts: List[Prompt]):
-    for pt in prompts:
-        print(f"- {pt.prompt} ")
-        res: Dict[str, Any] = {"name": pt.name, "parameters": pt.parameters}
-        print(f"|\n|-->\" {res} \n")
 
 
 def main() -> None:
     try:
         if (len(sys.argv) < 7):
             error_usage_func()
+        print("|-> Validating Prompts and Functions definitions...")
         valid_data = parse()
         if not valid_data:
             raise MyError("invalid input")
+        print("|-> Downloading The Model LLM")
 
         #  instantiate the Model with Prompts and Functions
         agent = Agent(
@@ -30,7 +25,7 @@ def main() -> None:
             [pt.prompt for pt in valid_data.prompts],
             valid_data.funcs
             )
-
+        print("|-> Generating output file...")
         results: List[Prompt] = agent.resolve_prompts()
         dump_json(
             [
@@ -43,7 +38,7 @@ def main() -> None:
     except MyError as e:
         print(f"# {e}")
     except BaseException as e:
-        print(f"ERROR catched: {e}")
+        print(f"External ERROR catched: {e}")
 
 
 if __name__ == "__main__":

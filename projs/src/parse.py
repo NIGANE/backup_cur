@@ -29,8 +29,10 @@ def load_inputs(s: str) -> List[Dict[str, Any]]:
         return data
 
 
-def ends_with(src: str, sub: str) -> bool:
+def ends_with(src: Optional[str], sub: str) -> bool:
     i: int = 0
+    if not src:
+        return False
     while i < len(sub):
         if (sub[len(sub) - i - 1] != src[len(src) - i - 1]):
             return False
@@ -44,13 +46,13 @@ def parse() -> ValidData:
     output: str = "--output"
     if len(sys.argv) != 7:
         raise MyError(f"Invalid arguments: {error_usage_func()}")
-    fn_definition_file: str = (
+    fn_definition_file: Optional[str] = (
         sys.argv[sys.argv.index(func_definitions) + 1]
         if func_definitions in sys.argv else None
                          )
-    input_file: str = (
+    input_file: Optional[str] = (
         sys.argv[sys.argv.index(input) + 1] if input in sys.argv else None)
-    output_file: str = (
+    output_file: Optional[str] = (
         sys.argv[sys.argv.index(output) + 1] if output in sys.argv else None)
     if (not ends_with(output_file, ".json") or
             not ends_with(input_file, ".json") or
@@ -79,8 +81,8 @@ def parse() -> ValidData:
             f"ValidationError ({e.errors()[0]['type']}, "
             f"'{e.errors()[0]['loc'][0]}'): {e.errors()[0]['msg']} ")
     except Exception as e:
-        raise MyError(f"GlobalError (validation): {e}")
-    filtered_functions: List[Dict[str, Any]]  = []
+        raise MyError(f"Error (validation): {e}")
+    filtered_functions: List[Dict[str, Any]] = []
 
     pomp: Dict[str, Any] = {}
     for fn in validated_functions:
@@ -104,6 +106,6 @@ def dump_json(outs: List[Dict[str, Any]], out_file: str) -> None:
     try:
         with open(out_file, "w") as file:
             dump(outs, file, indent=4)
-        print("Output file is ready.")
+        print(" - Output file is ready.")
     except FileNotFoundError:
         raise MyError(f"Error: \"{out_file}\" is not a valid path")

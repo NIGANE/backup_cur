@@ -1,4 +1,3 @@
 
-
 class MyError(BaseException):
     pass

@@ -1,5 +1,5 @@
 
-def in_string(sub: str, sen: str):
+def in_string(sub: str, sen: str) -> bool:
     if sub is None or sen is None:
         return False
     i = 0
