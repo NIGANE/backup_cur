@@ -9,7 +9,7 @@ install:
 	uv sync
 
 debug:
-	@echo "debuging mode"
+	uv run python -m pdb src/main.py
 
 lint:
 	flake8 .
