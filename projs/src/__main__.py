@@ -14,10 +14,9 @@ def main() -> None:
     try:
         if (len(sys.argv) < 7):
             error_usage_func()
-        print("|-> Validating Prompts and Functions definitions...")
         valid_data: ValidData = parse()
         if not valid_data:
-            raise MyError("invalid input")
+            raise MyError("invalid inputs")
 
         #  instantiate the Model with Prompts and Functions
         print("|-> Downloading The Model LLM",

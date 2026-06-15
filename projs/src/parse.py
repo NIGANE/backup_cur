@@ -11,9 +11,9 @@ from pydantic import ValidationError
 
 
 def error_usage_func() -> str:
-    return ("Usage: uv run python -m src --functions_definition."
+    return ("Usage: uv run python -m src --functions_definition"
             + " <fn_definitions_file>.json --input <input_file>.json "
-            + "--output <output_file>.json")
+            + "--output <output_file>.json [--model <model_name>]")
 
 
 def load_inputs(s: str) -> List[Dict[str, Any]]:
@@ -72,7 +72,17 @@ def parse() -> ValidData:
     ):
         raise MyError(
             f"Error: Missing required arguments.\n{error_usage_func()}")
+    usable: List[str] = [
+        func_definitions,
+        fn_definition_file,
+        input, input_file, output, output_file,
+        model_flag, model if model else "", sys.argv[0]]
+    if (len(
+            set(sys.argv) -
+            set(usable)) > 0):
+        raise MyError(f"Invalid arguments: {error_usage_func()}")
 
+    print("|-> Validating Prompts and Functions definitions...")
     fn_definitions: List[Dict[str, Any]] = load_inputs(fn_definition_file)
     input_prompts: List[Dict[str, Any]] = load_inputs(input_file)
     validated_functions: List[FunctionDefinition] = []

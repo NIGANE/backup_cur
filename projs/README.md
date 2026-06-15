@@ -223,6 +223,5 @@ AI assistance (Claude by Anthropic) was used in the following ways during this p
 | **FSM design** | Used as a sounding board to discuss state machine structure for JSON Schema; all code was written manually |
 | **Debugging logit mask off-by-one errors** | Described the bug in natural language and used AI to help reason through the character indexing logic |
 | **Writing this README** | The README structure and content were drafted with AI assistance based on the project details provided by the author |
-| **Understanding the Willard & Louf paper** | Used AI to clarify notation and terminology in the academic paper |
 
 No AI-generated code was submitted directly. All implementation decisions, architecture choices, and code were authored by amerkht.

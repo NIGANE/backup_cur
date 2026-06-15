@@ -1,4 +1,8 @@
 
+from functools import lru_cache
+from src.models.Prompt import Prompt
+
+
 def in_string(sub: str, sen: str) -> bool:
     if sub is None or sen is None:
         return False
@@ -17,3 +21,8 @@ def in_string(sub: str, sen: str) -> bool:
             j = 0
         i += 1
     return False
+
+
+@lru_cache()
+def _cache(prompt: str) -> Prompt:
+    return Prompt(prompt)
