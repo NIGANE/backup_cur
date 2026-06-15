@@ -44,8 +44,8 @@ class Agent():
         # print(self.prompt.name)
         selected_fn: Dict[str, Any] = {}
         if (self.prompt.name not in self.fn_names
-                or self.prompt.name == "undefined"):
-            self.prompt.name = "undefined"
+                or self.prompt.name == "fn_undefined"):
+            self.prompt.name = "fn_undefined"
             return
         else:
             selected_fn = [
