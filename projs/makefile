@@ -2,7 +2,7 @@
 FILE="./maps/easy/01_linear_path.txt"
 
 run:
-	uv run -m src $(FILE)
+	@uv run python -m src $(FILE)
 
 
 clean:
