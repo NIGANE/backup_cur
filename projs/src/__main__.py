@@ -15,7 +15,9 @@ def main() -> None:
         parsed_data = Parser(sys.argv)
     except MyError as e:
         print(f"# {e}")
-    
+    # except BaseException as e:
+    #     print(f"external Error ({e.__class__.__name__}): {e}")
+
 
 
 if __name__ == "__main__":

@@ -1,9 +1,11 @@
 
-FILE="./maps/easy/01_linear_path.txt"
+FILE="./maps/challenger/01_the_impossible_dream.txt"
 
 run:
-	@uv run python -m src $(FILE)
+	@uv run python3 -m src $(FILE)
 
+test:
+	@uv run python3 -m main $(FILE)
 
 clean:
 	@echo "Cleaning up..."
