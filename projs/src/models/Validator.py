@@ -1,8 +1,9 @@
 from typing import Optional, Tuple, Dict, List
 from re import Match, Pattern, compile, search
 from src.models.Error import MyError
-from src.models.Hub import Hub
+from src.models.Hub import Hub, ZoneType
 from src.models.Connection import Connection
+
 
 class Validator():
     def __init__(self) -> None:
@@ -52,6 +53,14 @@ class Validator():
                     if self.is_number(conf.split("=")[1]):
                         size: int = int(conf.split("=")[1])
                         hub.set_capacity(size)
+                if conf.startswith("zone"):
+                    zone: Optional[ZoneType] = self.is_valid_zone(
+                        conf.split("=")[1].strip())
+                    if zone:
+                        hub.set_zone(zone)
+                    else:
+                        raise self.missmatch_error(i, "invalid zone type")
+
         if line.startswith("start_hub"):
             hub.start = True
         if line.startswith("end_hub"):
@@ -79,6 +88,12 @@ class Validator():
         patt = compile(r"^\-?\d+$")
         match = search(patt, n)
         return bool(match)
+
+    def is_valid_zone(self, zone: str) -> Optional[ZoneType]:
+        for ele in ZoneType:
+            if ele.value == zone:
+                return ele
+        return None
 
     @staticmethod
     def missmatch_error(line: int, desc: Optional[str] = "") -> MyError:

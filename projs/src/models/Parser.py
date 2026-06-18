@@ -30,15 +30,14 @@ class Parser():
                 count: int = self.validator.nb_drones(line, i + 1)
                 self.manager.set_total_drones(count)
 
-            if (line.startswith("start_hub") or line.startswith("end_hub")
+            elif (line.startswith("start_hub") or line.startswith("end_hub")
                     or line.startswith("hub")):
                 hub: Hub = self.validator.hubs(line, i + 1)
                 self.manager.add_hub(hub, i + 1)
 
-            if line.startswith("connection"):
-                pass
-                # connection = self.validator.connections(line, i + 1)
-                # for ele in self.manager.hubs:
-                #     if ele.name == "":
-                #         print("found")
-                # # self.manager.resolve_connection(connection, i + 1)
+            elif line.startswith("connection"):
+                connection = self.validator.connections(line, i + 1)
+                self.manager.resolve_connection(connection, i + 1)
+            else:
+                raise MyError(
+                    f"Error (): invalid configuration at line {i + 1}.")
