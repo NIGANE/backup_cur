@@ -10,18 +10,17 @@ class Parser():
         self.argv = argv
         self.validator = Validator()
         self.manager = Manager()
-        self.load_file()
 
-    def load_file(self):
+    def load_file(self) -> List[str]:
         data = []
         try:
             with open(self.argv[1], "r") as f:
                 data = f.readlines()
-            self.run_validation(data)
+            return data
         except FileNotFoundError as e:
             raise MyError(f"FileNotFound {e}")
 
-    def run_validation(self, data) -> None:
+    def run_validation(self, data: List[str]) -> Manager:
         for i, line in enumerate(data):
             line = line.strip()
             if line.startswith("#") or not line:
@@ -41,3 +40,8 @@ class Parser():
             else:
                 raise MyError(
                     f"Error (): invalid configuration at line {i + 1}.")
+        if len(self.manager.hubs) < 1:
+            raise MyError("Error (configuration error): 0 provided hubs")
+        if self.manager.total_drones < 1:
+            raise MyError("Error (configuration error): 0 provided drones")
+        return self.manager

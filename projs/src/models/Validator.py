@@ -72,14 +72,14 @@ class Validator():
         if not match:
             raise self.missmatch_error(i, "invalid configurations")
         groups: Dict[str, str] = match.groupdict()
-        max_lint: int = 1
+        link_capacity: int = 1
         conf: Optional[str] = groups.get("config")
         if conf:
             if self.is_number(conf.strip().split("=")[1]):
-                max_lint = int(conf.strip().split("=")[1])
+                link_capacity = int(conf.strip().split("=")[1])
             else:
                 raise self.missmatch_error(i, "invalid number")
-        connection = Connection(groups["hub1"], groups["hub2"], max_lint)
+        connection = Connection(groups["hub1"], groups["hub2"], link_capacity)
         return connection
 
     def is_number(self, n: Optional[str]) -> bool:

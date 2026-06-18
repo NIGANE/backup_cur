@@ -21,6 +21,9 @@ class Hub:
         self.start: bool = False
         self.end: bool = False
         self.connections: List[Dict[str, Any]] = []
+        self.visited: bool = False
+        self.relaxed: float = float("+inf")
+        self.cost: float = 2 if self.type == ZoneType.RESTRICTED else 1
 
     def set_color(self, c: str) -> None:
         self.color = c
@@ -31,8 +34,8 @@ class Hub:
     def set_zone(self, zone: ZoneType) -> None:
         self.type = zone
 
-    def connect(self, hub: 'Hub', max_lint: int) -> None:
-        self.connections.append({"hub": hub, "max_lint": max_lint})
+    def connect(self, hub: 'Hub', link_capacity: int) -> None:
+        self.connections.append({"hub": hub, "link_capacity": link_capacity})
 
     def __str__(self) -> str:
         return (
@@ -40,7 +43,10 @@ class Hub:
             f"[color: {self.color}, capacity: {self.capacity}, "
             f"type: {self.type.value}]"
             f"{"-> start" if self.start else ""}"
-            f"{"-> end" if self.end else ""}"
+            f"{"-> end" if self.end else ""} "
+            "connections: \n["
+            f"{[ele["hub"].name for ele in self.connections]}"
+            "]"
             )
 
     def __eq__(self, hub: object):
