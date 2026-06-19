@@ -55,6 +55,7 @@ class Manager:
         cur: Hub = stack[-1]
         while (cur != self.end):
             target = self.get_chepest(cur)
+            cur.visited = True
             if (target):
                 stack.append(target)
                 cur = target
@@ -63,12 +64,15 @@ class Manager:
                 cur = stack[-1]
         print([ele.name for ele in stack])
 
-    def get_chepest(self, hub: Hub) -> Hub:
-        autorized: List[Hub] = [
+    def get_chepest(self, hub: Hub) -> Optional[Hub]:
+        authorized: List[Hub] = [
             ele["hub"] for ele in hub.connections if not ele["hub"].visited
         ]
-        min_cost: float = min([ele.relaxed for ele in autorized])
-        return [ele for ele in autorized if ele.relaxed == min_cost][0]
+        if len(authorized) < 1:
+            return None
+        print(authorized)
+        min_cost: float = min([ele.relaxed for ele in authorized])
+        return [ele for ele in authorized if ele.relaxed == min_cost][0]
 
     def resolve_connection(self, con: Connection, line: int):
         if (not self.get_by_name(con.hub1)
