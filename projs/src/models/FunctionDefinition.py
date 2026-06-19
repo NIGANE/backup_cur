@@ -8,6 +8,7 @@ class ValidTypes(Enum):
     NUMBER = "number"
     BOOL = "boolean"
     NONE = "None"
+    INTEGER = "integer"
 
 
 class TypeProperty(BaseModel):

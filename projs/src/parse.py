@@ -46,7 +46,7 @@ def parse() -> ValidData:
     output: str = "--output"
     model_flag: str = "--model"
     if len(sys.argv) < 7:
-        raise MyError(f"Invalid arguments: {error_usage_func()}")
+        raise MyError(f"Invalid args: {error_usage_func()}")
 
     fn_definition_file: Optional[str] = (
         sys.argv[sys.argv.index(func_definitions) + 1]
@@ -63,7 +63,7 @@ def parse() -> ValidData:
     if (not ends_with(output_file, ".json") or
             not ends_with(input_file, ".json") or
             not ends_with(fn_definition_file, ".json")):
-        raise MyError(f"Invalid arguments: {error_usage_func()}")
+        raise MyError(f"Invalid arg (not valid .json): {error_usage_func()}")
     if (
         (input_file is None) or
         (fn_definition_file is None) or
@@ -80,7 +80,7 @@ def parse() -> ValidData:
     if (len(
             set(sys.argv) -
             set(usable)) > 0):
-        raise MyError(f"Invalid arguments: {error_usage_func()}")
+        raise MyError(f"Invalid args: {error_usage_func()}")
 
     print("|-> Validating Prompts and Functions definitions...")
     fn_definitions: List[Dict[str, Any]] = load_inputs(fn_definition_file)

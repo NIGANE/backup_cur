@@ -28,7 +28,7 @@ class Agent():
         self.tokenizer: Tokenization = Tokenization(self.model)
         print("|-> start resolving prompts...")
         for prompt in prompts:
-            self.prompt: Prompt = _cache(prompt.lower())
+            self.prompt: Prompt = _cache(prompt)
             print(f"resolving prompt: {self.prompt.prompt}")
             if (not self.prompt.name):
                 self.generate_json_valid()
@@ -148,7 +148,8 @@ class Agent():
         j: int = 0
         for key in para:
             self.constrained_prompt += f'"{key}":'
-            if (para[key].value == ValidTypes.NUMBER.value):
+            if (para[key].value == ValidTypes.NUMBER.value
+                    or para[key].value == ValidTypes.INTEGER.value):
                 self.prompting_number_params(key, para[key].value)
             else:
                 self.prompting_str_params(key, para[key].value)
@@ -184,9 +185,12 @@ class Agent():
                 break
             founded += next_word
             i += 1
-
+        # print(self.constrained_prompt)
         self.constrained_prompt += (founded + '"').strip()
-        self.prompt.parameters[key] = float(founded)
+        if (type == ValidTypes.NUMBER.value):
+            self.prompt.parameters[key] = float(founded)
+        else:
+            self.prompt.parameters[key] = int(founded)
 
     def resolve_prompts(self) -> List[Prompt]:
         return self.prompts
