@@ -33,6 +33,10 @@ class Hub:
 
     def set_zone(self, zone: ZoneType) -> None:
         self.type = zone
+        if self.type == ZoneType.RESTRICTED:
+            self.cost = 2
+        else:
+            self.cost = 1
 
     def connect(self, hub: 'Hub', link_capacity: int) -> None:
         self.connections.append({"hub": hub, "link_capacity": link_capacity})

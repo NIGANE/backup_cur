@@ -1,4 +1,2 @@
-from src.models.Hub import ZonTypes
-
-
-print([type.value for type in ZonTypes])
+arr = [1, 2, 2, 3, 4, 0, -1, 0]
+print(min(arr))

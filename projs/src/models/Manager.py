@@ -9,6 +9,8 @@ class Manager:
     def __init__(self) -> None:
         self.total_drones: int = 0
         self.hubs: List[Hub] = []
+        self.shortest_path: Optional[List[Hub]] = []
+        self.paths: List[List[Hub]] = []
 
     def set_total_drones(self, nb: int) -> None:
         self.total_drones = nb
@@ -36,33 +38,54 @@ class Manager:
     def path_finding(self) -> None:
         self.start: Hub = [ele for ele in self.hubs if ele.start][0]
         self.end: Hub = [ele for ele in self.hubs if ele.end][0]
-        queue: List[Hub] = [ele for ele in self.hubs if ele.start]
+        queue: List[Hub] = [self.start]
         queue[0].relaxed = queue[0].cost
         while (len(queue) > 0):
             cur: Hub = queue.pop()
+            cur.visited = True
             for ele in cur.connections:
+
                 if (ele["hub"].type == ZoneType.BLOCKED):
+                    continue
+                if (ele["hub"].visited or ele["hub"] in queue):
                     continue
                 queue = [ele["hub"], *queue]
             for ele in cur.connections:
                 target = ele["hub"]
                 if (cur.relaxed + target.cost < target.relaxed):
-                    target.relaxed = cur.relaxed + target.cost
-        self.resolve_shortest_path()
 
-    def resolve_shortest_path(self) -> None:
+                    target.relaxed = cur.relaxed + target.cost
+        self.shortest_path = self.resolve_shortest_path()
+        if not (self.shortest_path):
+            raise MyError("no path found")
+        new_path: Optional[List[Hub]] = self.shortest_path
+        while new_path:
+            if new_path in self.paths:
+                break
+            for ele in new_path:
+                ele: Hub
+                ele.relaxed += 100.0
+            self.paths.append(new_path)
+            new_path = self.resolve_shortest_path()
+
+        print("paths found: ", len(self.paths))
+
+    def resolve_shortest_path(self) -> Optional[List[Hub]]:
+        self.unvisit()
         stack: List[Hub] = [self.start]
         cur: Hub = stack[-1]
         while (cur != self.end):
-            target = self.get_chepest(cur)
             cur.visited = True
+            target: Optional[Hub] = self.get_chepest(cur)
             if (target):
                 stack.append(target)
                 cur = target
             else:
                 stack.pop()
                 cur = stack[-1]
-        print([ele.name for ele in stack])
+        if len(stack) < 1:
+            return None
+        return stack
 
     def get_chepest(self, hub: Hub) -> Optional[Hub]:
         authorized: List[Hub] = [
@@ -70,7 +93,9 @@ class Manager:
         ]
         if len(authorized) < 1:
             return None
-        print(authorized)
+        prio: Optional[Hub] = self.any_priority(authorized)
+        if prio:
+            return prio
         min_cost: float = min([ele.relaxed for ele in authorized])
         return [ele for ele in authorized if ele.relaxed == min_cost][0]
 
@@ -89,6 +114,16 @@ class Manager:
             if ele.name == name:
                 return ele
         return None
+
+    def any_priority(self, hubs: List[Hub]) -> Optional[Hub]:
+        for ele in hubs:
+            if ele.type == ZoneType.PRIORITY.value:
+                return ele
+        return None
+
+    def unvisit(self):
+        for hub in self.hubs:
+            hub.visited = False
 
     def __str__(self):
         return (f"hubs: {len(self.hubs)} "
