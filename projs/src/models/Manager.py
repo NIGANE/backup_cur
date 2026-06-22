@@ -69,6 +69,10 @@ class Manager:
             new_path = self.resolve_shortest_path()
 
         print("paths found: ", len(self.paths))
+        for p in self.paths:
+            print([f"- {e.name}" for e in p])
+        print("-" * 100)
+        print("- shortest path: ", [ele.name for ele in self.shortest_path])
 
     def resolve_shortest_path(self) -> Optional[List[Hub]]:
         self.unvisit()
