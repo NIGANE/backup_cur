@@ -55,7 +55,7 @@ class Manager:
                 if (cur.relaxed + target.cost < target.relaxed):
 
                     target.relaxed = cur.relaxed + target.cost
-        self.shortest_path = self.resolve_shortest_path()
+        self.shortest_path = self.resolve_shortest_path(True)
         if not (self.shortest_path):
             raise MyError("no path found")
         new_path: Optional[List[Hub]] = self.shortest_path
@@ -63,24 +63,22 @@ class Manager:
             if new_path in self.paths:
                 break
             for ele in new_path:
-                ele: Hub
                 ele.relaxed += 100.0
             self.paths.append(new_path)
             new_path = self.resolve_shortest_path()
-
-        print("paths found: ", len(self.paths))
-        for p in self.paths:
-            print([f"- {e.name}" for e in p])
-        print("-" * 100)
+        print("- founded paths: ", len(self.paths))
         print("- shortest path: ", [ele.name for ele in self.shortest_path])
 
-    def resolve_shortest_path(self) -> Optional[List[Hub]]:
+    def resolve_shortest_path(self,
+                              shortest: bool = False) -> Optional[List[Hub]]:
         self.unvisit()
         stack: List[Hub] = [self.start]
         cur: Hub = stack[-1]
         while (cur != self.end):
             cur.visited = True
-            target: Optional[Hub] = self.get_chepest(cur)
+            target: Optional[Hub] = (
+                self.get_chepest(cur) if not shortest
+                else self.get_next_greedy(cur))
             if (target):
                 stack.append(target)
                 cur = target
@@ -102,6 +100,21 @@ class Manager:
             return prio
         min_cost: float = min([ele.relaxed for ele in authorized])
         return [ele for ele in authorized if ele.relaxed == min_cost][0]
+
+    def get_next_greedy(self, hub: Hub) -> Optional[Hub]:
+        authorized: List[Hub] = [
+            ele["hub"] for ele in hub.connections if not ele["hub"].visited
+        ]
+        if len(authorized) < 1:
+            return None
+        prio: Optional[Hub] = self.any_priority(authorized)
+        if prio:
+            return prio
+        next: List[Hub] = [
+            ele for ele in authorized if ele.relaxed == hub.relaxed + 1]
+        if len(next) < 1:
+            return None
+        return next[0]
 
     def resolve_connection(self, con: Connection, line: int):
         if (not self.get_by_name(con.hub1)
