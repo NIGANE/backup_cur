@@ -73,6 +73,7 @@ class Manager:
                               shortest: bool = False) -> Optional[List[Hub]]:
         self.unvisit()
         stack: List[Hub] = [self.start]
+        print(stack)
         cur: Hub = stack[-1]
         while (cur != self.end):
             cur.visited = True
