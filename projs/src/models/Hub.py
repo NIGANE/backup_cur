@@ -41,6 +41,10 @@ class Hub:
     def connect(self, hub: 'Hub', link_capacity: int) -> None:
         self.connections.append({"hub": hub, "link_capacity": link_capacity})
 
+    def relax_hh(self, prev: 'Hub') -> None:
+        self.relaxed = prev.relaxed + self.cost
+        self.prev: 'Hub' = prev
+
     def __str__(self) -> str:
         return (
             f"{self.name} ({self.x}, {self.y})"

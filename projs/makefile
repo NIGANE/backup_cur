@@ -10,7 +10,7 @@ hard_01="./maps/hard/01_maze_nightmare.txt"
 hard_02="./maps/hard/02_capacity_hell.txt"
 hard_03="./maps/hard/03_ultimate_challenge.txt"
 run:
-	@uv run python3 -m src $(medium_02)
+	@uv run python3 -m src $(hard_03)
 
 test:
 	@uv run python3 -m main $(FILE)

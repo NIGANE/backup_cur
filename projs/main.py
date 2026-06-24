@@ -1,2 +1,2 @@
-arr = [1, 2, 2, 3, 4, 0, -1, 0]
-print(min(arr))
+li = [1]
+print(li.pop())
