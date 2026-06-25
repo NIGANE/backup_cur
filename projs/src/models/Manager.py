@@ -3,6 +3,7 @@ from src.models.Hub import Hub
 from src.models.Connection import Connection
 from src.models.Error import MyError
 from src.models.Hub import ZoneType
+from src.models.Tools import Tools
 
 
 class Manager:
@@ -11,6 +12,12 @@ class Manager:
         self.hubs: List[Hub] = []
         self.shortest_path: List[Hub] = []
         self.paths: List[List[Hub]] = []
+
+    def get_total_cost(self, path: List[Hub]) -> float:
+        total: float = 0
+        for ele in path:
+            total += ele.cost
+        return total
 
     def set_total_drones(self, nb: int) -> None:
         self.total_drones = nb
@@ -62,6 +69,29 @@ class Manager:
         self.relaxation()
         self.find_shortest_path()
         self.discover_multiple_paths()
+        print("founded paths: ", len(self.paths))
+        self.paths_filter_by_cost(
+            self.get_total_cost(self.shortest_path) * 1.38)
+        if (len(self.paths) > 3):
+            self.paths_filter_by_len(len(self.shortest_path) + 1)
+        print("founded paths: ", len(self.paths))
+        print("cost per path: ", [self.get_total_cost(ele) for ele in self.paths])
+        print([[ele.name for ele in path] for path in self.paths])
+
+    def paths_filter_by_cost(self, min_cost: float) -> None:
+        new_list: List[List[Hub]] = []
+        for path in self.paths:
+            co: float = self.get_total_cost(path)
+            if min_cost > co:
+                new_list.append(path)
+        self.paths = new_list
+
+    def paths_filter_by_len(self, min_len: int) -> None:
+        new_list: List[List[Hub]] = []
+        for path in self.paths:
+            if len(path) <= min_len:
+                new_list.append(path)
+        self.paths = new_list
 
     def find_shortest_path(self) -> None:
         cur: Hub = self.end
@@ -72,24 +102,18 @@ class Manager:
             cur = cur.prev
 
     def discover_multiple_paths(self) -> None:
-        pass
-    # prev = [ele for ele in self.hubs if ele.relaxed == cur.relaxed + 1]
+        new_path: Optional[List[Hub]] = self.shortest_path
+        while new_path is not None:
+            if new_path in self.paths:
+                break
+            for ele in new_path:
+                ele.relaxed += 100.0
+            self.paths.append(new_path)
+            new_path = self.resolve_new_path()
 
-        # self.shortest_path = self.resolve_shortest_path(True)
-        # new_path: Optional[List[Hub]] = self.shortest_path
-        # while new_path is not None:
-        #     if new_path in self.paths:
-        #         break
-        #     for ele in new_path:
-        #         ele.relaxed += 100.0
-        #     self.paths.append(new_path)
-        #     new_path = self.resolve_shortest_path()
-        # print("- founded paths: ", len(self.paths))
-
-    def resolve_shortest_path(self) -> Optional[List[Hub]]:
+    def resolve_new_path(self) -> Optional[List[Hub]]:
         self.unvisit()
         stack: List[Hub] = [self.start]
-        # print(stack)
         cur: Hub = stack[-1]
         while (cur != self.end):
             cur.visited = True
@@ -98,8 +122,8 @@ class Manager:
                 stack.append(target)
                 cur = target
             else:
-                if stack[-1] == self.start:
-                    raise MyError("Error: no path found")
+                if cur == self.start:
+                    return None
                 stack.pop()
                 cur = stack[-1]
         if len(stack) < 1:
@@ -117,15 +141,6 @@ class Manager:
             return prio
         min_cost: float = min([ele.relaxed for ele in authorized])
         return [ele for ele in authorized if ele.relaxed == min_cost][0]
-
-        next: List[Hub] = [
-            ele for ele in authorized if ele.relaxed == hub.relaxed + 1]
-        if all([ele.type == ZoneType.RESTRICTED for ele in authorized]):
-            return [
-                ele for ele in authorized if ele.relaxed == hub.relaxed + 2][0]
-        if len(next) < 1:
-            return None
-        return next[0]
 
     def resolve_connection(self, con: Connection, line: int):
         if (not self.get_by_name(con.hub1)
