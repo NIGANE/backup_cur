@@ -8,7 +8,32 @@ from src.models.ErrorHandler import MyError
 
 
 class Tokenization:
+    """Encode and decode text using the model's tokenizer vocabulary.
+
+    This class implements a Byte Pair Encoding (BPE)-style tokenizer based on
+    the vocabulary and merge rules associated with a language model. It
+    converts text into token IDs for inference and reconstructs text from
+    token IDs after generation.
+
+    Attributes:
+        model: The language model providing the tokenizer resources.
+        int_vocab: Mapping from token IDs to their string representations.
+        str_vocab: Mapping from token strings to their corresponding IDs.
+        space_token_id: Token ID representing a space character.
+        new_line_token_id: Token ID representing a newline character.
+        priority: Mapping of merge pairs to their priority rank.
+        encoding: The current token sequence during BPE encoding.
+        token_ids: The encoded token IDs.
+    """
     def __init__(self, model: Small_LLM_Model):
+        """Initialize the tokenizer.
+
+        Loads the tokenizer vocabulary and merge rules from the supplied
+        language model.
+
+        Args:
+            model: The language model exposing the tokenizer files.
+        """
         self.model = model
         self.int_vocab: Dict[int, str] = {}
         self.str_vocab: Dict[str, int] = {}
@@ -21,6 +46,14 @@ class Tokenization:
         self.get_merges()
 
     def get_merges(self) -> None:
+        """Load the tokenizer merge rules.
+
+        Reads the merge file associated with the language model and builds the
+        priority table used during Byte Pair Encoding.
+
+        Raises:
+            MyError: If the merge file cannot be read or parsed.
+        """
         file_path: str = self.model.get_path_to_merges_file()
         try:
             with open(file_path, "r") as f:
@@ -30,6 +63,14 @@ class Tokenization:
             raise MyError(f"Error: {e}")
 
     def get_vocab(self) -> None:
+        """Load the tokenizer vocabulary.
+
+        Reads the tokenizer vocabulary and constructs both token-to-ID and
+        ID-to-token mappings.
+
+        Raises:
+            MyError: If the vocabulary file cannot be read or parsed.
+        """
         try:
             file_path: str = self.model.get_path_to_vocab_file()
             with open(file_path, "r") as f:
@@ -40,6 +81,18 @@ class Tokenization:
             raise MyError(f"Error: {e}")
 
     def encode(self, prompt: str) -> Tensor:
+        """Encode a prompt into token IDs.
+
+        The prompt is first normalized by replacing spaces and newline
+        characters with their corresponding tokenizer symbols. Merge rules are
+        then applied iteratively until no additional merges are possible.
+
+        Args:
+            prompt: The input text to tokenize.
+
+        Returns:
+            A tensor containing the encoded token IDs.
+        """
         space: str = self.int_vocab[self.space_token_id]
         new_line: str = self.int_vocab[self.new_line_token_id]
         self.encoding = [
