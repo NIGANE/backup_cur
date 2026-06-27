@@ -11,12 +11,28 @@ from pydantic import ValidationError
 
 
 def error_usage_func() -> str:
+    """Return the command-line usage message.
+
+    Returns:
+        A string describing the expected command-line arguments.
+    """
     return ("Usage: uv run python -m src --functions_definition"
             + " <fn_definitions_file>.json --input <input_file>.json "
             + "--output <output_file>.json [--model <model_name>]")
 
 
 def load_inputs(s: str) -> List[Dict[str, Any]]:
+    """Load JSON data from a file.
+
+    Args:
+        s: The path to the JSON file.
+
+    Returns:
+        The parsed JSON content.
+
+    Raises:
+        MyError: If the file does not exist or does not contain valid JSON.
+    """
     data: List[Dict[str, Any]] = []
     try:
         with open(s, 'r') as f:
@@ -30,6 +46,15 @@ def load_inputs(s: str) -> List[Dict[str, Any]]:
 
 
 def ends_with(src: Optional[str], sub: str) -> bool:
+    """Determine whether a string ends with a given suffix.
+
+    Args:
+        src: The string to inspect.
+        sub: The suffix to match.
+
+    Returns:
+        ``True`` if ``src`` ends with ``sub``; otherwise ``False``.
+    """
     i: int = 0
     if not src:
         return False
@@ -41,21 +66,38 @@ def ends_with(src: Optional[str], sub: str) -> bool:
 
 
 def parse() -> ValidData:
+    """Parse and validate the command-line arguments.
+
+    This function validates the provided command-line arguments, loads the
+    function definitions and input prompts from JSON files, validates their
+    contents using Pydantic models, and prepares the data required by the
+    constrained decoding pipeline.
+
+    Returns:
+        A container holding the validated function definitions, prompts,
+        output file path, and optional model name.
+
+    Raises:
+        MyError: If the command-line arguments are invalid, a required file
+            cannot be loaded, or the input data fails validation.
+    """
     func_definitions: str = "--functions_definition"
     input: str = "--input"
     output: str = "--output"
     model_flag: str = "--model"
-    if len(sys.argv) < 7:
-        raise MyError(f"Invalid args: {error_usage_func()}")
-
+    default_fn_definition: str = "data/input/functions_definition.json"
+    default_fn_calling: str = "data/input/function_calling_tests.json"
+    default_output: str = "data/output/function_calls.json"
     fn_definition_file: Optional[str] = (
         sys.argv[sys.argv.index(func_definitions) + 1]
-        if func_definitions in sys.argv else None
+        if func_definitions in sys.argv else default_fn_definition
                          )
     input_file: Optional[str] = (
-        sys.argv[sys.argv.index(input) + 1] if input in sys.argv else None)
+        sys.argv[sys.argv.index(input) + 1] if input in sys.argv else
+        default_fn_calling)
     output_file: Optional[str] = (
-        sys.argv[sys.argv.index(output) + 1] if output in sys.argv else None)
+        sys.argv[sys.argv.index(output) + 1] if output in sys.argv else
+        default_output)
     model: Optional[str] = (
         sys.argv[sys.argv.index(model_flag) + 1] if model_flag in sys.argv
         else None
@@ -119,6 +161,15 @@ def parse() -> ValidData:
 
 
 def dump_json(outs: List[Dict[str, Any]], out_file: str) -> None:
+    """Write the generated function calls to a JSON file.
+
+    Args:
+        outs: The data to serialize.
+        out_file: The path to the output JSON file.
+
+    Raises:
+        MyError: If the output file cannot be created or written.
+    """
     try:
         with open(out_file, "w") as file:
             dump(outs, file, indent=4)

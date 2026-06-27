@@ -2,10 +2,11 @@ FN_DEF= "data/input/functions_definition.json"
 FN_CAL= "data/input/function_calling_tests.json"
 OUT="data/output/function_calls.json"
 MODEL="Qwen/Qwen3-0.6B"
+ARGS = --functions_definition ${FN_DEF} --input ${FN_CAL} --output ${OUT} --model $(MODEL)
 
 all:
 	@echo "Running the application..."
-	@uv run python -m src --functions_definition ${FN_DEF} --input ${FN_CAL} --output ${OUT} --model $(MODEL)
+	@uv run python -m src $(ARGS)
 
 
 install:
