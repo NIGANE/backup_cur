@@ -7,10 +7,16 @@ from src.models.ErrorHandler import MyError
 from src.models.ValidData import ValidData
 
 from typing import List
-from llm_sdk import Small_LLM_Model
+from llm_sdk.llm_sdk import Small_LLM_Model
 
 
 def main() -> None:
+    """Run the call_me_maybe pipeline.
+
+    Parses and validates the command-line arguments, initializes the language
+    model and agent, resolves the input prompts through constrained decoding,
+    and writes the generated function calls to the output file.
+    """
     try:
         if (len(sys.argv) < 7):
             error_usage_func()

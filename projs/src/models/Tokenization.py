@@ -1,5 +1,5 @@
 
-from llm_sdk import Small_LLM_Model
+from llm_sdk.llm_sdk import Small_LLM_Model
 from torch import torch, Tensor
 from typing import Dict, List, Optional, Union, Tuple
 from json import load
@@ -109,6 +109,17 @@ class Tokenization:
         return torch.tensor([self.token_ids])
 
     def decode(self, token_ids: List[int] | Tensor) -> Union[List[str], str]:
+        """Decode token IDs into text.
+
+        Args:
+            token_ids: A sequence of token IDs or a tensor containing token
+            IDs.
+
+        Returns:
+            The decoded text. Returns a string for a list of token IDs or a
+            single-element list containing the decoded string when the input is
+            a tensor.
+        """
         tt: Union[List[int], Tensor] = (
             token_ids[0].tolist() if isinstance(token_ids, Tensor)
             else token_ids)
@@ -120,6 +131,17 @@ class Tokenization:
         return [re] if isinstance(token_ids, Tensor) else re
 
     def load_priority(self, lines: List[str]) -> Dict[Tuple[str, str], int]:
+        """Build the merge priority table.
+
+        Parses the tokenizer merge rules and assigns a priority to each merge
+        pair based on its order in the merge file.
+
+        Args:
+            lines: The lines read from the merge rules file.
+
+        Returns:
+            A mapping from token pairs to their merge priority.
+        """
         rank = 0
         re: Dict[Tuple[str, str], int] = {}
 
@@ -135,6 +157,16 @@ class Tokenization:
         return re
 
     def get_next_max_prio(self) -> float:
+        """Find the highest-priority merge available.
+
+        Scans the current encoding and identifies the merge pair with the
+        smallest priority value.
+
+        Returns:
+            The priority of the next merge to perform. Returns positive
+            infinity
+            if no valid merge exists.
+        """
         i = 0
         max_prio: float = float('+inf')
         while i < len(self.encoding) - 1:
@@ -146,6 +178,17 @@ class Tokenization:
         return (max_prio)
 
     def merge(self, max_prio: Union[int, float]) -> bool:
+        """Merge token pairs with the specified priority.
+
+        Applies a single Byte Pair Encoding merge pass by combining every token
+        pair whose priority matches the provided value.
+
+        Args:
+            max_prio: The priority of the merge rule to apply.
+
+        Returns:
+            ``True`` if at least one merge was performed; otherwise ``False``.
+        """
         new: List[str] = []
         merged: int = 0
         i = 0

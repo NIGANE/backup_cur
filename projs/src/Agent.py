@@ -1,4 +1,4 @@
-from llm_sdk import Small_LLM_Model
+from llm_sdk.llm_sdk import Small_LLM_Model
 from torch import Tensor, argmax, tensor, full
 from typing import List, Any, Dict, Union
 from functools import reduce
@@ -10,9 +10,41 @@ from src.tools.tools import _cache
 
 
 class Agent():
+    """Resolve user prompts into function calls using constrained decoding.
+
+        This class orchestrates the constrained decoding pipeline by selecting
+        the most appropriate function for each prompt and extracting its
+        parameters. It interacts with the language model at the token level to
+        ensure that generated outputs conform to the available function
+        definitions.
+
+    Attributes:
+        fns: The available function definitions, including the fallback
+            ``fn_undefined``.
+        fn_names: The names of all available functions.
+        model: The language model used for inference.
+        constrained_prompt: The prompt currently used for constrained
+            decoding.
+        max_tokens: The maximum number of tokens generated for constrained
+            decoding steps.
+        prompts: The resolved prompts.
+        tokenizer: The tokenizer associated with the language model.
+    """
     def __init__(
             self, model: Small_LLM_Model, prompts: List[str],
-            functions_definitions: List[Dict]):
+            functions_definitions: List[Dict]) -> None:
+        """Initialize the agent and resolve the supplied prompts.
+
+        A fallback function named ``fn_undefined`` is automatically added to
+        the available function definitions. Each prompt is processed
+        immediately and
+        resolved into a function call.
+
+        Args:
+            model: The language model used for constrained decoding.
+            prompts: The user prompts to resolve.
+            functions_definitions: The available function definitions.
+        """
         self.fns: List[Dict[str, Any]] = functions_definitions
         self.fns.append({
             "name": "fn_undefined",
@@ -36,9 +68,16 @@ class Agent():
             self.empty()
 
     def empty(self) -> None:
+        """Reset the constrained prompt state."""
         self.constrained_prompt = ""
 
     def generate_json_valid(self) -> None:
+        """Generate a valid function call for the current prompt.
+
+        The function name is selected using constrained decoding. If the
+        selected function accepts parameters, their values are generated
+        afterwards.
+        """
         # constrained decoding the function name
         self.generate_function_name()
         # print(self.prompt.name)
@@ -56,6 +95,12 @@ class Agent():
             self.generate_params()
 
     def build_prompt(self) -> str:
+        """Build the prompt describing the available functions.
+
+        Returns:
+            A formatted prompt containing the available function signatures and
+            descriptions.
+        """
         header: str = "starting point, avalaible functions:\n"
         preparing_list: List[str] = []
         item: str = ""
@@ -74,6 +119,12 @@ class Agent():
         return reduce(lambda a, b: a + b, preparing_list, header)
 
     def generate_function_name(self) -> None:
+        """Generate the function name using constrained decoding.
+
+        The language model is restricted to generating only valid function
+        names
+        from the available function definitions.
+        """
         authorized_ids: List[List[int]] = [
             self.tokenizer.encode(fn_name).tolist()[0]
             for fn_name in self.fn_names
@@ -94,6 +145,14 @@ class Agent():
 
     @staticmethod
     def max_tokenized(tokens: List[List[int]]) -> int:
+        """Return the length of the longest token sequence.
+
+        Args:
+            tokens: A collection of tokenized sequences.
+
+        Returns:
+            The maximum sequence length.
+        """
         if len(tokens) == 0:
             return 0
         max_size = len(tokens[0])
@@ -103,6 +162,15 @@ class Agent():
         return max_size
 
     def filter_authorized_ids(self, pattern: str) -> List[List[int]]:
+        """Filter candidate function names by prefix.
+
+        Args:
+            pattern: The generated function name prefix.
+
+        Returns:
+            The tokenized function names whose names start with the given
+            prefix.
+        """
         return [
             self.tokenizer.encode(fn_name).tolist()[0]
             for fn_name in self.fn_names
@@ -110,6 +178,18 @@ class Agent():
         ]
 
     def prompting_by_token(self, ppt: str, tokens: List[int]) -> str:
+        """Generate a token from a constrained vocabulary.
+
+        The model logits are masked so that only the supplied token IDs are
+        eligible for selection.
+
+        Args:
+            ppt: The prompt provided to the language model.
+            tokens: The token IDs allowed during decoding.
+
+        Returns:
+            The decoded token selected by the language model.
+        """
         prompt_ids: List[int] = self.tokenizer.encode(ppt)[0].tolist()
         logits: List[float] = self.model.get_logits_from_input_ids(prompt_ids)
         torch_logits: Tensor = tensor(logits)
@@ -122,6 +202,11 @@ class Agent():
         return re[0] if isinstance(re, List) else re
 
     def generate_params(self) -> None:
+        """Generate the parameters for the selected function.
+
+        Parameter values are generated according to the types defined by the
+        selected function's schema.
+        """
         target_func: Dict[str, Any] = [
             ele for ele in self.fns if ele["name"] == self.prompt.name][0]
         self.constrained_prompt = "You are a parameter extraction engine.\n"
@@ -158,6 +243,12 @@ class Agent():
                 self.constrained_prompt += ", "
 
     def prompting_str_params(self, key: str, type: str) -> None:
+        """Generate a string parameter value.
+
+        Args:
+            key: The parameter name.
+            type: The parameter type.
+        """
         founded: str = ""
         self.constrained_prompt += '"'
         while True:
@@ -169,6 +260,12 @@ class Agent():
         self.constrained_prompt += str(founded).strip() + '"'
 
     def prompting_number_params(self, key: str, type: str) -> None:
+        """Generate a numeric parameter value.
+
+        Args:
+            key: The parameter name.
+            type: The parameter type.
+        """
         i: int = 0
         founded: str = ""
         self.constrained_prompt += '" '
@@ -180,12 +277,11 @@ class Agent():
         while i < self.max_tokens:
             next_word = self.prompting_by_token(
                 self.constrained_prompt + founded,
-                self.tokenizer.encode('0123456789"')[0].tolist())
+                self.tokenizer.encode('.0123456789"')[0].tolist())
             if (next_word == '"'):
                 break
             founded += next_word
             i += 1
-        # print(self.constrained_prompt)
         self.constrained_prompt += (founded + '"').strip()
         if (type == ValidTypes.NUMBER.value):
             self.prompt.parameters[key] = float(founded)
@@ -193,9 +289,24 @@ class Agent():
             self.prompt.parameters[key] = int(founded)
 
     def resolve_prompts(self) -> List[Prompt]:
+        """Return the resolved prompts.
+
+        Returns:
+            The prompts annotated with the selected function names and
+            generated
+            parameters.
+        """
         return self.prompts
 
     def generate(self, prompt: str) -> str:
+        """Generate the next token without decoding constraints.
+
+        Args:
+            prompt: The prompt provided to the language model.
+
+        Returns:
+            The generated token.
+        """
         tokens_id: List[int] = self.tokenizer.encode(prompt)[0].tolist()
         logits: List[float] = self.model.get_logits_from_input_ids(tokens_id)
         max_tokens: List[int] = [int(argmax(tensor(logits)).item())]
