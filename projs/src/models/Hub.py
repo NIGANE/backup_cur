@@ -1,5 +1,6 @@
 from typing import Optional, List, Dict, Any
 from enum import Enum
+from src.Dron import Drone
 
 
 class ZoneType(Enum):
@@ -24,6 +25,15 @@ class Hub:
         self.visited: bool = False
         self.relaxed: float = float("+inf")
         self.cost: float = 2 if self.type == ZoneType.RESTRICTED else 1
+        self.deck: List[Drone] = []
+
+    def is_available(self) -> bool:
+        if (self.deck) == self.capacity:
+            return False
+        return True
+
+    def is_restricted(self) -> bool:
+        return bool(self.type == ZoneType.RESTRICTED)
 
     def set_color(self, c: str) -> None:
         self.color = c

@@ -15,6 +15,7 @@ class Manager:
         self.paths: List[List[Hub]] = []
         self.drones: List[Dron] = []
         self.turnes: int = 0
+        self.running_sim: bool = False
 
     def set_endpoints(self) -> None:
         try:
@@ -179,13 +180,30 @@ class Manager:
                 f"total drones: {self.total_drones}"
                 )
 
-    #     for nb in self.nb_drones
-    def run_simulation(self):
+    def split_drones(self):
+        for ind, ele in enumerate(self.drones):
+            ele.set_path(self.paths[(ind + 1) % len(self.paths)])
+            print((ind + 1) % len(self.paths))
+
+    def run_simulation(self) -> None:
         i: int = 0
+        self.running_sim = True
         while i < self.total_drones:
             drone = Dron(i + 1, self.start)
             self.drones.append(drone)
-            print(f"creating dron: D{i + 1} at [{self.start.name}] zon")
             i += 1
-        
+        self.split_drones()
+        while self.running_sim:
+            for dron in self.drones:
+                if dron.is_reached:
+                    continue
+                if dron.is_flying:
+                    # arrive it to next zone:
+                    continue
+                if dron.next_zone().is_available():
+                    if dron.next_zone().is_restricted():
+                        dron.is_flying = True
+                    else:
+                        dron.step()
+                self.turnes += 1
 
