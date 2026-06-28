@@ -4,6 +4,7 @@ from src.models.Connection import Connection
 from src.models.Error import MyError
 from src.models.Hub import ZoneType
 from src.models.Tools import Tools
+from src.Dron import Dron
 
 
 class Manager:
@@ -12,6 +13,15 @@ class Manager:
         self.hubs: List[Hub] = []
         self.shortest_path: List[Hub] = []
         self.paths: List[List[Hub]] = []
+        self.drones: List[Dron] = []
+        self.turnes: int = 0
+
+    def set_endpoints(self) -> None:
+        try:
+            self.start: Hub = [ele for ele in self.hubs if ele.start][0]
+            self.end: Hub = [ele for ele in self.hubs if ele.end][0]
+        except Exception:
+            raise MyError("Error: no start/end hub founded")
 
     def get_total_cost(self, path: List[Hub]) -> float:
         total: float = 0
@@ -43,8 +53,6 @@ class Manager:
             )
 
     def relaxation(self) -> None:
-        self.start: Hub = [ele for ele in self.hubs if ele.start][0]
-        self.end: Hub = [ele for ele in self.hubs if ele.end][0]
         queue: List[Hub] = [self.start]
         queue[0].relaxed = queue[0].cost
         while (len(queue) > 0):
@@ -69,14 +77,12 @@ class Manager:
         self.relaxation()
         self.find_shortest_path()
         self.discover_multiple_paths()
-        print("founded paths: ", len(self.paths))
         self.paths_filter_by_cost(
             self.get_total_cost(self.shortest_path) * 1.38)
         if (len(self.paths) > 3):
             self.paths_filter_by_len(len(self.shortest_path) + 1)
         print("founded paths: ", len(self.paths))
-        print("cost per path: ", [self.get_total_cost(ele) for ele in self.paths])
-        print([[ele.name for ele in path] for path in self.paths])
+        print("paths: ", [[ele.name for ele in path] for path in self.paths])
 
     def paths_filter_by_cost(self, min_cost: float) -> None:
         new_list: List[List[Hub]] = []
@@ -147,7 +153,7 @@ class Manager:
                 or not self.get_by_name(con.hub2)):
             raise MyError(
                 "Error (invalid configuration): "
-                f"invalid connection hubs at line {line}")
+                f"Unkown connection hubs at line {line}")
         hub1: Hub = [ele for ele in self.hubs if ele.name == con.hub1][0]
         hub2: Hub = [ele for ele in self.hubs if ele.name == con.hub2][0]
         hub1.connect(hub2, con.max_lint)
@@ -172,3 +178,14 @@ class Manager:
         return (f"hubs: {len(self.hubs)} "
                 f"total drones: {self.total_drones}"
                 )
+
+    #     for nb in self.nb_drones
+    def run_simulation(self):
+        i: int = 0
+        while i < self.total_drones:
+            drone = Dron(i + 1, self.start)
+            self.drones.append(drone)
+            print(f"creating dron: D{i + 1} at [{self.start.name}] zon")
+            i += 1
+        
+

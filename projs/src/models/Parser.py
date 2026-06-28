@@ -40,8 +40,12 @@ class Parser():
             else:
                 raise MyError(
                     f"Error (): invalid configuration at line {i + 1}.")
+        self.manager.set_endpoints()
         if len(self.manager.hubs) < 1:
             raise MyError("Error (configuration error): 0 provided hubs")
         if self.manager.total_drones < 1:
             raise MyError("Error (configuration error): 0 provided drones")
+        if (self.manager.start.capacity < self.manager.total_drones
+                or self.manager.end.capacity < self.manager.total_drones):
+            raise MyError("Error: invalid capacity for start/end hubs")
         return self.manager

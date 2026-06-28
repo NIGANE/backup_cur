@@ -18,6 +18,7 @@ def main() -> None:
         data: List[str] = parser.load_file()
         manager: Manager = parser.run_validation(data)
         manager.path_finding()
+        manager.run_simulation()
     except MyError as e:
         print(f"# {e}")
     # except BaseException as e:

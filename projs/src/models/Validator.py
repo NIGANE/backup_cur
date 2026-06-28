@@ -16,6 +16,7 @@ class Validator():
             r"(?:\s\[(?P<config>\w+=\w+)\])?$")
         self.nb: Pattern = compile(
             r"^nb_drones:\s(?P<count>\d+)$")
+        # self.nb_drones = 0
 
     def nb_drones(self, line: str, i: int) -> int:
         match: Optional[Match] = search(self.nb, line)
@@ -26,9 +27,14 @@ class Validator():
                 or not self.is_number(nb)
                 or int(nb) < 0):
             raise self.missmatch_error(i, "invalid number")
+        self.nb_drones = int(nb)
         return int(nb)
 
     def hubs(self, line: str, i: int) -> Hub:
+        if 'nb_drones' not in self.__dict__:
+            raise MyError(
+                "Error: nb_drones must be "
+                "provided at the top of the config file")
         match: Optional[Match] = search(self.hub_pattern, line)
         if not match:
             raise self.missmatch_error(i, "invalid configuration")
@@ -53,6 +59,9 @@ class Validator():
                     if self.is_number(conf.split("=")[1]):
                         size: int = int(conf.split("=")[1])
                         hub.set_capacity(size)
+                else:
+                    if line.startswith("start_hub") or line.startswith("end_hub"):
+                        hub.capacity = self.nb_drones
                 if conf.startswith("zone"):
                     zone: Optional[ZoneType] = self.is_valid_zone(
                         conf.split("=")[1].strip())
