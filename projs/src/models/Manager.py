@@ -3,8 +3,8 @@ from src.models.Hub import Hub
 from src.models.Connection import Connection
 from src.models.Error import MyError
 from src.models.Hub import ZoneType
-from src.models.Tools import Tools
-from src.Dron import Dron
+# from src.models.Tools import Tools
+from src.Drone import Drone
 
 
 class Manager:
@@ -13,7 +13,7 @@ class Manager:
         self.hubs: List[Hub] = []
         self.shortest_path: List[Hub] = []
         self.paths: List[List[Hub]] = []
-        self.drones: List[Dron] = []
+        self.drones: List[Drone] = []
         self.turnes: int = 0
         self.running_sim: bool = False
 
@@ -189,21 +189,21 @@ class Manager:
         i: int = 0
         self.running_sim = True
         while i < self.total_drones:
-            drone = Dron(i + 1, self.start)
+            drone = Drone(i + 1, self.start)
             self.drones.append(drone)
             i += 1
         self.split_drones()
         while self.running_sim:
-            for dron in self.drones:
-                if dron.is_reached:
+            for drone in self.drones:
+                if drone.is_reached:
                     continue
-                if dron.is_flying:
+                if drone.is_flying:
                     # arrive it to next zone:
                     continue
-                if dron.next_zone().is_available():
-                    if dron.next_zone().is_restricted():
-                        dron.is_flying = True
+                if drone.next_zone().is_available():
+                    if drone.next_zone().is_restricted():
+                        drone.is_flying = True
                     else:
-                        dron.step()
+                        drone.step()
                 self.turnes += 1
 

@@ -1,6 +1,7 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, TYPE_CHECKING
 from enum import Enum
-from src.Dron import Drone
+if TYPE_CHECKING:
+    from src.Drone import Drone
 
 
 class ZoneType(Enum):
@@ -31,6 +32,11 @@ class Hub:
         if (self.deck) == self.capacity:
             return False
         return True
+
+    def pop(self, drone: Drone) -> None:
+        for dro in self.deck:
+            if dro == drone:
+                self.deck = list(set(self.deck) - set([drone]))
 
     def is_restricted(self) -> bool:
         return bool(self.type == ZoneType.RESTRICTED)

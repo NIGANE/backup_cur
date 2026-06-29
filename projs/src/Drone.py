@@ -3,7 +3,7 @@ from typing import List
 from src.models.Error import MyError
 
 
-class Dron:
+class Drone:
     def __init__(self, i: int, station: Hub):
         self.name: str = f"D{i}"
         self.is_flying: bool = False
@@ -27,7 +27,7 @@ class Dron:
         raise MyError(
             f"Error: no solution path found for this drone [{self.name}]")
 
-    def setp(self) -> None:
+    def step(self) -> None:
         self.prev_zone().pop(self)
         self.next_zone().append(self)
         self.index += 1
