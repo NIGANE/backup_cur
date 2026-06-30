@@ -27,7 +27,7 @@ class Validator():
                 or not self.is_number(nb)
                 or int(nb) < 0):
             raise self.missmatch_error(i, "invalid number")
-        self.nb_drones = int(nb)
+        self.nb_drones: int = int(nb)
         return int(nb)
 
     def hubs(self, line: str, i: int) -> Hub:

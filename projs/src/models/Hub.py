@@ -1,5 +1,6 @@
 from typing import Optional, List, Dict, Any, TYPE_CHECKING
 from enum import Enum
+from src.models.Error import MyError
 if TYPE_CHECKING:
     from src.Drone import Drone
 
@@ -26,17 +27,21 @@ class Hub:
         self.visited: bool = False
         self.relaxed: float = float("+inf")
         self.cost: float = 2 if self.type == ZoneType.RESTRICTED else 1
-        self.deck: List[Drone] = []
+        self.deck: List['Drone'] = []
 
     def is_available(self) -> bool:
-        if (self.deck) == self.capacity:
+        if (len(self.deck)) == self.capacity:
             return False
         return True
 
-    def pop(self, drone: Drone) -> None:
-        for dro in self.deck:
-            if dro == drone:
-                self.deck = list(set(self.deck) - set([drone]))
+    def pop(self, drone: 'Drone') -> None:
+        self.deck = [dro for dro in self.deck if dro != drone]
+
+    def append(self, drone: 'Drone') -> None:
+        if len(self.deck) == self.capacity:
+            raise MyError(
+                f"no space left to insert new drone into zone: {self.name}")
+        self.deck.append(drone)
 
     def is_restricted(self) -> bool:
         return bool(self.type == ZoneType.RESTRICTED)
@@ -66,9 +71,9 @@ class Hub:
             f"{self.name} ({self.x}, {self.y})"
             f"[color: {self.color}, capacity: {self.capacity}, "
             f"type: {self.type.value}]"
-            f"{"-> start" if self.start else ""}"
-            f"{"-> end" if self.end else ""} "
-            "connections: \n["
+            # f"{"-> start" if self.start else ""}"
+            # f"{"-> end" if self.end else ""} "
+            " connections: ["
             f"{[ele["hub"].name for ele in self.connections]}"
             "]"
             )

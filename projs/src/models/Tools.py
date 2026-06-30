@@ -1,4 +1,5 @@
 from typing import Any, List
+from src.Drone import Drone
 
 
 class Tools:
@@ -10,3 +11,8 @@ class Tools:
                 return i
             i += 1
         return -1
+
+    @staticmethod
+    def fetch_drones(drones: List[Drone]) -> None:
+        for dr in drones:
+            print(f"- {dr.name} [{dr.cur_zone().name}]")

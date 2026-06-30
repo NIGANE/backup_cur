@@ -3,5 +3,11 @@
         "stddef.h": "c",
         "stdio.h": "c",
         "libft.h": "c"
-    }
+    },
+    "apc.electron": {
+    "opacity": 0.50,
+    "transparent": true,
+    "backgroundColor": "#00000000",
+    "vibrancy": "ultra-dark"
+},
 }

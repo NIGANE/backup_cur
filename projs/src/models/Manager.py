@@ -3,7 +3,7 @@ from src.models.Hub import Hub
 from src.models.Connection import Connection
 from src.models.Error import MyError
 from src.models.Hub import ZoneType
-# from src.models.Tools import Tools
+from src.models.Tools import Tools
 from src.Drone import Drone
 
 
@@ -16,6 +16,7 @@ class Manager:
         self.drones: List[Drone] = []
         self.turnes: int = 0
         self.running_sim: bool = False
+        self.connections: List[Connection] = []
 
     def set_endpoints(self) -> None:
         try:
@@ -82,8 +83,8 @@ class Manager:
             self.get_total_cost(self.shortest_path) * 1.38)
         if (len(self.paths) > 3):
             self.paths_filter_by_len(len(self.shortest_path) + 1)
-        print("founded paths: ", len(self.paths))
-        print("paths: ", [[ele.name for ele in path] for path in self.paths])
+        # print("founded paths: ", len(self.paths))
+        # print("paths: ", [[ele.name for ele in path] for path in self.paths])
 
     def paths_filter_by_cost(self, min_cost: float) -> None:
         new_list: List[List[Hub]] = []
@@ -158,6 +159,7 @@ class Manager:
         hub1: Hub = [ele for ele in self.hubs if ele.name == con.hub1][0]
         hub2: Hub = [ele for ele in self.hubs if ele.name == con.hub2][0]
         hub1.connect(hub2, con.max_lint)
+        self.connections.append(con)
 
     def get_by_name(self, name: str) -> Optional[Hub]:
         for ele in self.hubs:
@@ -183,27 +185,58 @@ class Manager:
     def split_drones(self):
         for ind, ele in enumerate(self.drones):
             ele.set_path(self.paths[(ind + 1) % len(self.paths)])
-            print((ind + 1) % len(self.paths))
+
+    def reset_connection_link_capacity(self):
+        for con in self.connections:
+            con.per_turn = 0
 
     def run_simulation(self) -> None:
         i: int = 0
         self.running_sim = True
+        print("paths: ", len(self.paths))
         while i < self.total_drones:
             drone = Drone(i + 1, self.start)
             self.drones.append(drone)
             i += 1
         self.split_drones()
-        while self.running_sim:
+
+        for i in range(1, 5):
+            print(f"turn {i}: breaking")
             for drone in self.drones:
                 if drone.is_reached:
                     continue
-                if drone.is_flying:
+                elif drone.is_flying:
                     # arrive it to next zone:
                     continue
-                if drone.next_zone().is_available():
-                    if drone.next_zone().is_restricted():
-                        drone.is_flying = True
-                    else:
-                        drone.step()
-                self.turnes += 1
+                elif drone.next_zone().is_available():
+                    if drone.link_opened(self.connections):
+                        if (drone.next_zone().is_restricted()):
+                            print(f"trait {drone}")
+                            if not drone.is_flying:
+                                drone.is_flying = True
+                                print(drone, "on restricted link")
+                                print(drone.next_zone())
+                            else:
+                                drone.is_flying = False
+                                drone.step()
+                                print(f"get out {drone} from restricted link")
+                        else:
+                            drone.is_flying = False
+                            drone.step()
 
+            self.reset_connection_link_capacity()
+            Tools.fetch_drones(self.drones)
+
+        # while self.running_sim:
+        #     for drone in self.drones:
+        #         if drone.is_reached:
+        #             continue
+        #         if drone.is_flying:
+        #             # arrive it to next zone:
+        #             continue
+        #         if drone.next_zone().is_available():
+        #             if drone.next_zone().is_restricted():
+        #                 drone.is_flying = True
+        #             else:
+        #                 drone.step()
+        #         self.turnes += 1

@@ -25,7 +25,5 @@ def main() -> None:
     #     print(f"external Error ({e.__class__.__name__}): {e}")
 
 
-
-
 if __name__ == "__main__":
     main()
