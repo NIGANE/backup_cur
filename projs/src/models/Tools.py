@@ -1,5 +1,6 @@
 from typing import Any, List
 from src.Drone import Drone
+from src.models.Hub import Hub
 
 
 class Tools:
@@ -15,4 +16,13 @@ class Tools:
     @staticmethod
     def fetch_drones(drones: List[Drone]) -> None:
         for dr in drones:
-            print(f"- {dr.name} [{dr.cur_zone().name}]")
+            print(
+                f"- {dr.name} [{dr.cur_zone().name}]"
+                f"{" => Fly-in" if dr.is_flying else ""}")
+
+    @staticmethod
+    def fetch_paths(paths: List[Hub]) -> None:
+        for path in paths:
+            for zone in path:
+                print("*", zone.name, f"({zone.capacity})", end=" ")
+            print("\n")

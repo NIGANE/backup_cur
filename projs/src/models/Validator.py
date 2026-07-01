@@ -58,9 +58,13 @@ class Validator():
                 if conf.startswith("max_drones"):
                     if self.is_number(conf.split("=")[1]):
                         size: int = int(conf.split("=")[1])
+                        if size == 0:
+                            raise self.missmatch_error(
+                                i, "invalid zone capacity")
                         hub.set_capacity(size)
                 else:
-                    if line.startswith("start_hub") or line.startswith("end_hub"):
+                    if (line.startswith("start_hub")
+                            or line.startswith("end_hub")):
                         hub.capacity = self.nb_drones
                 if conf.startswith("zone"):
                     zone: Optional[ZoneType] = self.is_valid_zone(
@@ -86,6 +90,8 @@ class Validator():
         if conf:
             if self.is_number(conf.strip().split("=")[1]):
                 link_capacity = int(conf.strip().split("=")[1])
+                if link_capacity == 0:
+                    raise self.missmatch_error(i, "invalid connection capacity")
             else:
                 raise self.missmatch_error(i, "invalid number")
         connection = Connection(groups["hub1"], groups["hub2"], link_capacity)

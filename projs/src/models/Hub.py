@@ -46,6 +46,9 @@ class Hub:
     def is_restricted(self) -> bool:
         return bool(self.type == ZoneType.RESTRICTED)
 
+    def is_priority(self) -> bool:
+        return self.type == ZoneType.PRIORITY
+
     def set_color(self, c: str) -> None:
         self.color = c
 
@@ -64,6 +67,10 @@ class Hub:
 
     def relax_hh(self, prev: 'Hub') -> None:
         self.relaxed = prev.relaxed + self.cost
+        self.prev: 'Hub' = prev
+
+    def relax_priority(self, prev: 'Hub') -> None:
+        self.relaxed = -100
         self.prev: 'Hub' = prev
 
     def __str__(self) -> str:

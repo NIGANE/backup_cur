@@ -1,3 +1,3 @@
 To_do:
-    - move to work on other maps
+    - check priority test on map
     - fix bug on validator.py file 

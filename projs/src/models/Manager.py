@@ -3,7 +3,7 @@ from src.models.Hub import Hub
 from src.models.Connection import Connection
 from src.models.Error import MyError
 from src.models.Hub import ZoneType
-from src.models.Tools import Tools
+# from src.models.Tools import Tools
 from src.Drone import Drone
 
 
@@ -69,11 +69,13 @@ class Manager:
                     continue
                 queue = [ele["hub"], *queue]
             for ele in cur.connections:
-                target = ele["hub"]
+                target: Hub = ele["hub"]
                 if (cur.relaxed + target.cost < target.relaxed):
                     target.relax_hh(cur)
-        if not self.end.relaxed:
-            raise MyError("Error: path not found")
+                    # if target.is_priority():
+                    #     target.relax_priority(cur)
+        if self.end.relaxed == float("inf"):
+            raise MyError("Error: No solution path founded")
 
     def path_finding(self) -> None:
         self.relaxation()
@@ -81,10 +83,8 @@ class Manager:
         self.discover_multiple_paths()
         self.paths_filter_by_cost(
             self.get_total_cost(self.shortest_path) * 1.38)
-        if (len(self.paths) > 3):
-            self.paths_filter_by_len(len(self.shortest_path) + 1)
-        # print("founded paths: ", len(self.paths))
-        # print("paths: ", [[ele.name for ele in path] for path in self.paths])
+        if (len(self.paths) > 4):
+            self.paths_filter_by_len(len(self.shortest_path) + 2)
 
     def paths_filter_by_cost(self, min_cost: float) -> None:
         new_list: List[List[Hub]] = []
@@ -151,11 +151,27 @@ class Manager:
         return [ele for ele in authorized if ele.relaxed == min_cost][0]
 
     def resolve_connection(self, con: Connection, line: int):
-        if (not self.get_by_name(con.hub1)
-                or not self.get_by_name(con.hub2)):
+        start_hub = [ele for ele in self.hubs if ele.start]
+        end_hub = [ele for ele in self.hubs if ele.end]
+        if len(start_hub) == 0:
             raise MyError(
                 "Error (invalid configuration): "
-                f"Unkown connection hubs at line {line}")
+                "No start_hub founded"
+            )
+        if len(end_hub) == 0:
+            raise MyError(
+                "Error (invalid configuration): "
+                "No end_hub founded"
+            )
+        if not self.get_by_name(con.hub1):
+            raise MyError(
+                "Error (invalid configuration): "
+                f"Unkown connection hub '{con.hub1}' at line {line}")
+
+        if not self.get_by_name(con.hub2):
+            raise MyError(
+                "Error (invalid configuration): "
+                f"Unkown connection hub '{con.hub2}' at line {line}")
         hub1: Hub = [ele for ele in self.hubs if ele.name == con.hub1][0]
         hub2: Hub = [ele for ele in self.hubs if ele.name == con.hub2][0]
         hub1.connect(hub2, con.max_lint)
@@ -198,45 +214,25 @@ class Manager:
             drone = Drone(i + 1, self.start)
             self.drones.append(drone)
             i += 1
-        self.split_drones()
 
-        for i in range(1, 5):
-            print(f"turn {i}: breaking")
+        self.split_drones()
+        while self.running_sim:
+            self.turnes += 1
             for drone in self.drones:
                 if drone.is_reached:
                     continue
-                elif drone.is_flying:
-                    # arrive it to next zone:
-                    continue
-                elif drone.next_zone().is_available():
+                if drone.next_zone().is_available():
                     if drone.link_opened(self.connections):
                         if (drone.next_zone().is_restricted()):
-                            print(f"trait {drone}")
                             if not drone.is_flying:
                                 drone.is_flying = True
-                                print(drone, "on restricted link")
-                                print(drone.next_zone())
                             else:
                                 drone.is_flying = False
                                 drone.step()
-                                print(f"get out {drone} from restricted link")
                         else:
                             drone.is_flying = False
                             drone.step()
-
+            if all([ele.is_reached for ele in self.drones]):
+                break
             self.reset_connection_link_capacity()
-            Tools.fetch_drones(self.drones)
-
-        # while self.running_sim:
-        #     for drone in self.drones:
-        #         if drone.is_reached:
-        #             continue
-        #         if drone.is_flying:
-        #             # arrive it to next zone:
-        #             continue
-        #         if drone.next_zone().is_available():
-        #             if drone.next_zone().is_restricted():
-        #                 drone.is_flying = True
-        #             else:
-        #                 drone.step()
-        #         self.turnes += 1
+        print("Total turns: ", self.turnes)
