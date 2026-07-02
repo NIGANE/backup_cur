@@ -1,3 +1,3 @@
 To_do:
     - check priority test on map
-    - fix bug on validator.py file 
+    - fix 0 on start/end zones max_capacity

@@ -13,7 +13,7 @@ class ZoneType(Enum):
 
 
 class Hub:
-    def __init__(self, x, y, name: str,
+    def __init__(self, x: int, y: int, name: str,
                  zone_type: ZoneType = ZoneType.NORMAL) -> None:
         self.x: int = x
         self.y: int = y
@@ -30,6 +30,8 @@ class Hub:
         self.deck: List['Drone'] = []
 
     def is_available(self) -> bool:
+        if self.end:
+            return True
         if (len(self.deck)) == self.capacity:
             return False
         return True
@@ -38,6 +40,9 @@ class Hub:
         self.deck = [dro for dro in self.deck if dro != drone]
 
     def append(self, drone: 'Drone') -> None:
+        if self.end:
+            self.deck.append(drone)
+            return
         if len(self.deck) == self.capacity:
             raise MyError(
                 f"no space left to insert new drone into zone: {self.name}")
@@ -71,7 +76,7 @@ class Hub:
 
     def relax_priority(self, prev: 'Hub') -> None:
         self.relaxed = -100
-        self.prev: 'Hub' = prev
+        self.prev = prev
 
     def __str__(self) -> str:
         return (
@@ -85,9 +90,7 @@ class Hub:
             "]"
             )
 
-    def __eq__(self, hub: object):
-        if not isinstance(hub, Hub):
-            return False
-        if self.x == hub.x and self.y == hub.y:
-            return True
-        return False
+    def __eq__(self, hub: object) -> bool:
+        return (isinstance(hub, Hub)
+                and self.x == hub.x and self.y == hub.y
+                )

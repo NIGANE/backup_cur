@@ -36,6 +36,10 @@ class Parser():
 
             elif line.startswith("connection"):
                 connection = self.validator.connections(line, i + 1)
+                for con in self.manager.connections:
+                    if connection == con:
+                        raise self.validator.missmatch_error(
+                            i + 1, "Duplicate connection")
                 self.manager.resolve_connection(connection, i + 1)
             else:
                 raise MyError(
@@ -45,7 +49,4 @@ class Parser():
             raise MyError("Error (configuration error): 0 provided hubs")
         if self.manager.total_drones < 1:
             raise MyError("Error (configuration error): 0 provided drones")
-        if (self.manager.start.capacity < self.manager.total_drones
-                or self.manager.end.capacity < self.manager.total_drones):
-            raise MyError("Error: invalid capacity for start/end hubs")
         return self.manager

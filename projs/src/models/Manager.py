@@ -36,10 +36,11 @@ class Manager:
 
     def add_hub(self, hub: Hub, line: int) -> None:
         for ele in self.hubs:
-            if ele == hub:
+            if ele == hub or ele.name == hub.name:
                 raise MyError(
                     "Error (Invalid configuraions): duplicate hub coordinates"
                     f" from configuration file line: {line}")
+
         self.hubs.append(hub)
         start = [hub for hub in self.hubs if hub.start]
         end = [hub for hub in self.hubs if hub.end]
@@ -150,7 +151,7 @@ class Manager:
         min_cost: float = min([ele.relaxed for ele in authorized])
         return [ele for ele in authorized if ele.relaxed == min_cost][0]
 
-    def resolve_connection(self, con: Connection, line: int):
+    def resolve_connection(self, con: Connection, line: int) -> None:
         start_hub = [ele for ele in self.hubs if ele.start]
         end_hub = [ele for ele in self.hubs if ele.end]
         if len(start_hub) == 0:
@@ -172,6 +173,7 @@ class Manager:
             raise MyError(
                 "Error (invalid configuration): "
                 f"Unkown connection hub '{con.hub2}' at line {line}")
+
         hub1: Hub = [ele for ele in self.hubs if ele.name == con.hub1][0]
         hub2: Hub = [ele for ele in self.hubs if ele.name == con.hub2][0]
         hub1.connect(hub2, con.max_lint)
@@ -189,20 +191,20 @@ class Manager:
                 return ele
         return None
 
-    def unvisit(self):
+    def unvisit(self) -> None:
         for hub in self.hubs:
             hub.visited = False
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (f"hubs: {len(self.hubs)} "
                 f"total drones: {self.total_drones}"
                 )
 
-    def split_drones(self):
+    def split_drones(self) -> None:
         for ind, ele in enumerate(self.drones):
             ele.set_path(self.paths[(ind + 1) % len(self.paths)])
 
-    def reset_connection_link_capacity(self):
+    def reset_connection_link_capacity(self) -> None:
         for con in self.connections:
             con.per_turn = 0
 

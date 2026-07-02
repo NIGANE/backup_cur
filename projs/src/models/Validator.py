@@ -16,7 +16,6 @@ class Validator():
             r"(?:\s\[(?P<config>\w+=\w+)\])?$")
         self.nb: Pattern = compile(
             r"^nb_drones:\s(?P<count>\d+)$")
-        # self.nb_drones = 0
 
     def nb_drones(self, line: str, i: int) -> int:
         match: Optional[Match] = search(self.nb, line)
@@ -27,11 +26,11 @@ class Validator():
                 or not self.is_number(nb)
                 or int(nb) < 0):
             raise self.missmatch_error(i, "invalid number")
-        self.nb_drones: int = int(nb)
+        self.drones_count: int = int(nb)
         return int(nb)
 
     def hubs(self, line: str, i: int) -> Hub:
-        if 'nb_drones' not in self.__dict__:
+        if 'drones_count' not in self.__dict__:
             raise MyError(
                 "Error: nb_drones must be "
                 "provided at the top of the config file")
@@ -49,6 +48,10 @@ class Validator():
         hub = Hub(int(groups["x"]), int(groups["y"]), hub_name)
         if groups.get("config"):
             config: List[str] = groups["config"].strip().split()
+            allowed = ["color", "max_drones", "zone"]
+            if not all([param.strip().split("=")[0]
+                        in allowed for param in config]):
+                raise self.missmatch_error(i, "invalid link configuration")
             for conf in config:
                 if conf.startswith("color"):
                     if self.valid_color(conf.split("=")[1]):
@@ -65,7 +68,7 @@ class Validator():
                 else:
                     if (line.startswith("start_hub")
                             or line.startswith("end_hub")):
-                        hub.capacity = self.nb_drones
+                        hub.capacity = self.drones_count
                 if conf.startswith("zone"):
                     zone: Optional[ZoneType] = self.is_valid_zone(
                         conf.split("=")[1].strip())
@@ -88,10 +91,13 @@ class Validator():
         link_capacity: int = 1
         conf: Optional[str] = groups.get("config")
         if conf:
+            if conf.strip().split("=")[0] not in ["max_link_capacity"]:
+                raise self.missmatch_error(i, "invalid link configuration")
             if self.is_number(conf.strip().split("=")[1]):
                 link_capacity = int(conf.strip().split("=")[1])
                 if link_capacity == 0:
-                    raise self.missmatch_error(i, "invalid connection capacity")
+                    raise self.missmatch_error(
+                        i, "invalid connection capacity")
             else:
                 raise self.missmatch_error(i, "invalid number")
         connection = Connection(groups["hub1"], groups["hub2"], link_capacity)
