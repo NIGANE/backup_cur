@@ -75,7 +75,7 @@ class Hub:
         self.prev: 'Hub' = prev
 
     def relax_priority(self, prev: 'Hub') -> None:
-        self.relaxed = -100
+        self.relaxed = -50
         self.prev = prev
 
     def __str__(self) -> str:

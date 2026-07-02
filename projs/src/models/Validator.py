@@ -37,15 +37,24 @@ class Validator():
         match: Optional[Match] = search(self.hub_pattern, line)
         if not match:
             raise self.missmatch_error(i, "invalid configuration")
+
         groups: Dict[str, str] = match.groupdict()
         if not (groups.get("name")):
             raise self.missmatch_error(i, "invalid name for hub")
+
         hub_name: str = groups["name"]
         coordinates: Tuple[Optional[str], Optional[str]] = (
             groups.get("x"), groups.get("y"))
         if not (all([self.is_number(ele) for ele in coordinates])):
             raise self.missmatch_error(i, "invalid number")
+
         hub = Hub(int(groups["x"]), int(groups["y"]), hub_name)
+
+        if line.startswith("start_hub"):
+            hub.start = True
+        if line.startswith("end_hub"):
+            hub.end = True
+
         if groups.get("config"):
             config: List[str] = groups["config"].strip().split()
             allowed = ["color", "max_drones", "zone"]
@@ -61,7 +70,7 @@ class Validator():
                 if conf.startswith("max_drones"):
                     if self.is_number(conf.split("=")[1]):
                         size: int = int(conf.split("=")[1])
-                        if size == 0:
+                        if size == 0 and not (hub.start or hub.end):
                             raise self.missmatch_error(
                                 i, "invalid zone capacity")
                         hub.set_capacity(size)
@@ -76,11 +85,6 @@ class Validator():
                         hub.set_zone(zone)
                     else:
                         raise self.missmatch_error(i, "invalid zone type")
-
-        if line.startswith("start_hub"):
-            hub.start = True
-        if line.startswith("end_hub"):
-            hub.end = True
         return hub
 
     def connections(self, line: str, i: int) -> Connection:

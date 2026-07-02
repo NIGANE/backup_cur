@@ -72,9 +72,10 @@ class Manager:
             for ele in cur.connections:
                 target: Hub = ele["hub"]
                 if (cur.relaxed + target.cost < target.relaxed):
-                    target.relax_hh(cur)
-                    # if target.is_priority():
-                    #     target.relax_priority(cur)
+                    if target.is_priority():
+                        target.relax_priority(cur)
+                    else:
+                        target.relax_hh(cur)
         if self.end.relaxed == float("inf"):
             raise MyError("Error: No solution path founded")
 
@@ -109,6 +110,7 @@ class Manager:
             if cur == self.start:
                 break
             cur = cur.prev
+        print("shortest pash: ", [zone.name for zone in self.shortest_path])
 
     def discover_multiple_paths(self) -> None:
         new_path: Optional[List[Hub]] = self.shortest_path
