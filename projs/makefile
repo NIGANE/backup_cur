@@ -1,5 +1,4 @@
 
-FILE="./maps/challenger/01_the_impossible_dream.txt"
 EASY_01="./maps/easy/01_linear_path.txt"
 EASY_02="./maps/easy/02_simple_fork.txt"
 EASY_03="./maps/easy/03_basic_capacity.txt"
@@ -11,8 +10,12 @@ hard_02="./maps/hard/02_capacity_hell.txt"
 hard_03="./maps/hard/03_ultimate_challenge.txt"
 dream="./maps/challenger/01_the_impossible_dream.txt"
 test_map="./test_map.txt"
+
 run:
-	@uv run python3 -m src $(EASY_01)
+	@uv run python3 -m src $(med_01)
+
+install:
+	@uv sync
 
 test:
 	@uv run python3 -m main $(FILE)
@@ -27,6 +30,7 @@ clean:
 lint:
 	flake8 . 
 	mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+
 
 clean-all: clean
 	@rm -rf .venv

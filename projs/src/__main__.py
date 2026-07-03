@@ -1,8 +1,8 @@
 import sys
 from typing import List
-from src.models.Parser import Parser
-from src.models.Error import MyError
-from src.models.Manager import Manager
+from src.Parser import Parser
+from src.Error import MyError
+from src.Manager import Manager
 
 
 def _usage() -> str:
@@ -21,8 +21,8 @@ def main() -> None:
         manager.run_simulation()
     except MyError as e:
         print(f"# {e}")
-    # except BaseException as e:
-    #     print(f"external Error ({e.__class__.__name__}): {e}")
+    except BaseException as e:
+        print(f"external Error ({e.__class__.__name__}): {e}")
 
 
 if __name__ == "__main__":

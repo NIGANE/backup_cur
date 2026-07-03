@@ -1,6 +1,6 @@
 from typing import Any, List
 from src.Drone import Drone
-from src.models.Hub import Hub
+from src.Hub import Hub
 
 
 class Tools:

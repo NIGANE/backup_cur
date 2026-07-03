@@ -1,10 +1,12 @@
 from typing import List, Optional
-from src.models.Hub import Hub
-from src.models.Connection import Connection
-from src.models.Error import MyError
-from src.models.Hub import ZoneType
-# from src.models.Tools import Tools
+from src.Hub import Hub
+from src.Connection import Connection
+from src.Error import MyError
+from src.Hub import ZoneType
 from src.Drone import Drone
+import colorama
+
+colorama.init(autoreset=True)
 
 
 class Manager:
@@ -17,6 +19,7 @@ class Manager:
         self.turnes: int = 0
         self.running_sim: bool = False
         self.connections: List[Connection] = []
+        self.tracked_drones: List[Drone] = []
 
     def set_endpoints(self) -> None:
         try:
@@ -110,7 +113,7 @@ class Manager:
             if cur == self.start:
                 break
             cur = cur.prev
-        print("shortest pash: ", [zone.name for zone in self.shortest_path])
+        # print("shortest pash: ", [zone.name for zone in self.shortest_path])
 
     def discover_multiple_paths(self) -> None:
         new_path: Optional[List[Hub]] = self.shortest_path
@@ -213,7 +216,6 @@ class Manager:
     def run_simulation(self) -> None:
         i: int = 0
         self.running_sim = True
-        print("paths: ", len(self.paths))
         while i < self.total_drones:
             drone = Drone(i + 1, self.start)
             self.drones.append(drone)
@@ -230,13 +232,34 @@ class Manager:
                         if (drone.next_zone().is_restricted()):
                             if not drone.is_flying:
                                 drone.is_flying = True
+                                self.tracked_drones.append(drone)
                             else:
                                 drone.is_flying = False
+                                self.tracked_drones.append(drone)
                                 drone.step()
                         else:
                             drone.is_flying = False
+                            self.tracked_drones.append(drone)
                             drone.step()
+            self.tracking_output()
             if all([ele.is_reached for ele in self.drones]):
                 break
             self.reset_connection_link_capacity()
         print("Total turns: ", self.turnes)
+
+    def tracking_output(self) -> None:
+        i = len(self.tracked_drones) - 1
+        for ele in self.tracked_drones:
+            print(f"{ele.name}", end="-")
+            if ele.is_flying:
+                print(
+                    f"{ele.cur_zone().get_colored_name()}",
+                    f"-{ele.next_zone().get_colored_name()}",
+                    end="")
+            else:
+                print(f"{ele.cur_zone().get_colored_name()}", end="")
+            if i != 0:
+                print(", ", end="")
+            i -= 1
+        print("")
+        self.tracked_drones = []

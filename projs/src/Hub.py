@@ -1,6 +1,8 @@
 from typing import Optional, List, Dict, Any, TYPE_CHECKING
 from enum import Enum
-from src.models.Error import MyError
+from src.Error import MyError
+from src.Color import Color
+import colorama
 if TYPE_CHECKING:
     from src.Drone import Drone
 
@@ -29,6 +31,11 @@ class Hub:
         self.cost: float = 2 if self.type == ZoneType.RESTRICTED else 1
         self.deck: List['Drone'] = []
 
+    def get_colored_name(self) -> str:
+        if not self.color:
+            return self.name
+        return str(getattr(colorama.Fore, self.color) + self.name)
+
     def is_available(self) -> bool:
         if self.end:
             return True
@@ -55,7 +62,11 @@ class Hub:
         return self.type == ZoneType.PRIORITY
 
     def set_color(self, c: str) -> None:
-        self.color = c
+        if c is None or c == "":
+            return
+        re: Optional[Color] = Color.in_reserve(c)
+        if re:
+            self.color = re.name
 
     def set_capacity(self, n: int) -> None:
         self.capacity = n
@@ -83,8 +94,6 @@ class Hub:
             f"{self.name} ({self.x}, {self.y})"
             f"[color: {self.color}, capacity: {self.capacity}, "
             f"type: {self.type.value}]"
-            # f"{"-> start" if self.start else ""}"
-            # f"{"-> end" if self.end else ""} "
             " connections: ["
             f"{[ele["hub"].name for ele in self.connections]}"
             "]"

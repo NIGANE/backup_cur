@@ -1,7 +1,7 @@
-from src.models.Hub import Hub
+from src.Hub import Hub
 from typing import List
-from src.models.Error import MyError
-from src.models.Connection import Connection
+from src.Error import MyError
+from src.Connection import Connection
 
 
 class Drone:
@@ -60,5 +60,5 @@ class Drone:
     def __str__(self) -> str:
         return (
             f"{self.name} "
-            f"[{'flying' if self.is_flying else "in"}"
+            f"[{'flying' if self.is_flying else 'in'}"
             f" {self.station.name}]")

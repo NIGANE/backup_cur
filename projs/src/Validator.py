@@ -1,8 +1,8 @@
 from typing import Optional, Tuple, Dict, List
 from re import Match, Pattern, compile, search
-from src.models.Error import MyError
-from src.models.Hub import Hub, ZoneType
-from src.models.Connection import Connection
+from src.Error import MyError
+from src.Hub import Hub, ZoneType
+from src.Connection import Connection
 
 
 class Validator():

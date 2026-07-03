@@ -1,8 +1,8 @@
 from typing import List
-from src.models.Error import MyError
-from src.models.Validator import Validator
-from src.models.Manager import Manager
-from src.models.Hub import Hub
+from src.Error import MyError
+from src.Validator import Validator
+from src.Manager import Manager
+from src.Hub import Hub
 
 
 class Parser():
