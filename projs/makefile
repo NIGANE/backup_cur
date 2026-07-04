@@ -12,13 +12,14 @@ dream="./maps/challenger/01_the_impossible_dream.txt"
 test_map="./test_map.txt"
 
 run:
-	@uv run python3 -m src $(med_01)
+	@uv run python3 -m main $(EASY_01)
 
 install:
 	@uv sync
 
-test:
-	@uv run python3 -m main $(FILE)
+lint:
+	flake8 . 
+	mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 clean:
 	@echo "Cleaning up..."
@@ -26,11 +27,7 @@ clean:
 	@rm -rf */__pycache__/
 	@rm -rf __pycache__
 	@rm -rf */*/__pycache__/
-
-lint:
-	flake8 . 
-	mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
-
+	@rm -rf .mypy_cache
 
 clean-all: clean
 	@rm -rf .venv

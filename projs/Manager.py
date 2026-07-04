@@ -1,16 +1,33 @@
 from typing import List, Optional
-from src.Hub import Hub
-from src.Connection import Connection
-from src.Error import MyError
-from src.Hub import ZoneType
-from src.Drone import Drone
+from Hub import Hub, ZoneType
+from Connection import Connection
+from Error import MyError
+from Drone import Drone
 import colorama
 
 colorama.init(autoreset=True)
 
 
 class Manager:
+    """Manage the simulation lifecycle.
+
+    This class stores the simulation state, computes valid paths between the
+    start and destination hubs, distributes drones across those paths, and
+    executes the simulation turn by turn.
+
+    Attributes:
+        total_drones: The number of drones in the simulation.
+        hubs: The hubs forming the navigation graph.
+        shortest_path: The shortest path from the start to the destination.
+        paths: The candidate paths available for routing drones.
+        drones: The drones participating in the simulation.
+        turnes: The number of simulation turns elapsed.
+        running_sim: Whether the simulation is currently running.
+        connections: The graph connections between hubs.
+        tracked_drones: The drones whose movements are displayed each turn.
+    """
     def __init__(self) -> None:
+        """Initialize an empty simulation manager."""
         self.total_drones: int = 0
         self.hubs: List[Hub] = []
         self.shortest_path: List[Hub] = []
@@ -22,6 +39,11 @@ class Manager:
         self.tracked_drones: List[Drone] = []
 
     def set_endpoints(self) -> None:
+        """Locate the start and destination hubs.
+
+        Raises:
+            MyError: If the start or destination hub cannot be found.
+        """
         try:
             self.start: Hub = [ele for ele in self.hubs if ele.start][0]
             self.end: Hub = [ele for ele in self.hubs if ele.end][0]
@@ -29,19 +51,42 @@ class Manager:
             raise MyError("Error: no start/end hub founded")
 
     def get_total_cost(self, path: List[Hub]) -> float:
+        """Compute the traversal cost of a path.
+
+        Args:
+            path: The path to evaluate.
+
+        Returns:
+            The total traversal cost.
+        """
         total: float = 0
         for ele in path:
             total += ele.cost
         return total
 
     def set_total_drones(self, nb: int) -> None:
+        """Set the number of drones.
+
+        Args:
+            nb: The total number of drones.
+        """
         self.total_drones = nb
 
     def add_hub(self, hub: Hub, line: int) -> None:
+        """Add a hub to the simulation.
+
+        Args:
+            hub: The hub to add.
+            line: The configuration file line where the hub was defined.
+
+        Raises:
+            MyError: If the hub is duplicated or multiple start or destination
+                hubs are defined.
+        """
         for ele in self.hubs:
             if ele == hub or ele.name == hub.name:
                 raise MyError(
-                    "Error (Invalid configuraions): duplicate hub coordinates"
+                    "Error (Invalid configuraions): duplicate hub"
                     f" from configuration file line: {line}")
 
         self.hubs.append(hub)
@@ -59,6 +104,11 @@ class Manager:
             )
 
     def relaxation(self) -> None:
+        """Compute the minimum traversal cost to every reachable hub.
+
+        Raises:
+            MyError: If no path exists from the start to the destination.
+        """
         queue: List[Hub] = [self.start]
         queue[0].relaxed = queue[0].cost
         while (len(queue) > 0):
@@ -83,6 +133,7 @@ class Manager:
             raise MyError("Error: No solution path founded")
 
     def path_finding(self) -> None:
+        """Compute and filter the candidate paths for the simulation."""
         self.relaxation()
         self.find_shortest_path()
         self.discover_multiple_paths()
@@ -92,6 +143,11 @@ class Manager:
             self.paths_filter_by_len(len(self.shortest_path) + 2)
 
     def paths_filter_by_cost(self, min_cost: float) -> None:
+        """Discard paths whose cost exceeds the given threshold.
+
+        Args:
+            min_cost: The maximum allowed traversal cost.
+        """
         new_list: List[List[Hub]] = []
         for path in self.paths:
             co: float = self.get_total_cost(path)
@@ -100,6 +156,11 @@ class Manager:
         self.paths = new_list
 
     def paths_filter_by_len(self, min_len: int) -> None:
+        """Discard paths longer than the given length.
+
+        Args:
+            min_len: The maximum allowed path length.
+        """
         new_list: List[List[Hub]] = []
         for path in self.paths:
             if len(path) <= min_len:
@@ -107,6 +168,7 @@ class Manager:
         self.paths = new_list
 
     def find_shortest_path(self) -> None:
+        """Reconstruct the shortest path from the relaxation results."""
         cur: Hub = self.end
         while (True):
             self.shortest_path = [cur, *self.shortest_path]
@@ -116,6 +178,7 @@ class Manager:
         # print("shortest pash: ", [zone.name for zone in self.shortest_path])
 
     def discover_multiple_paths(self) -> None:
+        """Discover alternative paths between the endpoints."""
         new_path: Optional[List[Hub]] = self.shortest_path
         while new_path is not None:
             if new_path in self.paths:
@@ -126,6 +189,11 @@ class Manager:
             new_path = self.resolve_new_path()
 
     def resolve_new_path(self) -> Optional[List[Hub]]:
+        """Construct an alternative path.
+
+        Returns:
+            An alternative path if one exists; otherwise ``None``.
+        """
         self.unvisit()
         stack: List[Hub] = [self.start]
         cur: Hub = stack[-1]
@@ -145,6 +213,16 @@ class Manager:
         return stack
 
     def get_chepest(self, hub: Hub) -> Optional[Hub]:
+        """Return the cheapest reachable neighboring hub.
+
+        Priority hubs are preferred over cost-based selection.
+
+        Args:
+            hub: The current hub.
+
+        Returns:
+            The selected neighboring hub, or ``None`` if none is available.
+        """
         authorized: List[Hub] = [
             ele["hub"] for ele in hub.connections if not ele["hub"].visited
         ]
@@ -157,6 +235,16 @@ class Manager:
         return [ele for ele in authorized if ele.relaxed == min_cost][0]
 
     def resolve_connection(self, con: Connection, line: int) -> None:
+        """Validate and register a connection.
+
+        Args:
+            con: The connection to register.
+            line: The configuration file line where the connection was defined.
+
+        Raises:
+            MyError: If the connection references unknown hubs or the required
+                endpoints are missing.
+        """
         start_hub = [ele for ele in self.hubs if ele.start]
         end_hub = [ele for ele in self.hubs if ele.end]
         if len(start_hub) == 0:
@@ -185,18 +273,35 @@ class Manager:
         self.connections.append(con)
 
     def get_by_name(self, name: str) -> Optional[Hub]:
+        """Return the hub with the given name.
+
+        Args:
+            name: The hub identifier.
+
+        Returns:
+            The matching hub, or ``None`` if it does not exist.
+        """
         for ele in self.hubs:
             if ele.name == name:
                 return ele
         return None
 
     def any_priority(self, hubs: List[Hub]) -> Optional[Hub]:
+        """Return the first priority hub.
+
+        Args:
+            hubs: The hubs to inspect.
+
+        Returns:
+            The first priority hub, or ``None`` if none exists.
+        """
         for ele in hubs:
             if ele.type == ZoneType.PRIORITY.value:
                 return ele
         return None
 
     def unvisit(self) -> None:
+        """Clear the visited state of every hub."""
         for hub in self.hubs:
             hub.visited = False
 
@@ -206,14 +311,25 @@ class Manager:
                 )
 
     def split_drones(self) -> None:
+        """Return a human-readable summary of the simulation state.
+
+        Returns:
+            A summary containing the number of hubs and drones.
+        """
         for ind, ele in enumerate(self.drones):
             ele.set_path(self.paths[(ind + 1) % len(self.paths)])
 
     def reset_connection_link_capacity(self) -> None:
+        """Distribute drones across the available paths."""
         for con in self.connections:
             con.per_turn = 0
 
     def run_simulation(self) -> None:
+        """Execute the drone simulation.
+
+        Drones are created, assigned paths, and advanced turn by turn until all
+        of them reach the destination.
+        """
         i: int = 0
         self.running_sim = True
         while i < self.total_drones:
@@ -230,11 +346,16 @@ class Manager:
                 if drone.next_zone().is_available():
                     if drone.link_opened(self.connections):
                         if (drone.next_zone().is_restricted()):
-                            if not drone.is_flying:
+                            if (not drone.is_flying
+                                    and not drone.next_zone().reserved):
                                 drone.is_flying = True
+                                drone.next_zone().reserved = True
+                                drone.reserve.append(drone.next_zone())
                                 self.tracked_drones.append(drone)
-                            else:
+                            elif drone.next_zone() in drone.reserve:
                                 drone.is_flying = False
+                                drone.reserve.pop()
+                                drone.next_zone().reserved = False
                                 self.tracked_drones.append(drone)
                                 drone.step()
                         else:
@@ -248,6 +369,7 @@ class Manager:
         print("Total turns: ", self.turnes)
 
     def tracking_output(self) -> None:
+        """Print the drones that moved during the current simulation turn."""
         i = len(self.tracked_drones) - 1
         for ele in self.tracked_drones:
             print(f"{ele.name}", end="-")

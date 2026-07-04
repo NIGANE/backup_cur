@@ -1,17 +1,36 @@
 from typing import List
-from src.Error import MyError
-from src.Validator import Validator
-from src.Manager import Manager
-from src.Hub import Hub
+from Error import MyError
+from Validator import Validator
+from Manager import Manager
+from Hub import Hub
 
 
 class Parser():
+    """Parse and validate a simulation configuration file.
+
+    This class loads the configuration file, delegates validation to a
+    ``Validator``, and builds a ``Manager`` instance containing the
+    validated simulation state.
+    """
     def __init__(self, argv: List[str]) -> None:
+        """Initialize the parser.
+
+        Args:
+            argv: The command-line arguments.
+        """
         self.argv = argv
         self.validator = Validator()
         self.manager = Manager()
 
     def load_file(self) -> List[str]:
+        """Load the configuration file.
+
+        Returns:
+            The lines read from the configuration file.
+
+        Raises:
+            MyError: If the configuration file cannot be found.
+        """
         data = []
         try:
             with open(self.argv[1], "r") as f:
@@ -21,6 +40,23 @@ class Parser():
             raise MyError(f"FileNotFound {e}")
 
     def run_validation(self, data: List[str]) -> Manager:
+        """Validate the configuration and construct the simulation manager.
+
+        The configuration is processed line by line. Each directive is
+        validated
+        and used to populate the simulation manager with drones, hubs, and
+        connections.
+
+        Args:
+            data: The configuration file contents.
+
+        Returns:
+            A fully initialized ``Manager`` instance.
+
+        Raises:
+            MyError: If the configuration contains invalid syntax, duplicate
+                entities, missing required data, or inconsistent definitions.
+        """
         for i, line in enumerate(data):
             line = line.strip()
             if line.startswith("#") or not line:
@@ -43,7 +79,8 @@ class Parser():
                 self.manager.resolve_connection(connection, i + 1)
             else:
                 raise MyError(
-                    f"Error (): invalid configuration at line {i + 1}.")
+                    "Error (invalid configurations): "
+                    f"invalid configuration at line {i + 1}.")
         self.manager.set_endpoints()
         if len(self.manager.hubs) < 1:
             raise MyError("Error (configuration error): 0 provided hubs")
