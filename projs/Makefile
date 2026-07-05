@@ -4,7 +4,7 @@ OUT="data/output/function_calls.json"
 MODEL="Qwen/Qwen3-0.6B"
 ARGS = --functions_definition ${FN_DEF} --input ${FN_CAL} --output ${OUT} --model $(MODEL)
 
-all:
+run:
 	@echo "Running the application..."
 	@uv run python -m src $(ARGS)
 
@@ -14,7 +14,7 @@ install:
 	uv sync
 
 debug:
-	uv run python -m pdb src/main.py
+	uv run -- python -m pdb src/__main__.py
 
 lint:
 	flake8 .
