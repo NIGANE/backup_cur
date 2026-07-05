@@ -4,6 +4,17 @@ from src.models.Prompt import Prompt
 
 
 def in_string(sub: str, sen: str) -> bool:
+    """Determine whether a string is contained within another string.
+
+    The comparison is case-insensitive.
+
+    Args:
+        sub: The substring to search for.
+        sen: The string to search within.
+
+    Returns:
+        ``True`` if ``sub`` occurs within ``sen``; otherwise ``False``.
+    """
     if sub is None or sen is None:
         return False
     i = 0
@@ -25,4 +36,15 @@ def in_string(sub: str, sen: str) -> bool:
 
 @lru_cache()
 def _cache(prompt: str) -> Prompt:
+    """Return a cached ``Prompt`` instance.
+
+    Reuses previously created ``Prompt`` objects for identical prompt
+    strings, avoiding repeated instantiation.
+
+    Args:
+        prompt: The prompt text.
+
+    Returns:
+        A cached ``Prompt`` instance corresponding to the given prompt.
+    """
     return Prompt(prompt)
