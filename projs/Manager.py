@@ -200,6 +200,8 @@ class Manager:
         while (cur != self.end):
             cur.visited = True
             target: Optional[Hub] = self.get_chepest(cur)
+            if (target and target.type == ZoneType.BLOCKED):
+                return None
             if (target):
                 stack.append(target)
                 cur = target
@@ -376,7 +378,7 @@ class Manager:
             if ele.is_flying:
                 print(
                     f"{ele.cur_zone().get_colored_name()}",
-                    f"-{ele.next_zone().get_colored_name()}",
+                    f"- {ele.next_zone().get_colored_name()}",
                     end="")
             else:
                 print(f"{ele.cur_zone().get_colored_name()}", end="")

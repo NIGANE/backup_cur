@@ -95,8 +95,8 @@ class Validator():
             hub.start = True
         if line.startswith("end_hub"):
             hub.end = True
-
         if groups.get("config"):
+            self.duplication_check(groups.get("config").strip().split(), i)
             config: List[str] = groups["config"].strip().split()
             allowed = ["color", "max_drones", "zone"]
             if not all([param.strip().split("=")[0]
@@ -219,3 +219,14 @@ class Validator():
             return False
         patt = compile(r"^[a-zA-z]+$")
         return bool(search(patt, s))
+
+    def duplication_check(self, data: List[str], line: int) -> None:
+        i: int = 0
+        j: int = 0
+        while i < len(data) - 1:
+            while j < len(data) - 2:
+                if data[i].split("=") == data[j].split("="):
+                    raise MyError(f"Error: duplicate configuration at "
+                                  f"line {line}")
+                j += 1
+            i += 1
