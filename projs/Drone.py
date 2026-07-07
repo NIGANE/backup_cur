@@ -42,6 +42,7 @@ class Drone:
             path: The ordered sequence of hubs to traverse.
         """
         self.path = path
+        path[0].append(self)
 
     def cur_zone(self) -> Hub:
         """Return the drone's current hub.

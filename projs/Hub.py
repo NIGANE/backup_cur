@@ -111,7 +111,7 @@ class Hub:
         Raises:
             MyError: If the hub has reached its capacity.
         """
-        if self.end:
+        if self.end or self.start:
             self.deck.append(drone)
             return
         if len(self.deck) == self.capacity:
@@ -163,6 +163,8 @@ class Hub:
         Args:
             zone: The new zone type.
         """
+        if (zone == ZoneType.BLOCKED and self.start or self.end):
+            raise MyError("Error: no solution path would be founded if start/end zones are blocked")
         self.type = zone
         if self.type == ZoneType.RESTRICTED:
             self.cost = 2

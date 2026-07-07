@@ -378,8 +378,8 @@ class Manager:
             if ele.is_flying:
                 print(
                     f"{ele.cur_zone().get_colored_name()}",
-                    f"- {ele.next_zone().get_colored_name()}",
-                    end="")
+                    f"-{ele.next_zone().get_colored_name()}",
+                    end="", sep="")
             else:
                 print(f"{ele.cur_zone().get_colored_name()}", end="")
             if i != 0:
