@@ -164,7 +164,8 @@ class Hub:
             zone: The new zone type.
         """
         if (zone == ZoneType.BLOCKED and self.start or self.end):
-            raise MyError("Error: no solution path would be founded if start/end zones are blocked")
+            raise MyError("Error: no solution path would be "
+                          "founded if start/end zones are blocked")
         self.type = zone
         if self.type == ZoneType.RESTRICTED:
             self.cost = 2
