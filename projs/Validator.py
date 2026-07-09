@@ -21,11 +21,12 @@ class Validator():
         """
         self.hub_pattern: Pattern = compile(
             r"^\w+:\s(?P<name>\w+)\s(?P<x>(\-?\d+))\s(?P<y>(\-?\d+))"
-            r"(?:\s\[(?P<config>\w+=\w+(?:\s\w+=\w+)*)\])?$")
+            r"((\s+)?\#|(?:\s\[(?P<config>\w+=\w+(?:\s\w+=\w+)*)\])?$)"
+            r"")
         self.con_pattern: Pattern = compile(
             r"^connection:\s(?P<hub1>([a-zA-z0-9-_]+))\-"
             r"(?P<hub2>([a-zA-z0-9-_]+))"
-            r"(?:\s\[(?P<config>\w+=\w+)\])?$")
+            r"((\s+)?\#|(?:\s\[(?P<config>\w+=\w+)\])?$)")
         self.nb: Pattern = compile(
             r"^nb_drones:\s(?P<count>\d+)$")
 
