@@ -175,7 +175,6 @@ class Manager:
             if cur == self.start:
                 break
             cur = cur.prev
-        # print("shortest pash: ", [zone.name for zone in self.shortest_path])
 
     def discover_multiple_paths(self) -> None:
         """Discover alternative paths between the endpoints."""
@@ -308,6 +307,12 @@ class Manager:
             hub.visited = False
 
     def __str__(self) -> str:
+        """Return a human-readable summary of the simulation manager.
+
+        Returns:
+            A string containing the total number of hubs and drones managed by
+            the simulation.
+        """
         return (f"hubs: {len(self.hubs)} "
                 f"total drones: {self.total_drones}"
                 )

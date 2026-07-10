@@ -14,6 +14,9 @@ test_map="./test_map.txt"
 run:
 	@uv run python3 -m main $(test_map)
 
+debug:
+	@uv run python3 -m pdb main.py
+
 install:
 	@uv sync
 

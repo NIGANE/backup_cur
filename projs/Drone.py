@@ -137,6 +137,15 @@ class Drone:
         return False
 
     def fly(self) -> None:
+        """Begin traversing a restricted connection.
+
+        Reserves the next hub for the drone and marks it as flying. This method
+        is used when the drone enters a restricted zone, preventing other
+        drones from reserving the same hub simultaneously.
+
+        Raises:
+            MyError: If no connection exists between the current and next hub.
+        """
         cur_connection: Optional[Connection] = Connection.get_connection(
             self.next_zone().name, self.cur_zone().name)
         if not cur_connection:
@@ -146,9 +155,13 @@ class Drone:
         self.is_flying = True
 
     def fly_off(self) -> None:
+        """Complete traversal of a restricted connection.
+
+        Marks the drone as no longer flying and releases its reservation on the
+        destination hub, allowing other drones to reserve or enter it.
+        """
         self.is_flying = False
         self.reserve.pop()
-        self.next_zone().reserved = False
         if self in self.next_zone().in_reserve:
             self.next_zone().drop_reserve(self)
 

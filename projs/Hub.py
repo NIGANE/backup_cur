@@ -69,9 +69,21 @@ class Hub:
         self.in_reserve: List['Drone'] = []
 
     def reserve(self, drone: 'Drone') -> None:
+        """Reserve this hub for a drone.
+
+        Adds the drone to the list of drones that have reserved the hub.
+
+        Args:
+            drone: The drone reserving the hub.
+        """
         self.in_reserve.append(drone)
 
     def drop_reserve(self, drone: 'Drone') -> None:
+        """Remove a drone's reservation from the hub.
+
+        Args:
+            drone: The drone whose reservation should be removed.
+        """
         i: int = 0
         for drn in self.in_reserve:
             if drn == drone:
@@ -210,7 +222,7 @@ class Hub:
         Args:
             prev: The predecessor hub in the current shortest path.
         """
-        self.relaxed = -50
+        self.relaxed = 0
         self.prev = prev
 
     def __str__(self) -> str:
