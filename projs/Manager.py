@@ -350,11 +350,9 @@ class Manager:
                     self.tracked_drones.append(drone)
                     drone.step()
                 elif drone.next_zone().is_available():
-                    if drone.link_opened(self.connections):
+                    if drone.link_opened():
                         if (drone.next_zone().is_restricted()):
-                            if (not drone.is_flying
-                                    and not drone.next_zone().reserved):
-
+                            if (not drone.is_flying):
                                 drone.fly()
                                 self.tracked_drones.append(drone)
                         else:

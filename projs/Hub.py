@@ -65,7 +65,6 @@ class Hub:
         self.visited: bool = False
         self.relaxed: float = float("+inf")
         self.cost: float = 2 if self.type == ZoneType.RESTRICTED else 1
-        self.reserved: bool = False
         self.deck: List['Drone'] = []
         self.in_reserve: List['Drone'] = []
 

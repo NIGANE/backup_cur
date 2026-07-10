@@ -95,7 +95,7 @@ class Drone:
             self.is_reached = True
         self.station = self.cur_zone()
 
-    def link_opened(self, connections: List[Connection]) -> bool:
+    def link_opened(self) -> bool:
         """Determine whether the next connection can be traversed.
 
         If the connection has remaining capacity, its usage count is updated.
@@ -141,14 +141,6 @@ class Drone:
             self.next_zone().name, self.cur_zone().name)
         if not cur_connection:
             raise MyError("Error: connection not founded")
-        if self.next_zone().is_restricted():
-            if cur_connection.per_turn == cur_connection.max_lint:
-                self.next_zone().reserved = True
-
-            if (len(self.next_zone().deck)
-                    + len(self.next_zone().in_reserve)
-                    + 1) == self.next_zone().capacity:
-                self.next_zone().reserved = True
         self.reserve.append(self.next_zone())
         self.next_zone().reserve(self)
         self.is_flying = True
