@@ -345,21 +345,18 @@ class Manager:
             for drone in self.drones:
                 if drone.is_reached:
                     continue
-                if drone.next_zone().is_available():
+                if drone.next_zone() in drone.reserve:
+                    drone.fly_off()
+                    self.tracked_drones.append(drone)
+                    drone.step()
+                elif drone.next_zone().is_available():
                     if drone.link_opened(self.connections):
                         if (drone.next_zone().is_restricted()):
                             if (not drone.is_flying
                                     and not drone.next_zone().reserved):
-                                drone.is_flying = True
-                                drone.next_zone().reserved = True
-                                drone.reserve.append(drone.next_zone())
+
+                                drone.fly()
                                 self.tracked_drones.append(drone)
-                            elif drone.next_zone() in drone.reserve:
-                                drone.is_flying = False
-                                drone.reserve.pop()
-                                drone.next_zone().reserved = False
-                                self.tracked_drones.append(drone)
-                                drone.step()
                         else:
                             drone.is_flying = False
                             self.tracked_drones.append(drone)

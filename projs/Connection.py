@@ -1,3 +1,4 @@
+from typing import List, Optional
 
 
 class Connection:
@@ -14,6 +15,19 @@ class Connection:
         per_turn: The number of entities that have used the connection in
             the current simulation turn.
     """
+    connections: List['Connection'] = []
+
+    @classmethod
+    def get_connection(cls, hub1: str, hub2: str) -> Optional['Connection']:
+        for con in cls.connections:
+            if ((con.hub1 == hub1 and con.hub2 == hub2)
+                    or (con.hub2 == hub1 and con.hub1 == hub2)):
+                return con
+        return None
+
+    @classmethod
+    def new_connection(cls, con: 'Connection') -> None:
+        cls.connections.append(con)
 
     def __init__(self, hub1: str, hub2: str, max_lint: int = 1):
         """Initialize a connection.
@@ -28,6 +42,7 @@ class Connection:
         self.hub2: str = hub2
         self.max_lint: int = max_lint
         self.per_turn: int = 0
+        self.new_connection(self)
 
     def __str__(self) -> str:
         """Return a human-readable representation of the connection.

@@ -67,6 +67,17 @@ class Hub:
         self.cost: float = 2 if self.type == ZoneType.RESTRICTED else 1
         self.reserved: bool = False
         self.deck: List['Drone'] = []
+        self.in_reserve: List['Drone'] = []
+
+    def reserve(self, drone: 'Drone') -> None:
+        self.in_reserve.append(drone)
+
+    def drop_reserve(self, drone: 'Drone') -> None:
+        i: int = 0
+        for drn in self.in_reserve:
+            if drn == drone:
+                self.in_reserve.pop(i)
+            i += 1
 
     def get_colored_name(self) -> str:
         """Return the hub name with terminal color formatting.
@@ -90,7 +101,7 @@ class Hub:
         """
         if self.end:
             return True
-        if (len(self.deck)) == self.capacity:
+        if (len(self.deck) + len(self.in_reserve)) == self.capacity:
             return False
         return True
 
@@ -214,7 +225,7 @@ class Hub:
             f"[color: {self.color}, capacity: {self.capacity}, "
             f"type: {self.type.value}]"
             " connections: ["
-            f"{[ele["hub"].name for ele in self.connections]}"
+            f"{[ele['hub'].name for ele in self.connections]}"
             "]"
             )
 

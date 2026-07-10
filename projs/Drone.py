@@ -1,5 +1,5 @@
 from Hub import Hub
-from typing import List
+from typing import List, Optional
 from Error import MyError
 from Connection import Connection
 
@@ -87,6 +87,7 @@ class Drone:
         position within the path, and marks itself as reached if it arrives at
         its destination.
         """
+
         self.cur_zone().pop(self)
         self.next_zone().append(self)
         self.index += 1
@@ -108,9 +109,10 @@ class Drone:
         """
         cur = self.cur_zone()
         next = self.next_zone()
-        cur_connection: Connection = [con for con in connections
-                                      if con.hub1 == cur.name
-                                      and con.hub2 == next.name][0]
+        cur_connection: Optional[Connection] = Connection.get_connection(
+            cur.name, next.name)
+        if not cur_connection:
+            raise MyError("Error: Connection not found")
         if cur_connection.max_lint == cur_connection.per_turn:
             return False
         cur_connection.per_turn += 1
@@ -133,6 +135,30 @@ class Drone:
         if drone.name == self.name:
             return True
         return False
+
+    def fly(self) -> None:
+        cur_connection: Optional[Connection] = Connection.get_connection(
+            self.next_zone().name, self.cur_zone().name)
+        if not cur_connection:
+            raise MyError("Error: connection not founded")
+        if self.next_zone().is_restricted():
+            if cur_connection.per_turn == cur_connection.max_lint:
+                self.next_zone().reserved = True
+
+            if (len(self.next_zone().deck)
+                    + len(self.next_zone().in_reserve)
+                    + 1) == self.next_zone().capacity:
+                self.next_zone().reserved = True
+        self.reserve.append(self.next_zone())
+        self.next_zone().reserve(self)
+        self.is_flying = True
+
+    def fly_off(self) -> None:
+        self.is_flying = False
+        self.reserve.pop()
+        self.next_zone().reserved = False
+        if self in self.next_zone().in_reserve:
+            self.next_zone().drop_reserve(self)
 
     def __str__(self) -> str:
         """Return a human-readable representation of the drone.
