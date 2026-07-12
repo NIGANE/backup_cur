@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/04/12 21:34:25 by negane           ###   ########.fr       */
+/*   Updated: 2026/07/12 18:02:50 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,17 @@
 #include <pthread.h>
 #include "./header.h"
 
-long get_time()
+long long current_time_ms(void)
 {
     struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
-}
 
-long timestamp(long start)
+    gettimeofday(&tv, NULL);
+
+    return (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
+int timestamp(long long start)
 {
-    return (get_time() - start);
+    return (current_time_ms() - start);
 }
 
 void suspend(long s)
@@ -48,8 +49,7 @@ t_env *extract_args(char **av)
     env->required_compiles = ft_atoi(av[6]);
     env->t_cooldown = ft_atoi(av[7]);
     env->running = 1;
-    env->start_time = get_time();
-    printf("start at [%ld]\n", env->start_time);
+    env->start_time = current_time_ms();
     if (!env->nb_coders || !env->t_burn_out || !env->t_compile
         || !env->t_debug || !env->t_refactore || !env->required_compiles
         || !env->t_cooldown)
@@ -57,17 +57,19 @@ t_env *extract_args(char **av)
     return (env);
 }
 
-void *life_cycle(void * arg)
+void *routine()
 {
     // t_coder *coders = (t_coder *) arg;
+    // lock mutex
     printf("Executing thread:\n");
+    // unlock mutex
+    return NULL;
 }
 
 t_coder *create_coders(t_env *env)
 {
     t_coder *coders;
     int i;
-    int re;
 
     if (!env)
         return (NULL);
@@ -75,15 +77,11 @@ t_coder *create_coders(t_env *env)
     if (!coders)
         return (NULL);
     i = 0;
-    re = 0;
     while (i < env->nb_coders)
     {
         coders[i].id = i + 1;
         coders[i].compiles_end = 0;
         coders[i].env = env;
-        re = pthread_create(&(coders[i].thread_id), NULL, &life_cycle, &coders[i]);
-        if (re)
-            return (free(coders), NULL);
         i++;
     }
     return (coders);
@@ -96,21 +94,20 @@ int main(int ac, char **av) {
 
     if (ac < 9)
         return (printf("Error: The provided arguments aren't enough.\n"), 0);
+    printf("parsing && vlidating\n");
+    printf("initializing env, coders and dongles\n");
+    printf("runnning the simulation\n");
+    printf("waiting for stop sign\n");
     env = extract_args(av);
     if (!env)
         return (free(env), printf("Error: The provided arguments aren't correct.\n"), 0);
 
-    inspect_env(env);
-
     coders = create_coders(env);
     if (!coders)
         return (free(env), 0);
+    simulation(env, coders);
     i = 0;
-    while (i < env->nb_coders)
-    {
-        pthread_join(coders[i++].thread_id, NULL);
 
-    }
     free(coders);
     free(env);
 }
