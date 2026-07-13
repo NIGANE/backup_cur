@@ -12,7 +12,7 @@ dream="./maps/challenger/01_the_impossible_dream.txt"
 test_map="./test_map.txt"
 
 run:
-	@uv run python3 -m main $(test_map)
+	@uv run python3 -m main $(dream)
 
 debug:
 	@uv run python3 -m pdb main.py

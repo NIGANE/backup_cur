@@ -1,8 +1,7 @@
 from typing import Optional, List, Dict, Any, TYPE_CHECKING
 from enum import Enum
 from Error import MyError
-from Color import Color
-import colorama
+from Color import Color, Colorama
 if TYPE_CHECKING:
     from Drone import Drone
 
@@ -99,7 +98,7 @@ class Hub:
         """
         if not self.color:
             return self.name
-        return str(getattr(colorama.Fore, self.color) + self.name)
+        return str(getattr(Colorama, self.color).value + self.name)
 
     def is_available(self) -> bool:
         """Determine whether the hub can accept another drone.
