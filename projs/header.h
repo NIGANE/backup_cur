@@ -2,6 +2,18 @@
 #include <pthread.h>
 #include <stdio.h>
 
+typedef struct s_dongle t_dongle;
+typedef struct s_env t_env;
+typedef struct s_coder t_coder;
+
+typedef struct s_dongle{
+    int id;
+    pthread_t thread_id;
+    int is_available;
+    pthread_mutex_t dongle_lock;
+    t_env *env;
+} t_dongle;
+
 typedef struct s_env {
     int nb_coders;
     long t_compile;
@@ -12,16 +24,19 @@ typedef struct s_env {
     long t_cooldown;
     int running;
     long start_time;
-    pthread_mutex_t *donles; //list of dongles
+    t_coder *coders;
+    t_dongle *donles;
+    pthread_mutex_t env_lock;
+    pthread_mutex_t print_lock;
 } t_env;
 
 typedef struct s_coder {
     int id;
-    int compiles_end;
-    // pthread_mutex_t donle;
     pthread_t   thread_id;
+    int compiles_end;
     t_env *env;
 } t_coder;
+
 
 long ft_atoi(char *s);
 void inspect_env(t_env *env);
@@ -29,3 +44,4 @@ void simulation(t_env* env, t_coder *coders);
 void thread_call(int index, t_coder *coders, t_env *env);
 int odd(int a);
 int even(int a);
+int is_positive_number(char *a);

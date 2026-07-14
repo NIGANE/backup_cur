@@ -38,20 +38,22 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <unistd.h>
-
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	while (*s1 && *s2 && *s1 == *s2)
+	{
+		s1++;
+		s2++;
+	}
+	return ((unsigned char)*s1 - (unsigned char)*s2);
+}
 
 
 int main(void)
 {
 
-    long long start = current_time_ms();
-    int i = 1;
-    while (i < 10)
-    {
-        printf("time: [%d]\n", timestamp(start));
-        usleep(1000 * 400);
-        i++;
-    }
-
-    return 0;
+    char *a = "hello world";
+    if (ft_strcmp(a, "hello world"))
+        printf("not matching");
+    printf("re: %d\n", ft_strcmp(a, "hello world"));
 }

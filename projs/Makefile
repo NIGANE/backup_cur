@@ -1,8 +1,8 @@
-CC = cc -Wall -Wextra -Werror
+CC = cc 
 OUT = tt
 SRC = main.c ./heap/*.c ./helpers/*.c ./simulation.c
 
-ARGS = 5 400 10 10 10 4 2 2 2 2
+ARGS = 5 400 10 10 10 4 2 edf
 
 
 arg:run

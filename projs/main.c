@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/07/12 18:02:50 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/07/14 21:32:23 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,28 +33,42 @@ void suspend(long s)
     usleep(s * 1000);
 }
 
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	while (*s1 && *s2 && *s1 == *s2)
+	{
+		s1++;
+		s2++;
+	}
+	return ((unsigned char)*s1 - (unsigned char)*s2);
+}
 
-t_env *extract_args(char **av)
+int validate_args(char **av, int st, int len)
+{
+    int i;
+
+    i = st;
+    while (i < 8)
+    {
+        if (!is_positive_number(av[i]))
+            return (0);
+        i++;
+    }
+    return (1);
+}
+int extract_args(int ac, char **av)
 {
     t_env *env;
-    
-    env = malloc(sizeof(t_env));
-    if (!env)
-        return (NULL);
-    env->nb_coders = ft_atoi(av[1]);
-    env->t_burn_out = ft_atoi(av[2]);
-    env->t_compile = ft_atoi(av[3]);
-    env->t_debug = ft_atoi(av[4]);
-    env->t_refactore = ft_atoi(av[5]);
-    env->required_compiles = ft_atoi(av[6]);
-    env->t_cooldown = ft_atoi(av[7]);
-    env->running = 1;
-    env->start_time = current_time_ms();
-    if (!env->nb_coders || !env->t_burn_out || !env->t_compile
-        || !env->t_debug || !env->t_refactore || !env->required_compiles
-        || !env->t_cooldown)
-        return (NULL);
-    return (env);
+
+    if (!validate_args(av, 1, ac))
+        return (printf("error validating args"), 0);
+    if (!ft_atoi(av[1]) || !ft_atoi(av[2])
+        || !ft_atoi(av[2]) || !ft_atoi(av[3])
+        || !ft_atoi(av[4]) || !ft_atoi(av[5])
+        || !ft_atoi(av[6]) || !ft_atoi(av[7])
+        || ft_atoi(av[8]))
+        return (0);
+    return (1);
 }
 
 void *routine()
@@ -87,27 +101,25 @@ t_coder *create_coders(t_env *env)
     return (coders);
 }
 
+void usage_message(void)
+{
+    printf("Error: helpful usage error message.");
+}
+
+t_env *init_env(t_env *env)
+{
+    printf("initializing env, coders and dongles\n");
+    
+}
+
 int main(int ac, char **av) {
     t_env *env;
-    t_coder *coders;
-    int i;
-
-    if (ac < 9)
-        return (printf("Error: The provided arguments aren't enough.\n"), 0);
+    if (ac < 8 || ac > 9 )
+        return (usage_message(), 1);
     printf("parsing && vlidating\n");
-    printf("initializing env, coders and dongles\n");
-    printf("runnning the simulation\n");
-    printf("waiting for stop sign\n");
-    env = extract_args(av);
-    if (!env)
-        return (free(env), printf("Error: The provided arguments aren't correct.\n"), 0);
-
-    coders = create_coders(env);
-    if (!coders)
-        return (free(env), 0);
-    simulation(env, coders);
-    i = 0;
-
-    free(coders);
-    free(env);
+    if (!extract_args(ac, av))
+        return (printf("Error"), 1);
+    env = init_env(env);
+    // printf("runnning the simulation\n");
+    // printf("waiting for stop sign\n");
 }
