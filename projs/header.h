@@ -8,8 +8,8 @@ typedef struct s_coder t_coder;
 
 typedef struct s_dongle{
     int id;
-    pthread_t thread_id;
     int is_available;
+    pthread_t thread_id;
     pthread_mutex_t dongle_lock;
     t_env *env;
 } t_dongle;
@@ -25,7 +25,7 @@ typedef struct s_env {
     int running;
     long start_time;
     t_coder *coders;
-    t_dongle *donles;
+    t_dongle *dongles;
     pthread_mutex_t env_lock;
     pthread_mutex_t print_lock;
 } t_env;
@@ -33,7 +33,10 @@ typedef struct s_env {
 typedef struct s_coder {
     int id;
     pthread_t   thread_id;
-    int compiles_end;
+    int compiles_count;
+    int req_compiles;
+    t_dongle *left_dongle;
+    t_dongle *right_dongle;
     t_env *env;
 } t_coder;
 

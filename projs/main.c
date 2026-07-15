@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/07/14 21:32:23 by negane           ###   ########.fr       */
+/*   Updated: 2026/07/15 19:23:13 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,10 +63,11 @@ int extract_args(int ac, char **av)
     if (!validate_args(av, 1, ac))
         return (printf("error validating args"), 0);
     if (!ft_atoi(av[1]) || !ft_atoi(av[2])
-        || !ft_atoi(av[2]) || !ft_atoi(av[3])
+        || !ft_atoi(av[3])
         || !ft_atoi(av[4]) || !ft_atoi(av[5])
-        || !ft_atoi(av[6]) || !ft_atoi(av[7])
-        || ft_atoi(av[8]))
+        || !ft_atoi(av[6]) || !ft_atoi(av[7]))
+        return (0);
+    if (ft_strcmp(av[8], "edf") && ft_strcmp(av[8], "fifo"))
         return (0);
     return (1);
 }
@@ -94,7 +95,7 @@ t_coder *create_coders(t_env *env)
     while (i < env->nb_coders)
     {
         coders[i].id = i + 1;
-        coders[i].compiles_end = 0;
+        coders[i].compiles_count = 0;
         coders[i].env = env;
         i++;
     }
@@ -106,10 +107,88 @@ void usage_message(void)
     printf("Error: helpful usage error message.");
 }
 
-t_env *init_env(t_env *env)
+t_coder *init_coders(t_env *env)
 {
-    printf("initializing env, coders and dongles\n");
+    t_coder *coders;
+    int i;
     
+    coders = malloc(sizeof(t_coder) * env->nb_coders);
+    if (!coders)
+        return (NULL);
+    i = 0;
+    while (i < env->nb_coders)
+    {
+        coders[i].id = i + 1;
+        coders[i].compiles_count = 0;
+        coders[i].req_compiles = env->required_compiles;
+        coders[i].left_dongle = &(env->dongles[coders[i].id]);
+        coders[i].right_dongle = &(env->dongles[coders[i].id % env->nb_coders]);
+        i++;
+    }
+    return (coders);
+}
+
+t_dongle *init_donles(t_env *env)
+{
+    int i;
+    t_dongle *dongles;
+
+    dongles = malloc(sizeof(t_dongle) * env->nb_coders);
+    if (!dongles)
+        return (NULL);
+    i = 0;
+    while (i < env->nb_coders)
+    {
+        dongles[i].id = i + 1;
+        dongles[i].env = env;
+        i++;
+    }
+    return (dongles);
+}
+
+void init_threads(t_env *env)
+{
+    int i;
+
+    i = 0;
+    while (i < env->nb_coders)
+    {
+        pthread_create(&(env->coders[i].thread_id), NULL, routine, env);
+        i++;
+    }
+    i = 0;
+    while (i < env->nb_coders)
+    {
+        pthread_join(env->coders[i].thread_id, NULL);
+        i++;
+    }
+}
+
+
+t_env *init_env(char **av)
+{
+    t_env *env;
+
+    env = malloc(sizeof(t_env));
+    if (!env)
+        return (NULL);
+    env->nb_coders = ft_atoi(av[1]);
+    env->t_burn_out = ft_atoi(av[2]);
+    env->t_compile = ft_atoi(av[3]);
+    env->t_debug = ft_atoi(av[4]);
+    env->t_refactore = ft_atoi(av[5]);
+    env->required_compiles = ft_atoi(av[6]);
+    env->t_cooldown = ft_atoi(av[7]);
+    env->dongles = init_donles(env);
+    if (!env->dongles)
+        return (free(env), NULL);
+    env->coders = init_coders(env);
+    if (!env->coders)
+        return (free(env), NULL);
+    init_threads(env);
+    
+    return (env);
+    // printf("initializing env, coders and dongles\n");
 }
 
 int main(int ac, char **av) {
@@ -119,7 +198,7 @@ int main(int ac, char **av) {
     printf("parsing && vlidating\n");
     if (!extract_args(ac, av))
         return (printf("Error"), 1);
-    env = init_env(env);
+    env = init_env(av);
     // printf("runnning the simulation\n");
     // printf("waiting for stop sign\n");
 }
