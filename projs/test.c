@@ -38,22 +38,45 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <unistd.h>
-int	ft_strcmp(const char *s1, const char *s2)
+#include <pthread.h>
+#include <stdlib.h>
+
+typedef struct data_s{
+	int id;
+	int available;
+	pthread_mutex_t	lock;
+} data_t;
+
+void *routine(void *arg)
 {
-	while (*s1 && *s2 && *s1 == *s2)
+	data_t *data = (data_t *) arg;
+	if (!data)
+		return (printf("no shared data"), NULL);
+	if (data->available)
 	{
-		s1++;
-		s2++;
+		pthread_mutex_lock(&(data->lock));
+		data->available = 0;
+		printf("hello from thread - ");
+		printf("who is the king now hh.\n");
+		data->available = 1;
+		pthread_mutex_unlock(&(data->lock));
 	}
-	return ((unsigned char)*s1 - (unsigned char)*s2);
 }
 
 
 int main(void)
 {
-
-    char *a = "hello world";
-    if (ft_strcmp(a, "hello world"))
-        printf("not matching");
-    printf("re: %d\n", ft_strcmp(a, "hello world"));
+	pthread_t	th[2];
+	data_t *data = malloc(sizeof(data_t));
+	data->available = 1;
+	pthread_mutex_init(&(data->lock), NULL);
+	printf("initsializing all resources\n");
+	for (int i = 0; i < 2; i++)
+	{
+		pthread_create(&(th[i]), NULL, routine, (void *) data);
+	}
+	for (int i= 0; i < 2; i++)
+	{
+		pthread_join(th[i], NULL);
+	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/07/15 19:23:13 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/07/16 19:30:49 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,6 @@ int extract_args(int ac, char **av)
 
 void *routine()
 {
-    // t_coder *coders = (t_coder *) arg;
-    // lock mutex
     printf("Executing thread:\n");
     // unlock mutex
     return NULL;
@@ -153,7 +151,7 @@ void init_threads(t_env *env)
     i = 0;
     while (i < env->nb_coders)
     {
-        pthread_create(&(env->coders[i].thread_id), NULL, routine, env);
+        pthread_create(&(env->coders[i].thread_id), NULL, routine, env->coders[i]);
         i++;
     }
     i = 0;
@@ -185,7 +183,8 @@ t_env *init_env(char **av)
     env->coders = init_coders(env);
     if (!env->coders)
         return (free(env), NULL);
-    init_threads(env);
+    init_mutextes(env);
+    // init_threads(env);
     
     return (env);
     // printf("initializing env, coders and dongles\n");
