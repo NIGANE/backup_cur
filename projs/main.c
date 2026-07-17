@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/07/16 19:30:49 by negane           ###   ########.fr       */
+/*   Updated: 2026/07/17 19:04:58 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./heap/heap.h"
-#include <sys/time.h>
-#include <pthread.h>
+
 #include "./header.h"
 
 long long current_time_ms(void)
@@ -56,6 +54,14 @@ int validate_args(char **av, int st, int len)
     }
     return (1);
 }
+int lock(pthread_mutex_t *_lock)
+{
+    return pthread_mutex_lock(_lock);
+}
+int unlock(pthread_mutex_t *_lock)
+{
+    return pthread_mutex_unlock(_lock);
+}
 int extract_args(int ac, char **av)
 {
     t_env *env;
@@ -71,13 +77,84 @@ int extract_args(int ac, char **av)
         return (0);
     return (1);
 }
-
-void *routine()
+void request_ticket(int *id, t_env *env)
 {
-    printf("Executing thread:\n");
-    // unlock mutex
-    return NULL;
+    ft_insert(id, env->fifo);
 }
+
+int my_turn(int id, t_env *env)
+{
+    printf("pased");
+    if (!(env->fifo))
+        return (0);
+    printf("return the check\n");
+    return *(int *)env->fifo->data == id;
+}
+
+void grab_ticket(t_env *env)
+{
+    ft_pop(&(env->fifo));
+}
+
+int grab_donles(t_coder *coder)
+{
+    if (coder->left_dongle->is_available && coder->right_dongle->is_available)
+    {
+        lock(&(coder->left_dongle->dongle_lock));
+        lock(&(coder->right_dongle->dongle_lock));
+        coder->left_dongle->is_available = 0;
+        coder->right_dongle->is_available = 0;
+        
+        return (1);
+    }
+    return (0);
+}
+
+void leave_dongles(t_coder *coder)
+{
+    unlock(&(coder->left_dongle->dongle_lock));
+    unlock(&(coder->right_dongle->dongle_lock));
+    coder->left_dongle->is_available = 1;
+    coder->right_dongle->is_available = 1;
+}
+
+void *routine(void *arg)
+{
+    t_coder *coder = (t_coder *) arg;
+    t_env *env = coder->env;
+    if (!coder)
+        return (printf("no arg provided"), NULL);
+    
+    printf("%d/%d\n", coder->compiles_count, coder->req_compiles);
+    while (coder->compiles_count < coder->req_compiles)
+    {
+        while (!my_turn(coder->id, env))
+        {
+            printf("new ticket to sleep");
+            lock(&(env->env_lock));
+            request_ticket(&(coder->id), env);
+            printf("go to sleep");
+            pthread_cond_wait(&(env->cond), &(env->env_lock));
+            unlock(&(env->env_lock));
+        }
+        if (grab_donles(coder))
+        {
+            
+            lock(&(env->env_lock));
+            grab_ticket(coder->env);    
+            unlock(&(env->env_lock));
+            printf("[%d]: working", coder->id);
+            coder->compiles_count++;
+            leave_dongles(coder);
+            // grap_donles(coder);
+            // compile(coder);
+            // debug(coder);
+            // refactor(coder);
+        }
+    }
+    return (coder);
+}
+
 
 t_coder *create_coders(t_env *env)
 {
@@ -121,6 +198,7 @@ t_coder *init_coders(t_env *env)
         coders[i].req_compiles = env->required_compiles;
         coders[i].left_dongle = &(env->dongles[coders[i].id]);
         coders[i].right_dongle = &(env->dongles[coders[i].id % env->nb_coders]);
+        coders[i].env = env;
         i++;
     }
     return (coders);
@@ -151,7 +229,7 @@ void init_threads(t_env *env)
     i = 0;
     while (i < env->nb_coders)
     {
-        pthread_create(&(env->coders[i].thread_id), NULL, routine, env->coders[i]);
+        pthread_create(&(env->coders[i].thread_id), NULL, routine, &(env->coders[i]));
         i++;
     }
     i = 0;
@@ -160,6 +238,17 @@ void init_threads(t_env *env)
         pthread_join(env->coders[i].thread_id, NULL);
         i++;
     }
+}
+
+void init_mutexes(t_env *env)
+{
+    int i;
+
+    i = 0;
+    pthread_mutex_init(&(env->env_lock), NULL);
+    pthread_cond_init(&(env->cond), NULL);
+    while (i < env->nb_coders)
+        pthread_mutex_init(&(env->dongles[i++].dongle_lock), NULL);
 }
 
 
@@ -178,13 +267,15 @@ t_env *init_env(char **av)
     env->required_compiles = ft_atoi(av[6]);
     env->t_cooldown = ft_atoi(av[7]);
     env->dongles = init_donles(env);
+    env->fifo = NULL;
     if (!env->dongles)
         return (free(env), NULL);
     env->coders = init_coders(env);
     if (!env->coders)
         return (free(env), NULL);
-    init_mutextes(env);
-    // init_threads(env);
+    init_donles(env);
+    init_mutexes(env);
+    init_threads(env);
     
     return (env);
     // printf("initializing env, coders and dongles\n");

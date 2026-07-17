@@ -40,18 +40,31 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include "fifo/fifo.h"
 
 typedef struct data_s{
 	int id;
 	int available;
+	int cur_ticket;
+	node_t fifo;
 	pthread_mutex_t	lock;
 } data_t;
 
+void reqest()
+{
+
+}
+void get_ticket()
+{
+	
+}
 void *routine(void *arg)
 {
+
 	data_t *data = (data_t *) arg;
 	if (!data)
 		return (printf("no shared data"), NULL);
+	
 	pthread_mutex_lock(&(data->lock));
 	if (data->available)
 	{
@@ -73,6 +86,7 @@ int main(void)
 	data->available = 1;
 	// cond = pthread_cond_wait_init
 	pthread_mutex_init(&(data->lock), NULL);
+	
 	printf("initsializing all resources\n");
 	for (int i = 0; i < 2; i++)
 	{

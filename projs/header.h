@@ -1,15 +1,25 @@
 
 #include <pthread.h>
 #include <stdio.h>
+#include "./fifo/fifo.h"
+#include <sys/time.h>
+#include <unistd.h>
 
 typedef struct s_dongle t_dongle;
 typedef struct s_env t_env;
 typedef struct s_coder t_coder;
 
+typedef struct request_s {
+    void *data;
+    struct request_s *next;
+} request_t;
+
+
 typedef struct s_dongle{
     int id;
     int is_available;
     pthread_mutex_t dongle_lock;
+    long last_use;
     t_env *env;
 } t_dongle;
 
@@ -23,9 +33,11 @@ typedef struct s_env {
     long t_cooldown;
     int running;
     long start_time;
+    node_t *fifo;
     t_coder *coders;
     t_dongle *dongles;
     pthread_mutex_t env_lock;
+    pthread_cond_t cond;
     pthread_mutex_t print_lock;
 } t_env;
 

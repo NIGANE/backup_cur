@@ -1,8 +1,8 @@
 CC = cc 
 OUT = tt
-SRC = main.c ./heap/*.c ./helpers/*.c ./simulation.c
+SRC = main.c ./heap/*.c ./helpers/*.c ./simulation.c ./fifo/fifo.c
 
-ARGS = 5 400 10 10 10 4 2 edf
+ARGS = 1 400 10 10 10 4 2 edf
 
 
 arg:run
@@ -11,6 +11,7 @@ arg:run
 test:
 	@cc test.c
 	@./a.out
+
 
 run:
 	@$(CC) $(SRC) -o $(OUT)
