@@ -52,23 +52,26 @@ void *routine(void *arg)
 	data_t *data = (data_t *) arg;
 	if (!data)
 		return (printf("no shared data"), NULL);
+	pthread_mutex_lock(&(data->lock));
 	if (data->available)
 	{
-		pthread_mutex_lock(&(data->lock));
 		data->available = 0;
 		printf("hello from thread - ");
 		printf("who is the king now hh.\n");
+		sleep(5);
 		data->available = 1;
-		pthread_mutex_unlock(&(data->lock));
 	}
+	pthread_mutex_unlock(&(data->lock));
 }
 
 
 int main(void)
 {
+	// pthread_cond_t	*cond;
 	pthread_t	th[2];
 	data_t *data = malloc(sizeof(data_t));
 	data->available = 1;
+	// cond = pthread_cond_wait_init
 	pthread_mutex_init(&(data->lock), NULL);
 	printf("initsializing all resources\n");
 	for (int i = 0; i < 2; i++)

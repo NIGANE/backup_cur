@@ -9,7 +9,6 @@ typedef struct s_coder t_coder;
 typedef struct s_dongle{
     int id;
     int is_available;
-    pthread_t thread_id;
     pthread_mutex_t dongle_lock;
     t_env *env;
 } t_dongle;
