@@ -318,16 +318,17 @@ class Manager:
                 )
 
     def split_drones(self) -> None:
-        """Return a human-readable summary of the simulation state.
-
-        Returns:
-            A summary containing the number of hubs and drones.
-        """
+        """Distribute drones across the available paths."""
         for ind, ele in enumerate(self.drones):
             ele.set_path(self.paths[(ind + 1) % len(self.paths)])
 
     def reset_connection_link_capacity(self) -> None:
-        """Distribute drones across the available paths."""
+        """Reset the per-turn usage of every connection.
+
+        Clears the number of traversals recorded for each connection during the
+        current simulation turn, allowing all connections to be reused in the
+        next turn.
+        """
         for con in self.connections:
             con.per_turn = 0
 

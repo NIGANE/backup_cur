@@ -19,6 +19,20 @@ class Connection:
 
     @classmethod
     def get_connection(cls, hub1: str, hub2: str) -> Optional['Connection']:
+        """Return the connection between two hubs.
+
+        Searches the registered connections for one linking the specified hubs.
+        The order of the hub names is ignored, so a connection between
+        ``hub1`` and ``hub2`` is considered identical to one between
+        ``hub2`` and ``hub1``.
+
+        Args:
+            hub1: The name of the first hub.
+            hub2: The name of the second hub.
+
+        Returns:
+            The matching ``Connection`` if one exists; otherwise ``None``.
+        """
         for con in cls.connections:
             if ((con.hub1 == hub1 and con.hub2 == hub2)
                     or (con.hub2 == hub1 and con.hub1 == hub2)):
@@ -27,6 +41,14 @@ class Connection:
 
     @classmethod
     def new_connection(cls, con: 'Connection') -> None:
+        """Register a new connection.
+
+        Adds the specified connection to the collection of registered
+        connections maintained by the class.
+
+        Args:
+            con: The connection to register.
+        """
         cls.connections.append(con)
 
     def __init__(self, hub1: str, hub2: str, max_lint: int = 1):
