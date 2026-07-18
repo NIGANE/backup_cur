@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/07/17 19:04:58 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/07/18 21:22:27 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,15 +79,16 @@ int extract_args(int ac, char **av)
 }
 void request_ticket(int *id, t_env *env)
 {
-    ft_insert(id, env->fifo);
+    lock(&(env->env_lock));
+    env->fifo = ft_insert(id, env->fifo);
+    unlock(&(env->env_lock));
 }
 
 int my_turn(int id, t_env *env)
 {
-    printf("pased");
     if (!(env->fifo))
         return (0);
-    printf("return the check\n");
+    printf("re thr check");
     return *(int *)env->fifo->data == id;
 }
 
@@ -123,17 +124,15 @@ void *routine(void *arg)
     t_coder *coder = (t_coder *) arg;
     t_env *env = coder->env;
     if (!coder)
-        return (printf("no arg provided"), NULL);
+        return (printf("no arg provided\n"), NULL);
     
-    printf("%d/%d\n", coder->compiles_count, coder->req_compiles);
     while (coder->compiles_count < coder->req_compiles)
     {
         while (!my_turn(coder->id, env))
         {
-            printf("new ticket to sleep");
             lock(&(env->env_lock));
             request_ticket(&(coder->id), env);
-            printf("go to sleep");
+            printf("[%d]: goes to sleep\n", coder->id);
             pthread_cond_wait(&(env->cond), &(env->env_lock));
             unlock(&(env->env_lock));
         }
@@ -143,9 +142,11 @@ void *routine(void *arg)
             lock(&(env->env_lock));
             grab_ticket(coder->env);    
             unlock(&(env->env_lock));
-            printf("[%d]: working", coder->id);
-            coder->compiles_count++;
+            lock(&(env->print_lock));
+            printf("[%d]: working\n", coder->id);
+            unlock(&(env->print_lock));
             leave_dongles(coder);
+            coder->compiles_count++;
             // grap_donles(coder);
             // compile(coder);
             // debug(coder);
@@ -233,11 +234,13 @@ void init_threads(t_env *env)
         i++;
     }
     i = 0;
-    while (i < env->nb_coders)
-    {
-        pthread_join(env->coders[i].thread_id, NULL);
-        i++;
-    }
+    sleep(2);
+    // while (i < env->nb_coders)
+    // {
+    //     pthread_join(env->coders[i].thread_id, NULL);
+    //     i++;
+    // }
+    fetch_fifo(env->fifo);
 }
 
 void init_mutexes(t_env *env)
@@ -247,6 +250,7 @@ void init_mutexes(t_env *env)
     i = 0;
     pthread_mutex_init(&(env->env_lock), NULL);
     pthread_cond_init(&(env->cond), NULL);
+    pthread_mutex_init(&(env->print_lock), NULL);
     while (i < env->nb_coders)
         pthread_mutex_init(&(env->dongles[i++].dongle_lock), NULL);
 }
@@ -289,6 +293,7 @@ int main(int ac, char **av) {
     if (!extract_args(ac, av))
         return (printf("Error"), 1);
     env = init_env(av);
+    
     // printf("runnning the simulation\n");
     // printf("waiting for stop sign\n");
 }

@@ -2,7 +2,7 @@ CC = cc
 OUT = tt
 SRC = main.c ./heap/*.c ./helpers/*.c ./simulation.c ./fifo/fifo.c
 
-ARGS = 1 400 10 10 10 4 2 edf
+ARGS = 2 400 10 10 10 4 2 edf
 
 
 arg:run

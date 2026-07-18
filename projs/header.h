@@ -52,6 +52,7 @@ typedef struct s_coder {
 } t_coder;
 
 
+
 long ft_atoi(char *s);
 void inspect_env(t_env *env);
 void simulation(t_env* env, t_coder *coders);

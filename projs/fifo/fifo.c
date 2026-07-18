@@ -56,3 +56,17 @@ void ft_free(node_t *fifo)
         free(tmp);
     }
 }
+
+void fetch_fifo(node_t *head)
+{
+    if (!head)
+    {
+        printf("fifo is empty\n");
+        return;
+    }
+    while (head)
+    {
+        printf("- [%d] ticket\n",*(int *) head->data);
+        head = head->next;
+    }
+}
