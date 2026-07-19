@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/07/19 13:12:50 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/07/19 18:46:06 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,17 +101,11 @@ void grab_ticket(t_env *env)
 
 int grab_donles(t_coder *coder)
 {
-    printf("[%d] passed\n", coder->id);
-    printf("%d, %d: dongles\n", coder->left_dongle->is_available, coder->right_dongle->is_available);
     if (coder->left_dongle->is_available && coder->right_dongle->is_available)
     {
-        printf("[%d] locking left\n", coder->id);
-        lock(&coder->left_dongle->dongle_lock);
-        printf("[%d] locked left\n", coder->id);
+        lock(&(coder->left_dongle->dongle_lock));
+        lock(&(coder->right_dongle->dongle_lock));
 
-        printf("[%d] locking right\n", coder->id);
-        lock(&coder->right_dongle->dongle_lock);
-        printf("[%d] locked right\n", coder->id);
         coder->left_dongle->is_available = 0;
         coder->right_dongle->is_available = 0;
         
@@ -137,6 +131,9 @@ void *routine(void *arg)
     
     while (coder->compiles_count < coder->req_compiles)
     {
+        lock(&env->print_lock);
+        printf("coder [%d] %d/%d\n", coder->id,coder->compiles_count, coder->req_compiles);
+        unlock(&env->print_lock);
         lock(&(env->env_lock));
         while (!my_turn(coder->id, env))
         {
@@ -145,11 +142,13 @@ void *routine(void *arg)
             printf("[%d]: goes to sleep\n", coder->id);
             unlock(&(env->print_lock));
             pthread_cond_wait(&(env->cond), &(env->env_lock));
+            lock(&(env->print_lock));
+            printf("[%d] waking up\n", coder->id);
+            unlock(&(env->print_lock));
         }
         unlock(&(env->env_lock));
         if (grab_donles(coder))
         {
-            printf("enter working area\n");
             lock(&(env->env_lock));
             grab_ticket(coder->env);    
             unlock(&(env->env_lock));
@@ -158,6 +157,7 @@ void *routine(void *arg)
             sleep(4);
             unlock(&(env->print_lock));
             leave_dongles(coder);
+            pthread_cond_broadcast(&(env->cond));
             coder->compiles_count++;
             // grap_donles(coder);
             // compile(coder);
@@ -210,7 +210,7 @@ t_coder *init_coders(t_env *env)
         coders[i].compiles_count = 0;
         coders[i].req_compiles = env->required_compiles;
         coders[i].left_dongle = &(env->dongles[coders[i].id]);
-        coders[i].right_dongle = &(env->dongles[coders[i].id % env->nb_coders]);
+        coders[i].right_dongle = &(env->dongles[coders[i + 1].id % env->nb_coders]);
         coders[i].env = env;
         i++;
     }
