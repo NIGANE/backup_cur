@@ -85,15 +85,16 @@ int main(void)
 	data_t *data = malloc(sizeof(data_t));
 	data->available = 1;
 	// cond = pthread_cond_wait_init
-	pthread_mutex_init(&(data->lock), NULL);
+	int re = pthread_mutex_init(&(data->lock), NULL);
+	printf("re: %d\n", re);
 	
-	printf("initsializing all resources\n");
-	for (int i = 0; i < 2; i++)
-	{
-		pthread_create(&(th[i]), NULL, routine, (void *) data);
-	}
-	for (int i= 0; i < 2; i++)
-	{
-		pthread_join(th[i], NULL);
-	}
+	// printf("initsializing all resources\n");
+	// for (int i = 0; i < 2; i++)
+	// {
+	// 	pthread_create(&(th[i]), NULL, routine, (void *) data);
+	// }
+	// for (int i= 0; i < 2; i++)
+	// {
+	// 	pthread_join(th[i], NULL);
+	// }
 }

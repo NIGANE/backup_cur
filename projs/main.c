@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/07/18 21:22:27 by negane           ###   ########.fr       */
+/*   Updated: 2026/07/19 13:12:50 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,17 +79,19 @@ int extract_args(int ac, char **av)
 }
 void request_ticket(int *id, t_env *env)
 {
-    lock(&(env->env_lock));
     env->fifo = ft_insert(id, env->fifo);
-    unlock(&(env->env_lock));
 }
 
 int my_turn(int id, t_env *env)
 {
     if (!(env->fifo))
         return (0);
-    printf("re thr check");
     return *(int *)env->fifo->data == id;
+}
+
+int whos_next(t_env *env)
+{
+    return (*(int *) env->fifo->data);
 }
 
 void grab_ticket(t_env *env)
@@ -99,10 +101,17 @@ void grab_ticket(t_env *env)
 
 int grab_donles(t_coder *coder)
 {
+    printf("[%d] passed\n", coder->id);
+    printf("%d, %d: dongles\n", coder->left_dongle->is_available, coder->right_dongle->is_available);
     if (coder->left_dongle->is_available && coder->right_dongle->is_available)
     {
-        lock(&(coder->left_dongle->dongle_lock));
-        lock(&(coder->right_dongle->dongle_lock));
+        printf("[%d] locking left\n", coder->id);
+        lock(&coder->left_dongle->dongle_lock);
+        printf("[%d] locked left\n", coder->id);
+
+        printf("[%d] locking right\n", coder->id);
+        lock(&coder->right_dongle->dongle_lock);
+        printf("[%d] locked right\n", coder->id);
         coder->left_dongle->is_available = 0;
         coder->right_dongle->is_available = 0;
         
@@ -128,22 +137,25 @@ void *routine(void *arg)
     
     while (coder->compiles_count < coder->req_compiles)
     {
+        lock(&(env->env_lock));
         while (!my_turn(coder->id, env))
         {
-            lock(&(env->env_lock));
             request_ticket(&(coder->id), env);
+            lock(&(env->print_lock));
             printf("[%d]: goes to sleep\n", coder->id);
+            unlock(&(env->print_lock));
             pthread_cond_wait(&(env->cond), &(env->env_lock));
-            unlock(&(env->env_lock));
         }
+        unlock(&(env->env_lock));
         if (grab_donles(coder))
         {
-            
+            printf("enter working area\n");
             lock(&(env->env_lock));
             grab_ticket(coder->env);    
             unlock(&(env->env_lock));
             lock(&(env->print_lock));
             printf("[%d]: working\n", coder->id);
+            sleep(4);
             unlock(&(env->print_lock));
             leave_dongles(coder);
             coder->compiles_count++;
@@ -218,6 +230,7 @@ t_dongle *init_donles(t_env *env)
     {
         dongles[i].id = i + 1;
         dongles[i].env = env;
+        dongles[i].is_available = 1;
         i++;
     }
     return (dongles);
@@ -240,7 +253,6 @@ void init_threads(t_env *env)
     //     pthread_join(env->coders[i].thread_id, NULL);
     //     i++;
     // }
-    fetch_fifo(env->fifo);
 }
 
 void init_mutexes(t_env *env)
@@ -252,7 +264,10 @@ void init_mutexes(t_env *env)
     pthread_cond_init(&(env->cond), NULL);
     pthread_mutex_init(&(env->print_lock), NULL);
     while (i < env->nb_coders)
-        pthread_mutex_init(&(env->dongles[i++].dongle_lock), NULL);
+    {
+        pthread_mutex_init(&(env->dongles[i].dongle_lock), NULL);
+        i++;
+    }
 }
 
 
@@ -296,4 +311,19 @@ int main(int ac, char **av) {
     
     // printf("runnning the simulation\n");
     // printf("waiting for stop sign\n");
+    int i;
+    i = 0;
+    lock(&(env->env_lock));
+    lock(&(env->print_lock));
+    printf("next: %d\n", whos_next(env));
+    unlock(&(env->print_lock));
+    unlock(&(env->env_lock));
+    sleep(2);
+    pthread_cond_broadcast(&(env->cond));
+    // exit(0);
+    while (i < env->nb_coders)
+    {
+        pthread_join((env->coders[i].thread_id), NULL);
+        i++;   
+    }
 }
