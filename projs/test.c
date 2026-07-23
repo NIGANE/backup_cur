@@ -76,17 +76,20 @@ void *routine(void *arg)
 	}
 	pthread_mutex_unlock(&(data->lock));
 }
+int _log(env_t *env, ...arg);
+printf()
 
 
 int main(void)
 {
+
 	// pthread_cond_t	*cond;
-	pthread_t	th[2];
-	data_t *data = malloc(sizeof(data_t));
-	data->available = 1;
-	// cond = pthread_cond_wait_init
-	int re = pthread_mutex_init(&(data->lock), NULL);
-	printf("re: %d\n", re);
+	// pthread_t	th[2];
+	// data_t *data = malloc(sizeof(data_t));
+	// data->available = 1;
+	// // cond = pthread_cond_wait_init
+	// int re = pthread_mutex_init(&(data->lock), NULL);
+	// printf("re: %d\n", re);
 	
 	// printf("initsializing all resources\n");
 	// for (int i = 0; i < 2; i++)

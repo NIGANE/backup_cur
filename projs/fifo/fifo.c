@@ -70,3 +70,4 @@ void fetch_fifo(node_t *head)
         head = head->next;
     }
 }
+

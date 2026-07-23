@@ -28,12 +28,13 @@ typedef struct env_s {
     long t_compile;
     long t_debug;
     long t_refactore;
-    long t_burn_out;
+    long long t_burn_out;
     int required_compiles;
     long t_cooldown;
     int running;
     int start_simulation;
     long start_time;
+    int stop_simulation;
     pthread_t monitor_id;
     pthread_cond_t monitor_cond;
     node_t *fifo;
@@ -48,6 +49,7 @@ typedef struct coder_s {
     pthread_t   thread_id;
     int compiles_count;
     int req_compiles;
+    long long last_compile_time;
     int ready;
     dongle_t *left_dongle;
     dongle_t *right_dongle;
@@ -67,3 +69,4 @@ int is_positive_number(char *a);
 
 int lock(pthread_mutex_t *_lock);
 int unlock(pthread_mutex_t *_lock);
+int timestamp(long long start);
