@@ -5,9 +5,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-typedef struct s_dongle t_dongle;
-typedef struct s_env t_env;
-typedef struct s_coder t_coder;
+typedef struct dongle_s dongle_t;
+typedef struct env_s env_t;
+typedef struct coder_s coder_t;
 
 typedef struct request_s {
     void *data;
@@ -15,15 +15,15 @@ typedef struct request_s {
 } request_t;
 
 
-typedef struct s_dongle{
+typedef struct dongle_s{
     int id;
     int is_available;
     pthread_mutex_t dongle_lock;
     long last_use;
-    t_env *env;
-} t_dongle;
+    env_t *env;
+} dongle_t;
 
-typedef struct s_env {
+typedef struct env_s {
     int nb_coders;
     long t_compile;
     long t_debug;
@@ -32,31 +32,38 @@ typedef struct s_env {
     int required_compiles;
     long t_cooldown;
     int running;
+    int start_simulation;
     long start_time;
+    pthread_t monitor_id;
+    pthread_cond_t monitor_cond;
     node_t *fifo;
-    t_coder *coders;
-    t_dongle *dongles;
+    coder_t *coders;
+    dongle_t *dongles;
     pthread_mutex_t env_lock;
-    pthread_cond_t cond;
     pthread_mutex_t print_lock;
-} t_env;
+} env_t;
 
-typedef struct s_coder {
+typedef struct coder_s {
     int id;
     pthread_t   thread_id;
     int compiles_count;
     int req_compiles;
-    t_dongle *left_dongle;
-    t_dongle *right_dongle;
-    t_env *env;
-} t_coder;
+    int ready;
+    dongle_t *left_dongle;
+    dongle_t *right_dongle;
+    pthread_cond_t cond;
+    env_t *env;
+} coder_t;
 
 
 
 long ft_atoi(char *s);
-void inspect_env(t_env *env);
-void simulation(t_env* env, t_coder *coders);
-void thread_call(int index, t_coder *coders, t_env *env);
+void inspecenv_t(env_t *env);
+void simulation(env_t* env, coder_t *coders);
+void thread_call(int index, coder_t *coders, env_t *env);
 int odd(int a);
 int even(int a);
 int is_positive_number(char *a);
+
+int lock(pthread_mutex_t *_lock);
+int unlock(pthread_mutex_t *_lock);

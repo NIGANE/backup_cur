@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "./header.h"
 
-void start(t_env *env, t_coder *coders, int (*fn)(int))
+void start(env_t *env, coder_t *coders, int (*fn)(int))
 {
     (void) env;
     (void) coders;
@@ -18,7 +18,7 @@ void start(t_env *env, t_coder *coders, int (*fn)(int))
 }
 
 
-void thread_call(int index, t_coder *coders, t_env *env)
+void thread_call(int index, coder_t *coders, env_t *env)
 {
     // check_if_donles_are_available
     (void) coders;
@@ -26,7 +26,7 @@ void thread_call(int index, t_coder *coders, t_env *env)
     printf("index: %d\n", index);
 }
 
-void    simulation(t_env *env, t_coder *coders)
+void    simulation(env_t *env, coder_t *coders)
 {
     (void) env;
     (void) coders;

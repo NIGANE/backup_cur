@@ -1,5 +1,5 @@
 #include "../header.h"
-void inspect_env(t_env *env)
+void inspect_env(env_t *env)
 {
     printf("coders: %d\n",env->nb_coders);
     printf("time of compiling: %ld\n",env->t_compile);
