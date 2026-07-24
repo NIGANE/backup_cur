@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/07/23 16:26:50 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/07/24 21:41:26 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void _log(char *s, env_t *env)
     printf("%s", s);
     unlock(&(env->print_lock)); 
 }
+
 int compiles_end(env_t *env)
 {
     coder_t *coder;
@@ -149,16 +150,18 @@ void request_ticket(coder_t *coder)
     coder->env->fifo = ft_insert(coder, coder->env->fifo);
 }
 
-int my_turn(int id, env_t *env)
+// int my_turn(int id, env_t *env)
+// {
+//     if (!(env->fifo))
+//         return (0);
+//     return *(int *)env->fifo->data == id;
+// }
+
+coder_t *whos_next(env_t *env)
 {
     if (!(env->fifo))
-        return (0);
-    return *(int *)env->fifo->data == id;
-}
-
-int whos_next(env_t *env)
-{
-    return (*(int *) env->fifo->data);
+        return (NULL);
+    return ((coder_t *) (env->fifo->data));
 }
 
 void grab_ticket(env_t *env)
@@ -168,18 +171,15 @@ void grab_ticket(env_t *env)
 
 int grab_dongles(coder_t *coder)
 {
-    return (0);
     if (coder->left_dongle->is_available && coder->right_dongle->is_available)
     {
         lock(&(coder->left_dongle->dongle_lock));
         lock(&(coder->right_dongle->dongle_lock));
+        coder->left_dongle->is_available = 0;
+        coder->right_dongle->is_available = 0;
         lock(&(coder->env->print_lock));
         printf("[%d] grab_dongles\n", coder->id);
         unlock(&(coder->env->print_lock));
-
-        coder->left_dongle->is_available = 0;
-        coder->right_dongle->is_available = 0;
-        
         return (1);
     }
     return (0);
@@ -191,11 +191,18 @@ void leave_dongles(coder_t *coder)
     unlock(&(coder->right_dongle->dongle_lock));
     coder->left_dongle->is_available = 1;
     coder->right_dongle->is_available = 1;
+    lock(&(coder->env->print_lock));
+    printf("[%d] leave_dongles\n", coder->id);
+    unlock(&(coder->env->print_lock));
 }
 
 void *monitor(void *arg)
 {
-    env_t *env = (env_t *) arg;
+    env_t *env;
+    coder_t *next_coder;
+
+    next_coder = NULL;
+    env = (env_t *) arg;
     if (!env)
         return (printf("no arg provided"), NULL);
     lock(&(env->env_lock));
@@ -211,11 +218,25 @@ void *monitor(void *arg)
     {
         if (is_burn_out(env) || compiles_end(env))
             break;
-        _log("grab_next ticket - ", env);
-        _log("wake the threads\n", env);
-        sleep(2);
+        // unlock(&(env->env_lock));
+        printf("---------------------------\n");
+        next_coder = whos_next(env);
+        if (!next_coder)
+            return (env);
+        lock(&(env->print_lock));
+        printf("[%d] is next\n", next_coder->id);
+        unlock(&(env->print_lock));
+        next_coder->ready = 1;
+        pthread_cond_signal(&(next_coder->cond));
+        lock(&(env->print_lock));
+        printf("monitor goes to sleep.\n------------------------\n");
+        unlock(&(env->print_lock));
+        pthread_cond_wait(&(env->monitor_cond), &(env->env_lock));
+        lock(&(env->print_lock));
+        printf("monitor woke up\n");
+        unlock(&(env->print_lock));
     }
-    pthread_cond_wait(&(env->monitor_cond), &(env->env_lock));
+    // pthread_cond_wait(&(env->monitor_cond), &(env->env_lock));
     return (env);
 }
 
@@ -234,16 +255,24 @@ void *routine(void *arg)
                 return (unlock(&env->env_lock), coder);
             if (!in_queue(coder))
                 request_ticket(coder);
-            _log("to sleep\n", env);
+
+            lock(&(env->print_lock));
+            printf("[%d] sleeps\n", coder->id);
+            unlock(&(env->print_lock));
             sleep_coder(coder);
+            lock(&(env->print_lock));
+            printf("thread [%d], woke up\n", coder->id);
+            unlock(&(env->print_lock));
         }
+        ft_pop(&(env->fifo));
         unlock(&(env->env_lock));
-        if (!env->stop_simulation)
+        if (env->stop_simulation)
             return (printf("end simulation\n"), coder);
         coder->ready = 0;
         grab_dongles(coder);
+        pthread_cond_signal(&(env->monitor_cond));
         _log("do the work\n", env);
-        leave_dongles(coder);       
+        leave_dongles(coder);
     }
     return (coder);
 }
