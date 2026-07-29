@@ -6,12 +6,61 @@
 /*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/07/24 21:41:26 by negane           ###   ########.fr       */
+/*   Updated: 2026/07/29 20:07:21 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "./header.h"
+
+void clean_env(env_t *env)
+{
+    if (!env)
+        return;
+    if (env->coders)
+        free(env->coders);
+    if (env->dongles)
+        free(env->dongles);
+    ft_free(env->fifo);
+    free(env);
+}
+
+void free_threads_mutexes(env_t *env)
+{
+    int i;
+
+    if (!env)
+        return;
+    // pthread_mutex_destroy(&(env->env_lock));
+    pthread_mutex_destroy(&(env->print_lock));
+    pthread_mutex_destroy(&(env->env_lock));
+    pthread_cond_destroy(&(env->monitor_cond));
+    i = 0;
+    while (i < env->nb_coders)
+    {
+        pthread_cond_destroy(&(env->coders[i].cond));
+        pthread_mutex_destroy(&(env->dongles[i].dongle_lock));
+        i++;
+    }
+}
+
+env_t *wake_all(env_t *env)
+{
+    node_t *cur;
+    coder_t *coder;
+    
+    if (!env->fifo)
+        return (env);
+    cur = env->fifo;
+
+    while (cur)
+    {
+        coder = (coder_t *) cur->data;
+        pthread_cond_signal(&(coder->cond));
+        cur = cur->next;
+    }
+    return (env);
+}
 
 int in_queue(coder_t *coder);
 void _log(char *s, env_t *env)
@@ -75,6 +124,10 @@ int len(node_t *head)
 
 void sleep_coder(coder_t *coder)
 {
+    lock(&coder->env->print_lock);
+    printf("[%d] sleeping\n", coder->id);
+    unlock(&coder->env->print_lock);
+    
     pthread_cond_wait(&(coder->cond), &(coder->env->env_lock));
 }
 
@@ -150,13 +203,6 @@ void request_ticket(coder_t *coder)
     coder->env->fifo = ft_insert(coder, coder->env->fifo);
 }
 
-// int my_turn(int id, env_t *env)
-// {
-//     if (!(env->fifo))
-//         return (0);
-//     return *(int *)env->fifo->data == id;
-// }
-
 coder_t *whos_next(env_t *env)
 {
     if (!(env->fifo))
@@ -171,6 +217,10 @@ void grab_ticket(env_t *env)
 
 int grab_dongles(coder_t *coder)
 {
+    lock(&(coder->env->print_lock));
+    printf("thread: [%d] \n", coder->id);
+    printf("left: %d - right: %d\n", coder->left_dongle->is_available, coder->right_dongle->is_available);
+    unlock(&(coder->env->print_lock));
     if (coder->left_dongle->is_available && coder->right_dongle->is_available)
     {
         lock(&(coder->left_dongle->dongle_lock));
@@ -178,7 +228,7 @@ int grab_dongles(coder_t *coder)
         coder->left_dongle->is_available = 0;
         coder->right_dongle->is_available = 0;
         lock(&(coder->env->print_lock));
-        printf("[%d] grab_dongles\n", coder->id);
+        printf("[%d] grab_dongles -----------------------\n", coder->id);
         unlock(&(coder->env->print_lock));
         return (1);
     }
@@ -187,12 +237,12 @@ int grab_dongles(coder_t *coder)
 
 void leave_dongles(coder_t *coder)
 {
-    unlock(&(coder->left_dongle->dongle_lock));
-    unlock(&(coder->right_dongle->dongle_lock));
     coder->left_dongle->is_available = 1;
     coder->right_dongle->is_available = 1;
+    unlock(&(coder->left_dongle->dongle_lock));
+    unlock(&(coder->right_dongle->dongle_lock));
     lock(&(coder->env->print_lock));
-    printf("[%d] leave_dongles\n", coder->id);
+    printf("[%d] leave_dongles ------------------------\n", coder->id);
     unlock(&(coder->env->print_lock));
 }
 
@@ -216,27 +266,24 @@ void *monitor(void *arg)
     _log("monitor start work\n", env);
     while (!(env->stop_simulation) && !compiles_end(env))
     {
-        if (is_burn_out(env) || compiles_end(env))
-            break;
-        // unlock(&(env->env_lock));
-        printf("---------------------------\n");
+        unlock(&(env->env_lock));
         next_coder = whos_next(env);
         if (!next_coder)
-            return (env);
+            break;
         lock(&(env->print_lock));
         printf("[%d] is next\n", next_coder->id);
         unlock(&(env->print_lock));
         next_coder->ready = 1;
         pthread_cond_signal(&(next_coder->cond));
-        lock(&(env->print_lock));
-        printf("monitor goes to sleep.\n------------------------\n");
-        unlock(&(env->print_lock));
+        fetch_fifo(env->fifo);
         pthread_cond_wait(&(env->monitor_cond), &(env->env_lock));
-        lock(&(env->print_lock));
-        printf("monitor woke up\n");
-        unlock(&(env->print_lock));
     }
-    // pthread_cond_wait(&(env->monitor_cond), &(env->env_lock));
+    if (env->stop_simulation)
+    {
+        return (unlock(&(env->env_lock)), wake_all(env));
+    }
+    if (compiles_end(env))
+        printf("compiles end\n");
     return (env);
 }
 
@@ -257,22 +304,28 @@ void *routine(void *arg)
                 request_ticket(coder);
 
             lock(&(env->print_lock));
-            printf("[%d] sleeps\n", coder->id);
             unlock(&(env->print_lock));
+            
             sleep_coder(coder);
+            if (env->stop_simulation)
+                return (unlock(&(env->env_lock)), coder);
             lock(&(env->print_lock));
-            printf("thread [%d], woke up\n", coder->id);
+            printf("[%d] wake up\n", coder->id);
             unlock(&(env->print_lock));
         }
-        ft_pop(&(env->fifo));
-        unlock(&(env->env_lock));
         if (env->stop_simulation)
             return (printf("end simulation\n"), coder);
+        ft_pop(&(env->fifo));
+        unlock(&(env->env_lock));
         coder->ready = 0;
         grab_dongles(coder);
-        pthread_cond_signal(&(env->monitor_cond));
         _log("do the work\n", env);
         leave_dongles(coder);
+        pthread_cond_signal(&(env->monitor_cond));
+        coder->compiles_count++;
+        lock(&(env->print_lock));
+        printf("[%d] status: %d/%d\n", coder->id, coder->compiles_count, coder->req_compiles);
+        unlock(&(env->print_lock));
     }
     return (coder);
 }
@@ -334,8 +387,8 @@ coder_t *init_coders(env_t *env)
         coders[i].id = i + 1;
         coders[i].compiles_count = 0;
         coders[i].req_compiles = env->required_compiles;
-        coders[i].left_dongle = &(env->dongles[coders[i].id]);
-        coders[i].right_dongle = &(env->dongles[coders[i + 1].id % env->nb_coders]);
+        coders[i].left_dongle = &(env->dongles[coders[i].id - 1]);
+        coders[i].right_dongle = &(env->dongles[coders[i].id % env->nb_coders]);
         coders[i].env = env;
         coders[i].ready = 0;
         coders[i].last_compile_time = 0;
@@ -373,6 +426,11 @@ void init_threads(env_t *env)
         pthread_create(&(env->coders[i].thread_id), NULL, routine, &(env->coders[i]));
         i++;
     }
+    sleep(2);
+    // lock(&(env->env_lock));
+    // printf("trying to make fun\n");
+    // env->stop_simulation = 1;
+    // unlock(&(env->env_lock));
     pthread_create(&(env->monitor_id), NULL, monitor, env);
 
 }
@@ -408,18 +466,17 @@ env_t *init_env(char **av)
     env->t_refactore = ft_atoi(av[5]);
     env->required_compiles = ft_atoi(av[6]);
     env->t_cooldown = ft_atoi(av[7]);
-    env->dongles = init_dongles(env);
     env->start_simulation = 0;
     env->stop_simulation = 0;
     env->fifo = NULL;
+    env->dongles = init_dongles(env);
     if (!env->dongles)
-        return (free(env), NULL);
+        return (clean_env(env), NULL);
     env->coders = init_coders(env);
     if (!env->coders)
-        return (free(env), NULL);
+        return (clean_env(env), NULL);
     init_mutexes(env);
     init_threads(env);
-    
     return (env);
 }
 
@@ -434,13 +491,13 @@ int main(int ac, char **av) {
         return (printf("Error"), 1);
     env = init_env(av);
     
-    
-    i = 0;
-    // while (i < env->nb_coders)
-    // {
-    //     pthread_join((env->coders[i].thread_id), NULL);
-    //     i++;   
-    // }
-    // printf("end_compilations: %d\n",compiles_end(env));
     pthread_join(env->monitor_id, NULL);
+    if (env->stop_simulation)
+    {
+        printf("error repported\n");
+        // error_report(env);
+    }
+    free_threads_mutexes(env);
+    clean_env(env);
+    printf("all good\n");
 }

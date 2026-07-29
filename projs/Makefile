@@ -18,12 +18,13 @@ run:
 cc:
 	@cc $(SRC) -o $(OUT)
 
-gdb:
-	@$(CC) $(SRC) -o $(OUT) -g
+gdb:GG
 	@gdb --args ./$(OUT) $(ARGS)
 clean:
 	@rm -rf ./$(OUT)
 	@rm -rf ./a.out
 
+GG:
+	@$(CC) $(SRC) -o $(OUT) -g
 tes:
 	./$(OUT)
