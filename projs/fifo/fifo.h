@@ -12,4 +12,4 @@ void ft_free(node_t *fifo);
 node_t *ft_create(void *data);
 node_t *ft_insert(void *data, node_t *fifo);
 node_t *ft_pop(node_t **fifo);
-void fetch_fifo(node_t *head);
+int ft_len(node_t *head);

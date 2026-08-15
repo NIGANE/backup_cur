@@ -7,7 +7,7 @@
 // } Coder;
 
 typedef struct s_heap {
-    int* data;
+    void* data;
     int len;
 } t_heap;
 
