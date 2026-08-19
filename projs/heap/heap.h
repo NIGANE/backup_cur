@@ -7,7 +7,7 @@
 // } Coder;
 
 typedef struct s_heap {
-    void* data;
+    int* data;
     int len;
 } t_heap;
 
@@ -26,7 +26,6 @@ t_heap *pop_max_heap(t_heap *heap);
 //  Min Heap
 int * sort_min_heap(int *list, int len);
 int is_min_sorted(int *list, int len);
-
 t_heap *insert_min_heap(t_heap *heap, int data);
 t_heap *pop_min_heap(t_heap *heap);
 
