@@ -30,11 +30,11 @@ void grab_dongles(coder_t *coder)
     {
         lock(&(coder->left_dongle->dongle_lock));
         lock(&env->print_lock);
-        printf("%lld %d has taken a dongle\n", timestamp(env->start_time), coder->id);
+        printf("[%lld] [%d] has taken a dongle\n", timestamp(env->start_time), coder->id);
         unlock(&env->print_lock);
         lock(&(coder->right_dongle->dongle_lock));
         lock(&env->print_lock);
-        printf("%lld %d has taken a dongle\n", timestamp(env->start_time), coder->id);
+        printf("[%lld] [%d] has taken a dongle\n", timestamp(env->start_time), coder->id);
         unlock(&env->print_lock);
         coder->left_dongle->ready_to_use = 0;
         coder->right_dongle->ready_to_use = 0;

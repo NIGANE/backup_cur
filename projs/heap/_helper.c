@@ -6,7 +6,7 @@
 /*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/05 16:53:03 by negane            #+#    #+#             */
-/*   Updated: 2026/08/15 23:12:30 by negane           ###   ########.fr       */
+/*   Updated: 2026/08/19 18:28:06 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,8 +77,6 @@ t_heap	*create_heap(int data)
 void inspect_heap(t_heap *heap)
 {
     printf("//+++++||+++++\\\\\n");
-    printf("max heap: %s\n", is_max_sorted(heap->data, heap->len) ? "True" : "False");
-    printf("min heap: %s\n", is_min_sorted(heap->data, heap->len) ? "True" : "False");
     printf("len: %d\n", heap->len);
     printf("data: \n");
     print_arr(heap->data, heap->len);

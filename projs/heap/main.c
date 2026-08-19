@@ -15,6 +15,8 @@ int main(void)
     head = insert_min_heap(head, 5);
     head = insert_min_heap(head, 8);
     inspect_heap(head);
+    pop_min_heap(head);
+    inspect_heap(head);
     // sort_min_heap(head->data, head->len);
     // inspect_heap(head);
     // sort_max_heap(head->data, head->len);

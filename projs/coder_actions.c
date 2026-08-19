@@ -37,3 +37,23 @@ void refactor(coder_t *coder)
     unlock(&(coder->env->print_lock));
     suspend(coder->env->t_refactore);
 }
+
+int in_heap(coder_t *coder)
+{
+    edf_heap_t *heap;
+    int i;
+
+    if (!coder)
+        return (1);
+    heap = coder->env->heap;
+    if (!heap)
+        return (1);
+    i = 0;
+    while (i < heap->size)
+    {
+        if (((coder_t *) heap->array[i]->data)->id == coder->id)
+            return (1);
+        i++;
+    }
+    return (0);
+}

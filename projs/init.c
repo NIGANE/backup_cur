@@ -19,6 +19,9 @@ env_t *init_env(char **av)
     env->total_compiles = 0;
     env->target_compiles = env->nb_coders * env->required_compiles;
     env->fifo = NULL;
+    env->heap = NULL;
+    if (!strcmp(av[8], "edf"))
+        env->heap = edf_heap_init(env->nb_coders);
     env->dongles = init_dongles(env);
     env->coders = init_coders(env);
     if (!(env->coders) || !(env->dongles))
@@ -69,7 +72,7 @@ coder_t *init_coders(env_t *env)
         coders[i].right_dongle = &(env->dongles[coders[i].id % env->nb_coders]);
         coders[i].env = env;
         coders[i].ready = 0;
-        coders[i].last_compile_time = 0;
+        coders[i].last_compile_time = odd(coders[i].id) ? 1 : 2;
         i++;
     }
     return (coders);

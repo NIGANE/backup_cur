@@ -1,31 +1,41 @@
 #include "header.h"
 
-int validate_args(char **av, int st, int len)
+int is_number(char *s)
 {
-    int i;
-
-    i = st;
-    while (i < 8)
+    if (!s)
+        return (0);
+    while (*s)
     {
-        if (!is_positive_number(av[i]))
+        if (*s < '0' || *s > '9')
             return (0);
-        i++;
+        s++;
     }
     return (1);
+}
+
+void usage_message(void)
+{
+    printf("Error: helpful usage error message.");
 }
 
 int extract_args(int ac, char **av)
 {
     env_t *env;
+    int i;
 
-    if (!validate_args(av, 1, ac))
-        return (printf("error validating args"), 0);
+    i = 1;
+    while (i < ac - 1)
+    {
+        if (!is_number(av[i]))
+            return (printf("Error: '%s' is not a valid number\n", av[i]), 0);
+        i++;
+    }
     if (!atoi(av[1]) || !atoi(av[2])
         || !atoi(av[3])
         || !atoi(av[4]) || !atoi(av[5])
         || !atoi(av[6]) || !atoi(av[7]))
         return (0);
     if (strcmp(av[8], "edf") && strcmp(av[8], "fifo"))
-        return (0);
+        return (printf("Error message: '%s' is not a valid schedular\n", av[8]), 0);
     return (1);
 }

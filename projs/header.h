@@ -1,15 +1,18 @@
 
 #include <pthread.h>
 #include <stdio.h>
-#include "./fifo/fifo.h"
 #include <sys/time.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include "./fifo/fifo.h"
+
 
 typedef struct dongle_s dongle_t;
 typedef struct env_s env_t;
 typedef struct coder_s coder_t;
+typedef struct edf_node_s edf_node_t;
+typedef struct edf_heap_s edf_heap_t;
 
 typedef struct request_s {
     void *data;
@@ -43,6 +46,7 @@ typedef struct env_s {
     pthread_t monitor_id;
     pthread_cond_t monitor_cond;
     node_t *fifo;
+    edf_heap_t *heap;
     coder_t *coders;
     dongle_t *dongles;
     pthread_mutex_t env_lock;
@@ -62,10 +66,29 @@ typedef struct coder_s {
     env_t *env;
 } coder_t;
 
+typedef struct edf_node_s {
+	void		*data;             
+	long long	elapsed_time;     
+} edf_node_t;
 
-//  numbers.c
-int odd(int a);
-int is_positive_number(char *a);
+
+typedef struct edf_heap_s {
+	edf_node_t	**array;           
+	int			size;              
+	int			capacity;          
+} edf_heap_t;
+
+//  heap.c
+edf_heap_t *edf_heap_init(int capacity);
+edf_node_t *edf_node_create(void *coder);
+edf_heap_t *edf_heap_push(edf_heap_t *heap, void *coder);
+edf_node_t *edf_heap_pop(edf_heap_t *heap);
+void inspect_heap(edf_heap_t *heap);
+
+
+//  helpers.c.c
+int fifo_full(env_t *env);
+int heap_full(env_t *heap);
 
 //  clean.c
 void clean_env(env_t *env);
@@ -94,6 +117,7 @@ void suspend(long s);
 void compile(coder_t *coder);
 void debug(coder_t *coder);
 void refactor(coder_t *coder);
+int in_heap(coder_t *coder);
 
 //  resources_management.c
 void sleep_coder(coder_t *coder);
@@ -103,9 +127,9 @@ void grab_dongles(coder_t *coder);
 void leave_dongles(coder_t *coder);
 
 //  parsing.c
-int validate_args(char **av, int st, int len);
 int extract_args(int ac, char **av);
-
+int is_number(char *s);
+void usage_message(void);
 
 //  init.c
 env_t *init_env(char **av);
@@ -118,7 +142,5 @@ void init_mutexes(env_t *env);
 //  main.c
 int ft_resources(coder_t *coder);
 int odd(int a);
-int is_positive_number(char *a);
 coder_t *create_coders(env_t *env);
-void usage_message(void);
 
