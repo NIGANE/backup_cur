@@ -94,18 +94,23 @@ int heap_full(env_t *heap);
 void clean_env(env_t *env);
 void free_threads_mutexes(env_t *env);
 int compiles_end(env_t *env);
+void edf_heap_free(edf_heap_t *heap);
+void edf_node_free(edf_node_t *node);
 
 //  schedular_management.c
 void request_ticket(coder_t *coder);
 coder_t *whos_next(env_t *env);
 void grab_ticket(env_t *env);
 int in_queue(coder_t *coder);
-void lunch_up(env_t *env);
+int lunch_up(env_t *env);
 
 //  simulation.c
 void *monitor(void *arg);
 void *routine(void *arg);
+
+//  burn_out_protocol.c
 void check_burn_out(env_t *env);
+void check_heap_burn_out(env_t *env);
 env_t *wake_all(env_t *env);
 
 //  time.c
@@ -123,7 +128,7 @@ int in_heap(coder_t *coder);
 void sleep_coder(coder_t *coder);
 int lock(pthread_mutex_t *_lock);
 int unlock(pthread_mutex_t *_lock);
-void grab_dongles(coder_t *coder);
+int grab_dongles(coder_t *coder);
 void leave_dongles(coder_t *coder);
 
 //  parsing.c
@@ -135,8 +140,8 @@ void usage_message(void);
 env_t *init_env(char **av);
 dongle_t *init_dongles(env_t *env);
 coder_t *init_coders(env_t *env);
-void init_threads(env_t *env);
-void init_mutexes(env_t *env);
+int init_threads(env_t *env);
+int init_mutexes(env_t *env);
 
 
 //  main.c

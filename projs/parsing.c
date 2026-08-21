@@ -4,6 +4,8 @@ int is_number(char *s)
 {
     if (!s)
         return (0);
+    if (*s == '\0')
+        return (0);
     while (*s)
     {
         if (*s < '0' || *s > '9')
@@ -27,7 +29,7 @@ int extract_args(int ac, char **av)
     while (i < ac - 1)
     {
         if (!is_number(av[i]))
-            return (printf("Error: '%s' is not a valid number\n", av[i]), 0);
+            return (printf("Error: '%s' is not a valid number\n", av[i]), 1);
         i++;
     }
     if (!atoi(av[1]) || !atoi(av[2])
@@ -36,6 +38,6 @@ int extract_args(int ac, char **av)
         || !atoi(av[6]) || !atoi(av[7]))
         return (0);
     if (strcmp(av[8], "edf") && strcmp(av[8], "fifo"))
-        return (printf("Error message: '%s' is not a valid schedular\n", av[8]), 0);
+        return (printf("Error message: '%s' is not a valid schedular\n", av[8]), 1);
     return (1);
 }

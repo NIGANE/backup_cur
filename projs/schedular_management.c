@@ -2,9 +2,12 @@
 
 void request_ticket(coder_t *coder)
 {
+    if (!coder || coder->env->stop_simulation)
+        return;
     if (coder->env->heap)
     {
         coder->env->heap = edf_heap_push(coder->env->heap, coder);
+        if (!coder->env->heap)
         return;
     }
     coder->env->fifo = ft_insert(coder, coder->env->fifo);
@@ -21,8 +24,14 @@ coder_t *whos_next(env_t *env)
 
 void grab_ticket(env_t *env)
 {
-    if (env->heap && env->heap->size > 0);
-        edf_heap_pop(env->heap);
+    edf_node_t *node;
+
+    if (env->heap && env->heap->size > 0)
+    {
+        node = edf_heap_pop(env->heap);
+        edf_node_free(node);
+        return;
+    }
     ft_pop(&(env->fifo));
 }
 
@@ -43,7 +52,7 @@ int in_queue(coder_t *coder)
     return (0);
 }
 
-void lunch_up(env_t *env)
+int lunch_up(env_t *env)
 {
     int i;
 
@@ -51,7 +60,10 @@ void lunch_up(env_t *env)
     while (i < env->nb_coders)
     {
         if (odd(i))
-            pthread_create(&(env->coders[i].thread_id), NULL, routine, &(env->coders[i]));
+        {
+            if (pthread_create(&(env->coders[i].thread_id), NULL, routine, &(env->coders[i])) != 0)
+                return (0);
+        }
         i++;
     }
     suspend(5);
@@ -59,7 +71,11 @@ void lunch_up(env_t *env)
     while (i < env->nb_coders)
     {
         if (!odd(i))
-            pthread_create(&(env->coders[i].thread_id), NULL, routine, &(env->coders[i]));
+        {
+            if (pthread_create(&(env->coders[i].thread_id), NULL, routine, &(env->coders[i])) != 0)
+                return (0);
+        }
         i++;
     }
+    return (1);
 }

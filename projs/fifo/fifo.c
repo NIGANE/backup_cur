@@ -47,6 +47,7 @@ node_t *ft_pop(node_t **fifo)
 void ft_free(node_t *fifo)
 {
     node_t *tmp;
+
     if (!fifo)
         return;
     while (fifo)

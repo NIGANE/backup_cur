@@ -44,10 +44,10 @@ int in_heap(coder_t *coder)
     int i;
 
     if (!coder)
-        return (1);
+        return (0);
     heap = coder->env->heap;
     if (!heap)
-        return (1);
+        return (0);
     i = 0;
     while (i < heap->size)
     {

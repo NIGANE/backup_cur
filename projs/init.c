@@ -21,13 +21,23 @@ env_t *init_env(char **av)
     env->fifo = NULL;
     env->heap = NULL;
     if (!strcmp(av[8], "edf"))
+    {
         env->heap = edf_heap_init(env->nb_coders);
+        if (!env->heap)
+            return (NULL);
+    }
     env->dongles = init_dongles(env);
     env->coders = init_coders(env);
     if (!(env->coders) || !(env->dongles))
         return (clean_env(env), NULL);
-    init_mutexes(env);
-    init_threads(env);
+    if (!init_mutexes(env))
+        return (clean_env(env), NULL);
+    if (!init_threads(env))
+    {
+        free_threads_mutexes(env);
+        clean_env(env);
+        return (NULL);
+    }
     return (env);
 }
 
@@ -72,31 +82,40 @@ coder_t *init_coders(env_t *env)
         coders[i].right_dongle = &(env->dongles[coders[i].id % env->nb_coders]);
         coders[i].env = env;
         coders[i].ready = 0;
-        coders[i].last_compile_time = odd(coders[i].id) ? 1 : 2;
+        coders[i].last_compile_time = 0;
         i++;
     }
     return (coders);
 }
 
-void init_threads(env_t *env)
+int init_threads(env_t *env)
 {
-    lunch_up(env);
-    pthread_create(&(env->monitor_id), NULL, monitor, env);
+    if (!lunch_up(env))
+        return (0);
+    if (pthread_create(&(env->monitor_id), NULL, monitor, env) != 0)
+        return (0);
+    return (1);
 
 }
 
-void init_mutexes(env_t *env)
+int init_mutexes(env_t *env)
 {
     int i;
 
     i = 0;
-    pthread_mutex_init(&(env->env_lock), NULL);
-    pthread_mutex_init(&(env->print_lock), NULL);
-    pthread_cond_init(&(env->monitor_cond), NULL);
+    if (pthread_mutex_init(&(env->env_lock), NULL) != 0)
+        return (0);
+    if (pthread_mutex_init(&(env->print_lock), NULL) != 0)
+        return (0);
+    if (pthread_cond_init(&(env->monitor_cond), NULL) != 0)
+        return (0);
     while (i < env->nb_coders)
     {
-        pthread_mutex_init(&(env->dongles[i].dongle_lock), NULL);
-        pthread_cond_init(&(env->coders[i].cond), NULL);
+        if (pthread_mutex_init(&(env->dongles[i].dongle_lock), NULL) != 0)
+            return (0);
+        if (pthread_cond_init(&(env->coders[i].cond), NULL) != 0)
+            return (0);
         i++;
     }
+    return (1);
 }
