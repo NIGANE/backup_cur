@@ -5,6 +5,7 @@ void check_burn_out(env_t *env)
 {
     coder_t *coder;
     node_t *cur;
+    long long flag;
     int i;
 
     if (!env)
@@ -12,12 +13,16 @@ void check_burn_out(env_t *env)
     i = 0;
     while (env->nb_coders > i)
     {
+        
         if (env->coders[i].compiles_count == env->required_compiles)
         {
             i++;
             continue;
         }
-        if (env->coders[i].last_compile_time != 0 && timestamp(env->coders[i].last_compile_time) > env->t_burn_out)
+        flag = env->coders[i].last_compile_time;
+        if (flag == 0)
+            flag = env->start_time;
+        if (timestamp(flag) > env->t_burn_out)
         {
             lock(&(env->print_lock));
             printf("[%lld] [%d] burned out\n", timestamp(env->start_time), env->coders[i].id);

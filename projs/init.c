@@ -7,6 +7,7 @@ env_t *init_env(char **av)
     env = malloc(sizeof(env_t));
     if (!env)
         return (NULL);
+    env->req = 0;
     env->nb_coders = atoi(av[1]);
     env->t_burn_out = atoi(av[2]);
     env->t_compile = atoi(av[3]);

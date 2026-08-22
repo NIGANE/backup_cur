@@ -68,7 +68,6 @@ void *routine(void *arg)
         coder->ready = 0;
         if (grab_dongles(coder))
         {
-            // coder->last_compile_time = 0;
             coder->last_compile_time = current_time_ms();
             compile(coder);
             leave_dongles(coder);

@@ -11,10 +11,7 @@ edf_node_t *edf_node_create(void *coder)
 		return (NULL);
 	node->data = coder;
 	if (((coder_t *) coder)->last_compile_time == 0)
-	{
-		printf("passed\n");
 		node->elapsed_time = timestamp(((coder_t *) coder)->env->start_time);
-	}
 	else
 		node->elapsed_time = timestamp(((coder_t *) coder)->last_compile_time);
 	return (node);
@@ -43,7 +40,7 @@ edf_heap_t *edf_heap_init(int capacity)
 
 edf_heap_t *edf_heap_push(edf_heap_t *heap, void *coder)
 {
-	int			i;
+	int			i;+
 	int			parent;
 	edf_node_t	*tmp;
 
@@ -53,16 +50,19 @@ edf_heap_t *edf_heap_push(edf_heap_t *heap, void *coder)
         return (heap);
 	i = heap->size;
 	heap->array[i] = edf_node_create(coder);
-	// inspect_heap(heap);
     if (!(heap->array[i]))
         return (NULL);
 	heap->size++;
 	while (i > 0)
 	{
 		parent = (i - 1) / 2;
-		if (heap->array[i]->elapsed_time <= heap->array[parent]->elapsed_time)
+		if (heap->array[i]->elapsed_time > heap->array[parent]->elapsed_time)
 			break;
-
+		if (heap->array[i]->elapsed_time == heap->array[parent]->elapsed_time)
+		{
+			if (heap->array[i]->req_id > heap->array[parent]->req_id)
+				break;
+		}
 		tmp = heap->array[i];
 		heap->array[i] = heap->array[parent];
 		heap->array[parent] = tmp;

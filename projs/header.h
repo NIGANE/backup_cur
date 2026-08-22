@@ -30,6 +30,7 @@ typedef struct dongle_s{
 } dongle_t;
 
 typedef struct env_s {
+    long req;
     int nb_coders;
     long t_compile;
     long t_debug;
@@ -67,7 +68,8 @@ typedef struct coder_s {
 } coder_t;
 
 typedef struct edf_node_s {
-	void		*data;             
+    int    req_id;
+	void		*data;
 	long long	elapsed_time;     
 } edf_node_t;
 

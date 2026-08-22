@@ -7,7 +7,7 @@ void request_ticket(coder_t *coder)
     if (coder->env->heap)
     {
         coder->env->heap = edf_heap_push(coder->env->heap, coder);
-        if (!coder->env->heap)
+        coder->env->req++;
         return;
     }
     coder->env->fifo = ft_insert(coder, coder->env->fifo);
