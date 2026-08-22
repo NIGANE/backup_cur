@@ -147,5 +147,4 @@ int init_mutexes(env_t *env);
 //  main.c
 int ft_resources(coder_t *coder);
 int odd(int a);
-coder_t *create_coders(env_t *env);
-
+int main(int ac, char **av);

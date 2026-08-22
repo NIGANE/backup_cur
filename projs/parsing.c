@@ -32,11 +32,6 @@ int extract_args(int ac, char **av)
             return (printf("Error: '%s' is not a valid number\n", av[i]), 1);
         i++;
     }
-    if (!atoi(av[1]) || !atoi(av[2])
-        || !atoi(av[3])
-        || !atoi(av[4]) || !atoi(av[5])
-        || !atoi(av[6]) || !atoi(av[7]))
-        return (0);
     if (strcmp(av[8], "edf") && strcmp(av[8], "fifo"))
         return (printf("Error message: '%s' is not a valid schedular\n", av[8]), 1);
     return (1);

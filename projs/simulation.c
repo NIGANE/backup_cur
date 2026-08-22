@@ -10,6 +10,8 @@ void *monitor(void *arg)
     env = (env_t *) arg;
     if (!env)
         return (printf("no arg provided"), NULL);
+    if (env->required_compiles == 0)
+        return (env);
     lock(&(env->env_lock));
     while (!fifo_full(env) && !heap_full(env))
     {
@@ -34,7 +36,7 @@ void *monitor(void *arg)
         if (env->stop_simulation)
             break;
         unlock(&(env->env_lock));
-        usleep(20);
+        suspend(10);
         lock(&(env->env_lock));
     }
     if (env->stop_simulation)
@@ -66,10 +68,11 @@ void *routine(void *arg)
         coder->ready = 0;
         if (grab_dongles(coder))
         {
+            // coder->last_compile_time = 0;
+            coder->last_compile_time = current_time_ms();
             compile(coder);
             leave_dongles(coder);
             coder->compiles_count++;
-            coder->last_compile_time = current_time_ms();
             debug(coder);
             refactor(coder);
             lock(&(env->env_lock));
