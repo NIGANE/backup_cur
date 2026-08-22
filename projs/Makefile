@@ -4,7 +4,7 @@ SRC = clean.c main.c ./fifo/fifo.c helpers.c init.c parsing.c simulation.c \
 		resources_management.c schedular_management.c coder_actions.c  time.c \
 		heap.c burn_out_protocol.c
 
-ARGS = 5 3000 200 200 200 10 800 fifo
+ARGS = 5 3000 200 200 200 10 800 edf
 #		nb_coders	burn_out  compile_t   debug_t  refactor_t  req_compiles  cooldown   schedular
 #	801 fifo
 #	

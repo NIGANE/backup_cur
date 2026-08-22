@@ -1,4 +1,4 @@
-#include "header.h"
+#include "../header.h"
 
 edf_node_t *edf_node_create(void *coder)
 {
@@ -10,13 +10,13 @@ edf_node_t *edf_node_create(void *coder)
 	if (!node)
 		return (NULL);
 	node->data = coder;
-	if (((coder_t *) coder)->last_compile_time == 0)
-	{
-		printf("passed\n");
-		node->elapsed_time = timestamp(((coder_t *) coder)->env->start_time);
-	}
-	else
-		node->elapsed_time = timestamp(((coder_t *) coder)->last_compile_time);
+	// if (((coder_t *) coder)->last_compile_time == 0)
+	// {
+	// 	printf("passed\n");
+	// 	node->elapsed_time = timestamp(((coder_t *) coder)->env->start_time);
+	// }
+	// else
+    node->elapsed_time = timestamp(((coder_t *) coder)->last_compile_time);
 	return (node);
 }
 
@@ -105,6 +105,7 @@ edf_node_t *edf_heap_pop(edf_heap_t *heap)
 
 		i = largest;
 	}
+	printf("poing: %d\n", ((coder_t *) root->data)->id);
 	return (root);
 }
 
@@ -113,9 +114,14 @@ void inspect_heap(edf_heap_t *heap)
     int i;
 
     if (!heap)
+	{
+		printf("heap not exists\n");
         return;
+	}
     i = 0;
 	printf("inspecting heap\n");
+	if (heap->size == 0)
+		printf("=> heap empty\n");
     while (i < heap->size)
     {
         printf("coder: %d, elapsed: %lld\n", ((coder_t *) heap->array[i]->data)->id, heap->array[i]->elapsed_time);

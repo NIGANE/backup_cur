@@ -1,4 +1,4 @@
-source = *.c
+source = heap.c ../time.c main.c
 
 all:
 	@cc $(source)
