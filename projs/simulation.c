@@ -1,12 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   simulation.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/23 11:01:44 by amerkht           #+#    #+#             */
+/*   Updated: 2026/08/23 15:21:43 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
 void	*monitor(void *arg)
 {
-	env_t	*env;
-	coder_t	*next_coder;
+	t_env	*env;
 
-	next_coder = NULL;
-	env = (env_t *)arg;
+	env = (t_env *)arg;
 	if (!env)
 		return (printf("no arg provided"), NULL);
 	if (env->required_compiles == 0)
@@ -18,6 +28,22 @@ void	*monitor(void *arg)
 		suspend(20);
 		lock(&(env->env_lock));
 	}
+	monitor_body(env);
+	if (env->stop_simulation)
+	{
+		wake_all(env);
+		unlock(&env->env_lock);
+		return (env);
+	}
+	unlock(&env->env_lock);
+	return (env);
+}
+
+void	monitor_body(t_env *env)
+{
+	t_coder	*next_coder;
+
+	next_coder = NULL;
 	env->start_time = current_time_ms();
 	while (!(env->stop_simulation) && !compiles_end(env))
 	{
@@ -39,22 +65,14 @@ void	*monitor(void *arg)
 		suspend(10);
 		lock(&(env->env_lock));
 	}
-	if (env->stop_simulation)
-	{
-		wake_all(env);
-		unlock(&env->env_lock);
-		return (env);
-	}
-	unlock(&env->env_lock);
-	return (env);
 }
 
 void	*routine(void *arg)
 {
-	coder_t	*coder;
-	env_t	*env;
+	t_coder	*coder;
+	t_env	*env;
 
-	coder = (coder_t *)arg;
+	coder = (t_coder *)arg;
 	env = coder->env;
 	if (!coder)
 		return (printf("no arg provided\n"), NULL);
@@ -70,19 +88,24 @@ void	*routine(void *arg)
 		if (env->stop_simulation)
 			return (unlock(&(env->env_lock)), coder);
 		unlock(&(env->env_lock));
-		coder->ready = 0;
-		if (grab_dongles(coder))
-		{
-			coder->last_compile_time = current_time_ms();
-			compile(coder);
-			leave_dongles(coder);
-			coder->compiles_count++;
-			debug(coder);
-			refactor(coder);
-			lock(&(env->env_lock));
-			env->total_compiles++;
-			unlock(&(env->env_lock));
-		}
+		routine_body(coder);
 	}
 	return (coder);
+}
+
+void	routine_body(t_coder *coder)
+{
+	coder->ready = 0;
+	if (grab_dongles(coder))
+	{
+		coder->last_compile_time = current_time_ms();
+		compile(coder);
+		leave_dongles(coder);
+		coder->compiles_count++;
+		debug(coder);
+		refactor(coder);
+		lock(&(coder->env->env_lock));
+		coder->env->total_compiles++;
+		unlock(&(coder->env->env_lock));
+	}
 }

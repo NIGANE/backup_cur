@@ -1,50 +1,40 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   coder_actions.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/23 11:00:33 by amerkht           #+#    #+#             */
+/*   Updated: 2026/08/23 15:17:13 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
-void	compile(coder_t *coder)
+void	compile(t_coder *coder)
 {
-	lock(&(coder->env->print_lock));
-	if (coder->env->stop_simulation)
-	{
-		unlock(&(coder->env->print_lock));
-		return ;
-	}
-	printf("[%lld] [%d] is compiling\n", timestamp(coder->env->start_time),
-		coder->id);
-	unlock(&(coder->env->print_lock));
+	_log("[%lld] [%d] is compiling\n", timestamp(coder->env->start_time),
+		coder);
 	suspend(coder->env->t_compile);
 }
 
-void	debug(coder_t *coder)
+void	debug(t_coder *coder)
 {
-	lock(&(coder->env->print_lock));
-	if (coder->env->stop_simulation)
-	{
-		unlock(&(coder->env->print_lock));
-		return ;
-	}
-	printf("[%lld] [%d] is debuging\n", timestamp(coder->env->start_time),
-		coder->id);
-	unlock(&(coder->env->print_lock));
+	_log("[%lld] [%d] is debuging\n", timestamp(coder->env->start_time), coder);
 	suspend(coder->env->t_debug);
 }
 
-void	refactor(coder_t *coder)
+void	refactor(t_coder *coder)
 {
-	lock(&(coder->env->print_lock));
-	if (coder->env->stop_simulation)
-	{
-		unlock(&(coder->env->print_lock));
-		return ;
-	}
-	printf("[%lld] [%d] is refactoring\n", timestamp(coder->env->start_time),
-		coder->id);
-	unlock(&(coder->env->print_lock));
+	_log("[%lld] [%d] is refactoring\n", timestamp(coder->env->start_time),
+		coder);
 	suspend(coder->env->t_refactore);
 }
 
-int	in_heap(coder_t *coder)
+int	in_heap(t_coder *coder)
 {
-	edf_heap_t	*heap;
+	t_edf_heap	*heap;
 	int			i;
 
 	if (!coder)
@@ -55,9 +45,16 @@ int	in_heap(coder_t *coder)
 	i = 0;
 	while (i < heap->size)
 	{
-		if (((coder_t *)heap->array[i]->data)->id == coder->id)
+		if (((t_coder *)heap->array[i]->data)->id == coder->id)
 			return (1);
 		i++;
 	}
 	return (0);
+}
+
+void	_log(char *s, long long time, t_coder *coder)
+{
+	lock(&(coder->env->print_lock));
+	printf(s, time, coder->id);
+	unlock(&(coder->env->print_lock));
 }

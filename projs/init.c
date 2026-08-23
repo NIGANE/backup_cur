@@ -1,32 +1,26 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/23 11:01:16 by amerkht           #+#    #+#             */
+/*   Updated: 2026/08/23 15:19:23 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
-env_t	*init_env(char **av)
+t_env	*init_env(char **av)
 {
-	env_t	*env;
+	t_env	*env;
 
-	env = malloc(sizeof(env_t));
+	env = malloc(sizeof(t_env));
 	if (!env)
 		return (NULL);
-	env->req = 0;
-	env->nb_coders = atoi(av[1]);
-	env->t_burn_out = atoi(av[2]);
-	env->t_compile = atoi(av[3]);
-	env->t_debug = atoi(av[4]);
-	env->t_refactore = atoi(av[5]);
-	env->required_compiles = atoi(av[6]);
-	env->t_cooldown = atoi(av[7]);
-	env->start_simulation = 0;
-	env->stop_simulation = 0;
-	env->total_compiles = 0;
-	env->target_compiles = env->nb_coders * env->required_compiles;
-	env->fifo = NULL;
-	env->heap = NULL;
-	if (!strcmp(av[8], "edf"))
-	{
-		env->heap = edf_heap_init(env->nb_coders);
-		if (!env->heap)
-			return (NULL);
-	}
+	if (!int_statics(av, env))
+		return (NULL);
 	env->dongles = init_dongles(env);
 	env->coders = init_coders(env);
 	if (!(env->coders) || !(env->dongles))
@@ -42,12 +36,12 @@ env_t	*init_env(char **av)
 	return (env);
 }
 
-dongle_t	*init_dongles(env_t *env)
+t_dongle	*init_dongles(t_env *env)
 {
 	int			i;
-	dongle_t	*dongles;
+	t_dongle	*dongles;
 
-	dongles = malloc(sizeof(dongle_t) * env->nb_coders);
+	dongles = malloc(sizeof(t_dongle) * env->nb_coders);
 	if (!dongles)
 		return (NULL);
 	i = 0;
@@ -63,14 +57,14 @@ dongle_t	*init_dongles(env_t *env)
 	return (dongles);
 }
 
-coder_t	*init_coders(env_t *env)
+t_coder	*init_coders(t_env *env)
 {
-	coder_t	*coders;
+	t_coder	*coders;
 	int		i;
 
 	if (!(env->dongles))
 		return (NULL);
-	coders = malloc(sizeof(coder_t) * env->nb_coders);
+	coders = malloc(sizeof(t_coder) * env->nb_coders);
 	if (!coders)
 		return (NULL);
 	i = 0;
@@ -89,7 +83,7 @@ coder_t	*init_coders(env_t *env)
 	return (coders);
 }
 
-int	init_threads(env_t *env)
+int	init_threads(t_env *env)
 {
 	if (!lunch_up(env))
 		return (0);
@@ -98,7 +92,7 @@ int	init_threads(env_t *env)
 	return (1);
 }
 
-int	init_mutexes(env_t *env)
+int	init_mutexes(t_env *env)
 {
 	int	i;
 

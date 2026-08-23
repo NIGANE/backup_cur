@@ -1,15 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heap2.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/23 11:01:07 by amerkht           #+#    #+#             */
+/*   Updated: 2026/08/23 15:18:40 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
-void	swap(edf_node_t *a, edf_node_t *b)
+void	swap(t_edf_node *a, t_edf_node *b)
 {
-	edf_node_t	temp;
+	t_edf_node	temp;
 
 	temp = *a;
 	*a = *b;
 	*b = temp;
 }
 
-int	check_priority(edf_node_t *a, edf_node_t *b)
+int	check_priority(t_edf_node *a, t_edf_node *b)
 {
 	if (a->deadline != b->deadline)
 		return (a->deadline < b->deadline);
@@ -18,7 +30,7 @@ int	check_priority(edf_node_t *a, edf_node_t *b)
 	return (a->data->id < b->data->id);
 }
 
-void	heapify(edf_heap_t *heap, int i)
+void	heapify(t_edf_heap *heap, int i)
 {
 	int	largest;
 	int	left;

@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   header.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/23 11:00:48 by amerkht           #+#    #+#             */
+/*   Updated: 2026/08/23 15:14:06 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include <pthread.h>
 #include <stdio.h>
@@ -6,30 +17,24 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-typedef struct dongle_s		dongle_t;
-typedef struct env_s		env_t;
-typedef struct coder_s		coder_t;
-typedef struct edf_node_s	edf_node_t;
-typedef struct edf_heap_s	edf_heap_t;
-typedef struct node_s		node_t;
+typedef struct s_dongle		t_dongle;
+typedef struct s_env		t_env;
+typedef struct s_coder		t_coder;
+typedef struct s_edf_node	t_edf_node;
+typedef struct s_heap_edf	t_edf_heap;
+typedef struct s_node		t_node;
 
-typedef struct request_s
-{
-	void					*data;
-	struct request_s		*next;
-}							request_t;
-
-typedef struct dongle_s
+typedef struct s_dongle
 {
 	int						id;
 	int						available;
 	int						ready_to_use;
 	pthread_mutex_t			dongle_lock;
 	long					last_use;
-	env_t					*env;
-}							dongle_t;
+	t_env					*env;
+}							t_dongle;
 
-typedef struct env_s
+typedef struct s_env
 {
 	long					req;
 	int						nb_coders;
@@ -47,15 +52,15 @@ typedef struct env_s
 	long					target_compiles;
 	pthread_t				monitor_id;
 	pthread_cond_t			monitor_cond;
-	node_t					*fifo;
-	edf_heap_t				*heap;
-	coder_t					*coders;
-	dongle_t				*dongles;
+	t_node					*fifo;
+	t_edf_heap				*heap;
+	t_coder					*coders;
+	t_dongle				*dongles;
 	pthread_mutex_t			env_lock;
 	pthread_mutex_t			print_lock;
-}							env_t;
+}							t_env;
 
-typedef struct coder_s
+typedef struct s_coder
 {
 	int						id;
 	pthread_t				thread_id;
@@ -63,94 +68,101 @@ typedef struct coder_s
 	int						req_compiles;
 	long long				last_compile_time;
 	int						ready;
-	dongle_t				*left_dongle;
-	dongle_t				*right_dongle;
+	t_dongle				*left_dongle;
+	t_dongle				*right_dongle;
 	pthread_cond_t			cond;
-	env_t					*env;
-}							coder_t;
+	t_env					*env;
+}							t_coder;
 
-typedef struct edf_node_s
+typedef struct s_edf_node
 {
 	long					id;
-	coder_t					*data;
+	t_coder					*data;
 	long long				deadline;
-}							edf_node_t;
+}							t_edf_node;
 
-typedef struct edf_heap_s
+typedef struct s_heap_edf
 {
-	edf_node_t				**array;
+	t_edf_node				**array;
 	int						size;
 	int						capacity;
-}							edf_heap_t;
+}							t_edf_heap;
 
-typedef struct node_s
+typedef struct s_node
 {
 	int						id;
 	void					*data;
-	struct node_s			*next;
-}							node_t;
+	struct s_node			*next;
+}							t_node;
 
 //  fifo.c
-void						ft_free(node_t *fifo);
-node_t						*ft_create(void *data);
-node_t						*ft_insert(void *data, node_t *fifo);
-node_t						*ft_pop(node_t **fifo);
-int							ft_len(node_t *head);
+void						ft_free(t_node *fifo);
+t_node						*ft_create(void *data);
+t_node						*ft_insert(void *data, t_node *fifo);
+t_node						*ft_pop(t_node **fifo);
+int							ft_len(t_node *head);
 
 //  heap.c
-edf_heap_t					*edf_heap_init(int capacity);
-edf_node_t					*edf_node_create(coder_t *coder);
-edf_heap_t					*edf_heap_push(edf_heap_t *heap, coder_t *coder);
-edf_node_t					*edf_heap_pop(edf_heap_t *heap);
+t_edf_heap					*edf_heap_init(int capacity);
+t_edf_node					*edf_node_create(t_coder *coder);
+t_edf_heap					*edf_heap_push(t_edf_heap *heap, t_coder *coder);
+t_edf_node					*edf_heap_pop(t_edf_heap *heap);
 
 //  heap2.c
-void						swap(edf_node_t *a, edf_node_t *b);
-int							check_priority(edf_node_t *a, edf_node_t *b);
-void						heapify(edf_heap_t *h, int i);
+void						swap(t_edf_node *a, t_edf_node *b);
+int							check_priority(t_edf_node *a, t_edf_node *b);
+void						heapify(t_edf_heap *h, int i);
 
 //  helpers.c.c
-int							fifo_full(env_t *env);
-int							heap_full(env_t *heap);
+int							fifo_full(t_env *env);
+int							heap_full(t_env *heap);
+int							int_statics(char **av, t_env *env);
 
 //  clean.c
-void						clean_env(env_t *env);
-void						free_threads_mutexes(env_t *env);
-int							compiles_end(env_t *env);
-void						edf_heap_free(edf_heap_t *heap);
-void						edf_node_free(edf_node_t *node);
+void						clean_env(t_env *env);
+void						free_threads_mutexes(t_env *env);
+int							compiles_end(t_env *env);
+void						edf_heap_free(t_edf_heap *heap);
+void						edf_node_free(t_edf_node *node);
 
 //  schedular_management.c
-void						request_ticket(coder_t *coder);
-coder_t						*whos_next(env_t *env);
-void						grab_ticket(env_t *env);
-int							in_queue(coder_t *coder);
-int							lunch_up(env_t *env);
+void						request_ticket(t_coder *coder);
+t_coder						*whos_next(t_env *env);
+void						grab_ticket(t_env *env);
+int							in_queue(t_coder *coder);
+int							lunch_up(t_env *env);
 
 //  simulation.c
 void						*monitor(void *arg);
+void						monitor_body(t_env *env);
 void						*routine(void *arg);
+void						routine_body(t_coder *coder);
 
 //  burn_out_protocol.c
-void						check_burn_out(env_t *env);
-env_t						*wake_all(env_t *env);
+void						check_burn_out(t_env *env);
+void						burned_out(t_coder *coder, long long flag);
+t_env						*wake_all(t_env *env);
 
 //  time.c
+void						sleep_coder(t_coder *coder);
 long long					current_time_ms(void);
 long long					timestamp(long long start);
 void						suspend(long s);
 
 //  coder_actions.c
-void						compile(coder_t *coder);
-void						debug(coder_t *coder);
-void						refactor(coder_t *coder);
-int							in_heap(coder_t *coder);
+void						compile(t_coder *coder);
+void						debug(t_coder *coder);
+void						refactor(t_coder *coder);
+int							in_heap(t_coder *coder);
+void						_log(char *s, long long time, t_coder *coder);
 
 //  resources_management.c
-void						sleep_coder(coder_t *coder);
 int							lock(pthread_mutex_t *_lock);
 int							unlock(pthread_mutex_t *_lock);
-int							grab_dongles(coder_t *coder);
-void						leave_dongles(coder_t *coder);
+int							grab_dongles(t_coder *coder);
+void						cooldown(t_env *env, t_dongle *left,
+								t_dongle *right);
+void						leave_dongles(t_coder *coder);
 
 //  parsing.c
 int							extract_args(int ac, char **av);
@@ -158,13 +170,13 @@ int							is_number(char *s);
 void						usage_message(void);
 
 //  init.c
-env_t						*init_env(char **av);
-dongle_t					*init_dongles(env_t *env);
-coder_t						*init_coders(env_t *env);
-int							init_threads(env_t *env);
-int							init_mutexes(env_t *env);
+t_env						*init_env(char **av);
+t_dongle					*init_dongles(t_env *env);
+t_coder						*init_coders(t_env *env);
+int							init_threads(t_env *env);
+int							init_mutexes(t_env *env);
 
 //  main.c
-int							ft_resources(coder_t *coder);
+int							ft_resources(t_coder *coder);
 int							odd(int a);
 int							main(int ac, char **av);

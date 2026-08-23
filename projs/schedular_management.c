@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   schedular_management.c                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/23 11:01:40 by amerkht           #+#    #+#             */
+/*   Updated: 2026/08/23 15:21:11 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
-void	request_ticket(coder_t *coder)
+void	request_ticket(t_coder *coder)
 {
 	if (!coder || coder->env->stop_simulation)
 		return ;
@@ -12,18 +24,18 @@ void	request_ticket(coder_t *coder)
 	coder->env->fifo = ft_insert(coder, coder->env->fifo);
 }
 
-coder_t	*whos_next(env_t *env)
+t_coder	*whos_next(t_env *env)
 {
 	if ((env->heap) && env->heap->size > 0)
 		return (env->heap->array[0]->data);
 	if (!(env->fifo))
 		return (NULL);
-	return ((coder_t *)(env->fifo->data));
+	return ((t_coder *)(env->fifo->data));
 }
 
-void	grab_ticket(env_t *env)
+void	grab_ticket(t_env *env)
 {
-	edf_node_t	*node;
+	t_edf_node	*node;
 
 	if (env->heap && env->heap->size > 0)
 	{
@@ -34,17 +46,17 @@ void	grab_ticket(env_t *env)
 	ft_pop(&(env->fifo));
 }
 
-int	in_queue(coder_t *coder)
+int	in_queue(t_coder *coder)
 {
-	node_t	*cur;
-	coder_t	*tmp;
+	t_node	*cur;
+	t_coder	*tmp;
 
 	if (coder->env->heap)
 		return (in_heap(coder));
 	cur = coder->env->fifo;
 	while (cur)
 	{
-		tmp = (coder_t *)cur->data;
+		tmp = (t_coder *)cur->data;
 		if (tmp->id == coder->id)
 			return (1);
 		cur = cur->next;
@@ -52,7 +64,7 @@ int	in_queue(coder_t *coder)
 	return (0);
 }
 
-int	lunch_up(env_t *env)
+int	lunch_up(t_env *env)
 {
 	int	i;
 
@@ -67,7 +79,6 @@ int	lunch_up(env_t *env)
 		}
 		i++;
 	}
-	suspend(5);
 	i = 0;
 	while (i < env->nb_coders)
 	{

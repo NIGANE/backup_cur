@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/22 18:34:24 by negane           ###   ########.fr       */
+/*   Updated: 2026/08/23 15:23:49 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./header.h"
 
-int	ft_resources(coder_t *coder)
+int	ft_resources(t_coder *coder)
 {
 	if (coder->left_dongle->available && coder->right_dongle->available)
 	{
@@ -30,7 +30,7 @@ int	odd(int a)
 
 int	main(int ac, char **av)
 {
-	env_t	*env;
+	t_env	*env;
 	int		i;
 
 	if (ac < 8 || ac > 9)
@@ -47,9 +47,6 @@ int	main(int ac, char **av)
 		pthread_join(env->coders[i].thread_id, NULL);
 		i++;
 	}
-	if (!env->stop_simulation)
-		printf("compiles: %ld/%ld\n", env->total_compiles,
-			env->target_compiles);
 	free_threads_mutexes(env);
 	clean_env(env);
 	return (0);

@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   burn_out_protocol.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/23 11:00:15 by amerkht           #+#    #+#             */
+/*   Updated: 2026/08/23 15:15:00 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
-void	check_burn_out(env_t *env)
+void	check_burn_out(t_env *env)
 {
 	long long	flag;
 	int			i;
@@ -18,30 +30,35 @@ void	check_burn_out(env_t *env)
 		flag = env->coders[i].last_compile_time;
 		if (flag == 0)
 			flag = env->start_time;
-		if (timestamp(flag) > env->t_burn_out)
-		{
-			lock(&(env->print_lock));
-			printf("[%lld] [%d] burned out\n", timestamp(env->start_time),
-				env->coders[i].id);
-			unlock(&(env->print_lock));
-			env->stop_simulation = 1;
-			return ;
-		}
+		burned_out(&(env->coders[i]), flag);
 		i++;
 	}
 }
 
-env_t	*wake_all(env_t *env)
+void	burned_out(t_coder *coder, long long flag)
 {
-	node_t	*cur;
-	coder_t	*coder;
+	if (timestamp(flag) > coder->env->t_burn_out)
+	{
+		lock(&(coder->env->print_lock));
+		printf("[%lld] [%d] burned out\n", timestamp(coder->env->start_time),
+			coder->id);
+		unlock(&(coder->env->print_lock));
+		coder->env->stop_simulation = 1;
+		return ;
+	}
+}
+
+t_env	*wake_all(t_env *env)
+{
+	t_node	*cur;
+	t_coder	*coder;
 	int		i;
 
 	if (env->heap)
 	{
 		i = 0;
 		while (i < env->heap->size)
-			pthread_cond_signal(&(((coder_t *)env->heap->array[i++]->data)->cond));
+			pthread_cond_signal(&(env->heap->array[i++]->data->cond));
 		return (env);
 	}
 	if (!env->fifo)
@@ -49,7 +66,7 @@ env_t	*wake_all(env_t *env)
 	cur = env->fifo;
 	while (cur)
 	{
-		coder = (coder_t *)cur->data;
+		coder = (t_coder *)cur->data;
 		pthread_cond_signal(&(coder->cond));
 		cur = cur->next;
 	}

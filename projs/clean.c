@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   clean.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/23 11:00:27 by amerkht           #+#    #+#             */
+/*   Updated: 2026/08/23 15:15:31 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
-void	clean_env(env_t *env)
+void	clean_env(t_env *env)
 {
 	if (!env)
 		return ;
@@ -13,7 +25,7 @@ void	clean_env(env_t *env)
 	free(env);
 }
 
-void	free_threads_mutexes(env_t *env)
+void	free_threads_mutexes(t_env *env)
 {
 	int	i;
 
@@ -31,12 +43,12 @@ void	free_threads_mutexes(env_t *env)
 	}
 }
 
-int	compiles_end(env_t *env)
+int	compiles_end(t_env *env)
 {
 	return (env->total_compiles == env->target_compiles);
 }
 
-void	edf_heap_free(edf_heap_t *heap)
+void	edf_heap_free(t_edf_heap *heap)
 {
 	int	i;
 
@@ -52,7 +64,7 @@ void	edf_heap_free(edf_heap_t *heap)
 	free(heap);
 }
 
-void	edf_node_free(edf_node_t *node)
+void	edf_node_free(t_edf_node *node)
 {
 	if (!node)
 		return ;

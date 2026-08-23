@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   time.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/23 11:01:48 by amerkht           #+#    #+#             */
+/*   Updated: 2026/08/23 15:21:56 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
 long long	current_time_ms(void)
@@ -18,4 +30,9 @@ long long	timestamp(long long start)
 void	suspend(long s)
 {
 	usleep(s * 1000);
+}
+
+void	sleep_coder(t_coder *coder)
+{
+	pthread_cond_wait(&(coder->cond), &(coder->env->env_lock));
 }

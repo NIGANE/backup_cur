@@ -1,12 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heap.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/23 11:01:01 by amerkht           #+#    #+#             */
+/*   Updated: 2026/08/23 15:18:12 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
-edf_node_t	*edf_node_create(coder_t *coder)
+t_edf_node	*edf_node_create(t_coder *coder)
 {
-	edf_node_t	*node;
+	t_edf_node	*node;
 
 	if (!coder)
 		return (NULL);
-	node = malloc(sizeof(edf_node_t));
+	node = malloc(sizeof(t_edf_node));
 	if (!node)
 		return (NULL);
 	node->data = coder;
@@ -17,16 +29,16 @@ edf_node_t	*edf_node_create(coder_t *coder)
 	return (node);
 }
 
-edf_heap_t	*edf_heap_init(int capacity)
+t_edf_heap	*edf_heap_init(int capacity)
 {
-	edf_heap_t	*heap;
+	t_edf_heap	*heap;
 
 	if (capacity <= 0)
 		return (NULL);
-	heap = malloc(sizeof(edf_heap_t));
+	heap = malloc(sizeof(t_edf_heap));
 	if (!heap)
 		return (NULL);
-	heap->array = malloc(sizeof(edf_node_t *) * capacity);
+	heap->array = malloc(sizeof(t_edf_node *) * capacity);
 	if (!heap->array)
 	{
 		free(heap);
@@ -37,7 +49,7 @@ edf_heap_t	*edf_heap_init(int capacity)
 	return (heap);
 }
 
-edf_heap_t	*edf_heap_push(edf_heap_t *heap, coder_t *coder)
+t_edf_heap	*edf_heap_push(t_edf_heap *heap, t_coder *coder)
 {
 	int	cur;
 	int	parent;
@@ -45,14 +57,10 @@ edf_heap_t	*edf_heap_push(edf_heap_t *heap, coder_t *coder)
 	if (!coder || !heap)
 		return (NULL);
 	if (heap->size + 1 > heap->capacity)
-	{
 		return (heap);
-	}
 	heap->array[heap->size] = edf_node_create(coder);
 	if (!(heap->array[heap->size]))
-	{
 		return (NULL);
-	}
 	heap->size++;
 	cur = heap->size - 1;
 	while (cur > 0)
@@ -69,9 +77,9 @@ edf_heap_t	*edf_heap_push(edf_heap_t *heap, coder_t *coder)
 	return (heap);
 }
 
-edf_node_t	*edf_heap_pop(edf_heap_t *heap)
+t_edf_node	*edf_heap_pop(t_edf_heap *heap)
 {
-	edf_node_t	*root;
+	t_edf_node	*root;
 
 	if (!heap || heap->size == 0)
 		return (NULL);

@@ -1,10 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fifo.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/23 11:00:40 by amerkht           #+#    #+#             */
+/*   Updated: 2026/08/23 15:17:27 by amerkht          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "header.h"
 
-node_t	*ft_create(void *data)
+t_node	*ft_create(void *data)
 {
-	node_t	*node;
+	t_node	*node;
 
-	node = malloc(sizeof(node_t));
+	node = malloc(sizeof(t_node));
 	if (!node)
 		return (NULL);
 	node->data = data;
@@ -12,10 +24,10 @@ node_t	*ft_create(void *data)
 	return (node);
 }
 
-node_t	*ft_insert(void *data, node_t *fifo)
+t_node	*ft_insert(void *data, t_node *fifo)
 {
-	node_t	*node;
-	node_t	*cur;
+	t_node	*node;
+	t_node	*cur;
 
 	if (!data)
 		return (fifo);
@@ -31,9 +43,9 @@ node_t	*ft_insert(void *data, node_t *fifo)
 	return (fifo);
 }
 
-node_t	*ft_pop(node_t **fifo)
+t_node	*ft_pop(t_node **fifo)
 {
-	node_t	*re;
+	t_node	*re;
 
 	if (!fifo || !*fifo)
 		return (NULL);
@@ -42,9 +54,9 @@ node_t	*ft_pop(node_t **fifo)
 	return (re);
 }
 
-void	ft_free(node_t *fifo)
+void	ft_free(t_node *fifo)
 {
-	node_t	*tmp;
+	t_node	*tmp;
 
 	if (!fifo)
 		return ;
@@ -56,7 +68,7 @@ void	ft_free(node_t *fifo)
 	}
 }
 
-int	ft_len(node_t *head)
+int	ft_len(t_node *head)
 {
 	int	i;
 
