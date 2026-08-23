@@ -1,61 +1,57 @@
 #include "header.h"
 
-
-void check_burn_out(env_t *env)
+void	check_burn_out(env_t *env)
 {
-    coder_t *coder;
-    node_t *cur;
-    long long flag;
-    int i;
+	long long	flag;
+	int			i;
 
-    if (!env)
-        return;
-    i = 0;
-    while (env->nb_coders > i)
-    {
-        
-        if (env->coders[i].compiles_count == env->required_compiles)
-        {
-            i++;
-            continue;
-        }
-        flag = env->coders[i].last_compile_time;
-        if (flag == 0)
-            flag = env->start_time;
-        if (timestamp(flag) > env->t_burn_out)
-        {
-            lock(&(env->print_lock));
-            printf("[%lld] [%d] burned out\n", timestamp(env->start_time), env->coders[i].id);
-            unlock(&(env->print_lock));
-            env->stop_simulation = 1;
-            return;
-        }
-        i++;
-    }
+	if (!env)
+		return ;
+	i = 0;
+	while (env->nb_coders > i)
+	{
+		if (env->coders[i].compiles_count == env->required_compiles)
+		{
+			i++;
+			continue ;
+		}
+		flag = env->coders[i].last_compile_time;
+		if (flag == 0)
+			flag = env->start_time;
+		if (timestamp(flag) > env->t_burn_out)
+		{
+			lock(&(env->print_lock));
+			printf("[%lld] [%d] burned out\n", timestamp(env->start_time),
+				env->coders[i].id);
+			unlock(&(env->print_lock));
+			env->stop_simulation = 1;
+			return ;
+		}
+		i++;
+	}
 }
 
-env_t *wake_all(env_t *env)
+env_t	*wake_all(env_t *env)
 {
-    node_t *cur;
-    coder_t *coder;
-    int i;
+	node_t	*cur;
+	coder_t	*coder;
+	int		i;
 
-    if (env->heap)
-    {
-        i = 0;
-        while (i < env->heap->size)
-            pthread_cond_signal(&(((coder_t *) env->heap->array[i++]->data)->cond));
-        return (env);
-    }
-    if (!env->fifo)
-        return (env);
-    cur = env->fifo;
-
-    while (cur)
-    {
-        coder = (coder_t *) cur->data;
-        pthread_cond_signal(&(coder->cond));
-        cur = cur->next;
-    }
-    return (env);
+	if (env->heap)
+	{
+		i = 0;
+		while (i < env->heap->size)
+			pthread_cond_signal(&(((coder_t *)env->heap->array[i++]->data)->cond));
+		return (env);
+	}
+	if (!env->fifo)
+		return (env);
+	cur = env->fifo;
+	while (cur)
+	{
+		coder = (coder_t *)cur->data;
+		pthread_cond_signal(&(coder->cond));
+		cur = cur->next;
+	}
+	return (env);
 }

@@ -1,251 +1,228 @@
-[0] [4] has taken a dongle
-[0] [4] has taken a dongle
-[0] [4] is compiling
+inspecting heap
+coder: 2, req: 1, elapsed: 0
+coder: 4, req: 2, elapsed: 0
+coder: 1, req: 3, elapsed: 0
+coder: 3, req: 4, elapsed: 0
+coder: 5, req: 5, elapsed: 0
+pop coder: 2
+#######
+dongle: 1, available: 1, ready: 1
+dongle: 2, available: 0, ready: 1
+dongle: 3, available: 0, ready: 1
+dongle: 4, available: 1, ready: 1
+dongle: 5, available: 1, ready: 1
+#######
+inspecting heap
+coder: 4, req: 2, elapsed: 0
+coder: 3, req: 4, elapsed: 0
+coder: 1, req: 3, elapsed: 0
+coder: 5, req: 5, elapsed: 0
+pop coder: 4
+#######
+dongle: 1, available: 1, ready: 1
+dongle: 2, available: 0, ready: 1
+dongle: 3, available: 0, ready: 1
+dongle: 4, available: 0, ready: 1
+dongle: 5, available: 0, ready: 1
+#######
 [0] [2] has taken a dongle
 [0] [2] has taken a dongle
 [0] [2] is compiling
+[0] [4] has taken a dongle
+[0] [4] has taken a dongle
+[0] [4] is compiling
 [200] [2] is debuging
 [200] [4] is debuging
+inspecting heap
+coder: 1, req: 3, elapsed: 0
+coder: 3, req: 4, elapsed: 0
+coder: 5, req: 5, elapsed: 0
+pop coder: 1
+#######
+dongle: 1, available: 0, ready: 1
+dongle: 2, available: 0, ready: 1
+dongle: 3, available: 1, ready: 1
+dongle: 4, available: 1, ready: 1
+dongle: 5, available: 1, ready: 1
+#######
+inspecting heap
+coder: 3, req: 4, elapsed: 0
+coder: 5, req: 5, elapsed: 0
+pop coder: 3
+#######
+dongle: 1, available: 0, ready: 1
+dongle: 2, available: 0, ready: 1
+dongle: 3, available: 0, ready: 1
+dongle: 4, available: 0, ready: 1
+dongle: 5, available: 1, ready: 1
+#######
 [400] [2] is refactoring
 [400] [4] is refactoring
-[900] [5] has taken a dongle
-[900] [5] has taken a dongle
-[900] [5] is compiling
-[900] [3] has taken a dongle
-[900] [3] has taken a dongle
-[900] [3] is compiling
-[1100] [5] is debuging
-[1100] [3] is debuging
-[1300] [5] is refactoring
-[1300] [3] is refactoring
-[1801] [4] has taken a dongle
-[1801] [4] has taken a dongle
-[1801] [4] is compiling
-[1801] [1] has taken a dongle
-[1801] [1] has taken a dongle
-[1801] [1] is compiling
-[2001] [4] is debuging
-[2001] [1] is debuging
-[2201] [4] is refactoring
-[2201] [1] is refactoring
-[2702] [5] has taken a dongle
-[2702] [5] has taken a dongle
-[2702] [5] is compiling
-[2702] [2] has taken a dongle
-[2702] [2] has taken a dongle
-[2702] [2] is compiling
-[2902] [2] is debuging
-[2902] [5] is debuging
-[3102] [2] is refactoring
-[3103] [5] is refactoring
-[3602] [3] has taken a dongle
-[3602] [3] has taken a dongle
-[3602] [3] is compiling
-[3802] [3] is debuging
-[3808] [1] has taken a dongle
-[3808] [1] has taken a dongle
-[3808] [1] is compiling
-[4002] [3] is refactoring
-[4008] [1] is debuging
-[4208] [1] is refactoring
-[4503] [4] has taken a dongle
-[4503] [4] has taken a dongle
-[4503] [4] is compiling
-[4703] [4] is debuging
-[4708] [2] has taken a dongle
-[4708] [2] has taken a dongle
-[4708] [2] is compiling
-[4903] [4] is refactoring
-[4908] [2] is debuging
-[5108] [2] is refactoring
-[5403] [5] has taken a dongle
-[5403] [5] has taken a dongle
-[5403] [5] is compiling
-[5603] [5] is debuging
-[5609] [3] has taken a dongle
-[5609] [3] has taken a dongle
-[5609] [3] is compiling
-[5803] [5] is refactoring
-[5809] [3] is debuging
-[6009] [3] is refactoring
-[6303] [1] has taken a dongle
-[6303] [1] has taken a dongle
-[6303] [1] is compiling
-[6503] [1] is debuging
-[6510] [4] has taken a dongle
-[6510] [4] has taken a dongle
-[6510] [4] is compiling
-[6703] [1] is refactoring
-[6710] [4] is debuging
-[6910] [4] is refactoring
-[7204] [2] has taken a dongle
-[7204] [2] has taken a dongle
-[7204] [2] is compiling
-[7404] [2] is debuging
-[7410] [5] has taken a dongle
-[7410] [5] has taken a dongle
-[7410] [5] is compiling
-[7604] [2] is refactoring
-[7611] [5] is debuging
-[7811] [5] is refactoring
-[8104] [3] has taken a dongle
-[8104] [3] has taken a dongle
-[8104] [3] is compiling
-[8304] [3] is debuging
-[8311] [1] has taken a dongle
-[8311] [1] has taken a dongle
-[8311] [1] is compiling
-[8504] [3] is refactoring
-[8511] [1] is debuging
-[8711] [1] is refactoring
-[9004] [4] has taken a dongle
-[9004] [4] has taken a dongle
-[9004] [4] is compiling
-[9204] [4] is debuging
-[9211] [2] has taken a dongle
-[9211] [2] has taken a dongle
-[9211] [2] is compiling
-[9405] [4] is refactoring
-[9411] [2] is debuging
-[9611] [2] is refactoring
-[9905] [5] has taken a dongle
-[9905] [5] has taken a dongle
-[9905] [5] is compiling
-[10105] [5] is debuging
-[10111] [3] has taken a dongle
-[10111] [3] has taken a dongle
-[10111] [3] is compiling
-[10305] [5] is refactoring
-[10311] [3] is debuging
-[10511] [3] is refactoring
-[10806] [1] has taken a dongle
-[10806] [1] has taken a dongle
-[10806] [1] is compiling
-[11006] [1] is debuging
-[11012] [4] has taken a dongle
-[11012] [4] has taken a dongle
-[11012] [4] is compiling
-[11207] [1] is refactoring
-[11212] [4] is debuging
-[11412] [4] is refactoring
-[11707] [2] has taken a dongle
-[11707] [2] has taken a dongle
-[11707] [2] is compiling
-[11907] [2] is debuging
-[11912] [5] has taken a dongle
-[11912] [5] has taken a dongle
-[11912] [5] is compiling
-[12107] [2] is refactoring
-[12112] [5] is debuging
-[12312] [5] is refactoring
-[12607] [3] has taken a dongle
-[12607] [3] has taken a dongle
-[12607] [3] is compiling
-[12807] [3] is debuging
-[12812] [1] has taken a dongle
-[12812] [1] has taken a dongle
-[12812] [1] is compiling
-[13007] [3] is refactoring
-[13012] [1] is debuging
-[13212] [1] is refactoring
-[13508] [4] has taken a dongle
-[13508] [4] has taken a dongle
-[13508] [4] is compiling
-[13709] [4] is debuging
-[13713] [2] has taken a dongle
-[13713] [2] has taken a dongle
-[13713] [2] is compiling
-[13909] [4] is refactoring
-[13913] [2] is debuging
-[14113] [2] is refactoring
-[14410] [5] has taken a dongle
-[14410] [5] has taken a dongle
-[14410] [5] is compiling
-[14610] [5] is debuging
-[14614] [3] has taken a dongle
-[14614] [3] has taken a dongle
-[14614] [3] is compiling
-[14810] [5] is refactoring
-[14814] [3] is debuging
-[15014] [3] is refactoring
-[15311] [1] has taken a dongle
-[15311] [1] has taken a dongle
-[15311] [1] is compiling
-[15512] [1] is debuging
-[15515] [4] has taken a dongle
-[15515] [4] has taken a dongle
-[15515] [4] is compiling
-[15712] [1] is refactoring
-[15715] [4] is debuging
-[15915] [4] is refactoring
-[16213] [2] has taken a dongle
-[16213] [2] has taken a dongle
-[16213] [2] is compiling
-[16413] [2] is debuging
-[16416] [5] has taken a dongle
-[16416] [5] has taken a dongle
-[16416] [5] is compiling
-[16613] [2] is refactoring
-[16616] [5] is debuging
-[16816] [5] is refactoring
-[17114] [3] has taken a dongle
-[17114] [3] has taken a dongle
-[17114] [3] is compiling
-[17314] [3] is debuging
-[17317] [1] has taken a dongle
-[17317] [1] has taken a dongle
-[17317] [1] is compiling
-[17514] [3] is refactoring
-[17517] [1] is debuging
-[17718] [1] is refactoring
-[18015] [4] has taken a dongle
-[18015] [4] has taken a dongle
-[18015] [4] is compiling
-[18215] [4] is debuging
-[18218] [2] has taken a dongle
-[18218] [2] has taken a dongle
-[18218] [2] is compiling
-[18415] [4] is refactoring
-[18418] [2] is debuging
-[18618] [2] is refactoring
-[18917] [5] has taken a dongle
-[18917] [5] has taken a dongle
-[18917] [5] is compiling
-[19117] [5] is debuging
-[19118] [3] has taken a dongle
-[19118] [3] has taken a dongle
-[19118] [3] is compiling
-[19317] [5] is refactoring
-[19318] [3] is debuging
-[19518] [3] is refactoring
-[19818] [1] has taken a dongle
-[19818] [1] has taken a dongle
-[19818] [1] is compiling
-[20019] [1] is debuging
-[20019] [4] has taken a dongle
-[20019] [4] has taken a dongle
-[20019] [4] is compiling
-[20219] [1] is refactoring
-[20220] [4] is debuging
-[20420] [4] is refactoring
-[20720] [2] has taken a dongle
-[20720] [2] has taken a dongle
-[20720] [2] is compiling
-[20920] [2] is debuging
-[20921] [5] has taken a dongle
-[20921] [5] has taken a dongle
-[20921] [5] is compiling
-[21120] [2] is refactoring
-[21122] [5] is debuging
-[21322] [5] is refactoring
-[21620] [3] has taken a dongle
-[21620] [3] has taken a dongle
-[21620] [3] is compiling
-[21820] [3] is debuging
-[21822] [1] has taken a dongle
-[21822] [1] has taken a dongle
-[21822] [1] is compiling
-[22020] [3] is refactoring
-[22022] [1] is debuging
-[22222] [1] is refactoring
-compiles: 50/50
+[1000] [1] has taken a dongle
+[1000] [1] has taken a dongle
+[1000] [1] is compiling
+[1000] [3] has taken a dongle
+[1000] [3] has taken a dongle
+[1000] [3] is compiling
+[1200] [1] is debuging
+[1200] [3] is debuging
+inspecting heap
+coder: 5, req: 5, elapsed: 0
+coder: 2, req: 6, elapsed: 600
+coder: 4, req: 7, elapsed: 600
+pop coder: 5
+#######
+dongle: 1, available: 0, ready: 1
+dongle: 2, available: 1, ready: 1
+dongle: 3, available: 1, ready: 1
+dongle: 4, available: 1, ready: 1
+dongle: 5, available: 0, ready: 1
+#######
+inspecting heap
+coder: 2, req: 6, elapsed: 600
+coder: 4, req: 7, elapsed: 600
+pop coder: 2
+#######
+dongle: 1, available: 0, ready: 1
+dongle: 2, available: 0, ready: 1
+dongle: 3, available: 0, ready: 1
+dongle: 4, available: 1, ready: 1
+dongle: 5, available: 0, ready: 1
+#######
+[1400] [1] is refactoring
+[1401] [3] is refactoring
+[2000] [2] has taken a dongle
+[2000] [2] has taken a dongle
+[2000] [2] is compiling
+[2000] [5] has taken a dongle
+[2000] [5] has taken a dongle
+[2000] [5] is compiling
+[2201] [5] is debuging
+[2201] [2] is debuging
+inspecting heap
+coder: 4, req: 7, elapsed: 600
+coder: 1, req: 8, elapsed: 600
+coder: 3, req: 9, elapsed: 601
+pop coder: 4
+#######
+dongle: 1, available: 1, ready: 1
+dongle: 2, available: 1, ready: 1
+dongle: 3, available: 1, ready: 1
+dongle: 4, available: 0, ready: 1
+dongle: 5, available: 0, ready: 1
+#######
+inspecting heap
+coder: 1, req: 8, elapsed: 600
+coder: 3, req: 9, elapsed: 601
+pop coder: 1
+#######
+dongle: 1, available: 0, ready: 1
+dongle: 2, available: 0, ready: 1
+dongle: 3, available: 1, ready: 1
+dongle: 4, available: 0, ready: 1
+dongle: 5, available: 0, ready: 1
+#######
+[2401] [2] is refactoring
+[2401] [5] is refactoring
+[3001] [1] has taken a dongle
+[3001] [1] has taken a dongle
+[3001] [1] is compiling
+[3001] [4] has taken a dongle
+[3001] [4] has taken a dongle
+[3001] [4] is compiling
+[3202] [1] is debuging
+[3202] [4] is debuging
+inspecting heap
+coder: 3, req: 9, elapsed: 601
+coder: 2, req: 10, elapsed: 601
+coder: 5, req: 11, elapsed: 601
+pop coder: 3
+#######
+dongle: 1, available: 1, ready: 1
+dongle: 2, available: 1, ready: 1
+dongle: 3, available: 0, ready: 1
+dongle: 4, available: 0, ready: 1
+dongle: 5, available: 1, ready: 1
+#######
+[3402] [4] is refactoring
+[3402] [1] is refactoring
+[4002] [3] has taken a dongle
+[4002] [3] has taken a dongle
+[4002] [3] is compiling
+[4202] [3] is debuging
+inspecting heap
+coder: 2, req: 10, elapsed: 601
+coder: 5, req: 11, elapsed: 601
+coder: 4, req: 12, elapsed: 601
+coder: 1, req: 13, elapsed: 601
+pop coder: 2
+#######
+dongle: 1, available: 1, ready: 1
+dongle: 2, available: 0, ready: 1
+dongle: 3, available: 0, ready: 1
+dongle: 4, available: 1, ready: 1
+dongle: 5, available: 1, ready: 1
+#######
+inspecting heap
+coder: 5, req: 11, elapsed: 601
+coder: 1, req: 13, elapsed: 601
+coder: 4, req: 12, elapsed: 601
+pop coder: 5
+#######
+dongle: 1, available: 0, ready: 1
+dongle: 2, available: 0, ready: 1
+dongle: 3, available: 0, ready: 1
+dongle: 4, available: 1, ready: 1
+dongle: 5, available: 0, ready: 1
+#######
+[4206] [5] has taken a dongle
+[4206] [5] has taken a dongle
+[4206] [5] is compiling
+[4402] [3] is refactoring
+[4406] [5] is debuging
+inspecting heap
+coder: 4, req: 12, elapsed: 601
+coder: 1, req: 13, elapsed: 601
+pop coder: 4
+#######
+dongle: 1, available: 1, ready: 1
+dongle: 2, available: 0, ready: 1
+dongle: 3, available: 0, ready: 1
+dongle: 4, available: 0, ready: 1
+dongle: 5, available: 0, ready: 1
+#######
+[4606] [5] is refactoring
+[5002] [2] has taken a dongle
+[5002] [2] has taken a dongle
+[5002] [2] is compiling
+[5202] [2] is debuging
+[5206] [4] has taken a dongle
+[5206] [4] has taken a dongle
+[5206] [4] is compiling
+[5402] [2] is refactoring
+[5406] [4] is debuging
+inspecting heap
+coder: 3, req: 14, elapsed: 600
+coder: 1, req: 13, elapsed: 601
+coder: 5, req: 15, elapsed: 600
+pop coder: 3
+#######
+dongle: 1, available: 1, ready: 1
+dongle: 2, available: 1, ready: 1
+dongle: 3, available: 0, ready: 1
+dongle: 4, available: 0, ready: 1
+dongle: 5, available: 1, ready: 1
+#######
+inspecting heap
+coder: 5, req: 15, elapsed: 600
+coder: 1, req: 13, elapsed: 601
+pop coder: 5
+#######
+dongle: 1, available: 0, ready: 1
+dongle: 2, available: 1, ready: 1
+dongle: 3, available: 0, ready: 1
+dongle: 4, available: 0, ready: 1
+dongle: 5, available: 0, ready: 1
+#######
+[5606] [4] is refactoring
+[6005] [1] burned out

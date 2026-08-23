@@ -1,39 +1,34 @@
-CC = cc 
-OUT = tt
-SRC = clean.c main.c ./fifo/fifo.c helpers.c init.c parsing.c simulation.c \
-		resources_management.c schedular_management.c coder_actions.c  time.c \
-		heap.c burn_out_protocol.c
+NAME		= codexion
+CC			= cc
+CFLAGS		= -Wall -Wextra -Werror -pthread
+SRCS = burn_out_protocol.c clean.c coder_actions.c fifo.c heap2.c heap.c helpers.c \
+		init.c main.c parsing.c resources_management.c schedular_management.c \
+		simulation.c time.c
+OBJS		= $(SRCS:.c=.o)
 
-ARGS = 5 3000 200 200 200 10 700 fifo
+ARGS = 5 3000 200 200 200 10 800 edf
 #		nb_coders	burn_out  compile_t   debug_t  refactor_t  req_compiles  cooldown   schedular
-#	801 fifo
-#	
 
 
-arg:run
-	@./$(OUT) $(ARGS)
 
-test:
-	@cc test.c
-	@./a.out
+all: $(NAME)
 
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS)
 
-run:
-	@$(CC) $(SRC) -o $(OUT)
-cc:
-	@cc $(SRC) -o $(OUT)
+%.o: %.c codexion.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
-gdb:GG
-	@gdb --args ./$(OUT) $(ARGS)
 clean:
-	@rm -rf ./$(OUT)
-	@rm -rf ./a.out
+	rm -rf $(OBJS)
 
-GG:
-	@$(CC) $(SRC) -o $(OUT) -g
-tes:
-	./$(OUT)
+fclean: clean
+	rm -rf $(NAME)
+test:
+	./$(NAME) $(ARGS)
 
-heapo:
-	@$(CC) heap.c time.c
-	@./a.out
+re: fclean all
+
+.PHONY: all clean fclean re
+
+.SECONDARY: $(OBJS)
