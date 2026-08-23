@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:00:33 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 15:17:13 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/23 16:54:25 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	compile(t_coder *coder)
 {
+	if (coder->env->stop_simulation)
+		return ;
 	_log("[%lld] [%d] is compiling\n", timestamp(coder->env->start_time),
 		coder);
 	suspend(coder->env->t_compile);
@@ -21,12 +23,16 @@ void	compile(t_coder *coder)
 
 void	debug(t_coder *coder)
 {
+	if (coder->env->stop_simulation)
+		return ;
 	_log("[%lld] [%d] is debuging\n", timestamp(coder->env->start_time), coder);
 	suspend(coder->env->t_debug);
 }
 
 void	refactor(t_coder *coder)
 {
+	if (coder->env->stop_simulation)
+		return ;
 	_log("[%lld] [%d] is refactoring\n", timestamp(coder->env->start_time),
 		coder);
 	suspend(coder->env->t_refactore);
@@ -45,7 +51,7 @@ int	in_heap(t_coder *coder)
 	i = 0;
 	while (i < heap->size)
 	{
-		if (((t_coder *)heap->array[i]->data)->id == coder->id)
+		if (heap->array[i]->data->id == coder->id)
 			return (1);
 		i++;
 	}

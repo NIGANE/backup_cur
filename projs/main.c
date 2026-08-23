@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 15:23:49 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/23 16:08:19 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	main(int ac, char **av)
 		return (usage_message(), 1);
 	env = init_env(av);
 	if (!env)
-		return (printf("exiting after cleaing\n"), 1);
+		return (printf("Error: Failing allocating ressources\n"), 1);
 	pthread_join(env->monitor_id, NULL);
 	i = 0;
 	while (i < env->nb_coders)

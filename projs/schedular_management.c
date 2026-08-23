@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:40 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 15:21:11 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/23 16:19:01 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,13 @@ void	request_ticket(t_coder *coder)
 	if (coder->env->heap)
 	{
 		coder->env->heap = edf_heap_push(coder->env->heap, coder);
+		if (!coder->env->heap)
+			coder->env->stop_simulation = 1;
 		return ;
 	}
 	coder->env->fifo = ft_insert(coder, coder->env->fifo);
+	if (!coder->env->fifo)
+		coder->env->stop_simulation = 1;
 }
 
 t_coder	*whos_next(t_env *env)

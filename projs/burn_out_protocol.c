@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:00:15 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 15:15:00 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/23 16:25:38 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,11 @@ void	burned_out(t_coder *coder, long long flag)
 {
 	if (timestamp(flag) > coder->env->t_burn_out)
 	{
+		coder->env->stop_simulation = 1;
 		lock(&(coder->env->print_lock));
 		printf("[%lld] [%d] burned out\n", timestamp(coder->env->start_time),
 			coder->id);
 		unlock(&(coder->env->print_lock));
-		coder->env->stop_simulation = 1;
 		return ;
 	}
 }

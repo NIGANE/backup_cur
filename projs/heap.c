@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:01 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 15:18:12 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/23 16:07:11 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,7 @@ t_edf_heap	*edf_heap_init(int capacity)
 		return (NULL);
 	heap->array = malloc(sizeof(t_edf_node *) * capacity);
 	if (!heap->array)
-	{
-		free(heap);
-		return (NULL);
-	}
+		return (free(heap), NULL);
 	heap->size = 0;
 	heap->capacity = capacity;
 	return (heap);

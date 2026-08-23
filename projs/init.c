@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:16 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 15:19:23 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/23 16:09:21 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ t_coder	*init_coders(t_env *env)
 	t_coder	*coders;
 	int		i;
 
-	if (!(env->dongles))
+	if (!env || !(env->dongles))
 		return (NULL);
 	coders = malloc(sizeof(t_coder) * env->nb_coders);
 	if (!coders)

@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:44 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 15:21:43 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/23 17:10:20 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,14 @@ void	*monitor(void *arg)
 
 	env = (t_env *)arg;
 	if (!env)
-		return (printf("no arg provided"), NULL);
+		return (printf("Error detected!\n"), NULL);
 	if (env->required_compiles == 0)
 		return (env);
 	lock(&(env->env_lock));
 	while (!fifo_full(env) && !heap_full(env))
 	{
 		unlock(&(env->env_lock));
-		suspend(20);
+		suspend(10);
 		lock(&(env->env_lock));
 	}
 	monitor_body(env);
@@ -75,7 +75,7 @@ void	*routine(void *arg)
 	coder = (t_coder *)arg;
 	env = coder->env;
 	if (!coder)
-		return (printf("no arg provided\n"), NULL);
+		return (printf("Error detected!\n"), NULL);
 	while (coder->compiles_count < coder->req_compiles
 		&& !(env->stop_simulation))
 	{

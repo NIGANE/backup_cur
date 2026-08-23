@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:12 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 15:18:51 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/23 17:08:23 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ int	int_statics(char **av, t_env *env)
 	env->target_compiles = env->nb_coders * env->required_compiles;
 	env->fifo = NULL;
 	env->heap = NULL;
-	if (!strcmp(av[8], "edf"))
+	if (!strcmp(av[8], "edf") || !strcmp(av[8], "EDF"))
 	{
 		env->heap = edf_heap_init(env->nb_coders);
 		if (!env->heap)
