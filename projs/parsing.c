@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:31 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 17:13:17 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/24 09:42:43 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	is_number(char *s)
 
 void	usage_message(void)
 {
-	printf("Error: helpful usage error message.");
+	printf("Hint: helpful usage error message.");
 }
 
 int	extract_args(int ac, char **av)

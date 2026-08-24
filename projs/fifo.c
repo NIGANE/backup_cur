@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:00:40 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 15:17:27 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/24 09:59:18 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ t_node	*ft_create(void *data)
 		return (NULL);
 	node->data = data;
 	node->id = 0;
+	node->next = NULL;
 	return (node);
 }
 

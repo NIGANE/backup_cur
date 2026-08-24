@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 15:12:20 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 16:08:19 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/24 09:42:24 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int	main(int ac, char **av)
 	int		i;
 
 	if (ac < 8 || ac > 9)
-		return (usage_message(), 1);
+		return (printf("Error: no arg provided\n"), usage_message(), 1);
 	if (!extract_args(ac, av))
 		return (usage_message(), 1);
 	env = init_env(av);

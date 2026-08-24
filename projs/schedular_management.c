@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:40 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 16:19:01 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/24 10:03:56 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	grab_ticket(t_env *env)
 		edf_node_free(node);
 		return ;
 	}
-	ft_pop(&(env->fifo));
+	free(ft_pop(&(env->fifo)));
 }
 
 int	in_queue(t_coder *coder)
