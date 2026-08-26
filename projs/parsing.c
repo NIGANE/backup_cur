@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:31 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/24 09:42:43 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/26 11:14:54 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,25 @@ int	is_number(char *s)
 	return (1);
 }
 
-void	usage_message(void)
+void	usage_message(const char *prog_name)
 {
-	printf("Hint: helpful usage error message.");
+	fprintf(stderr, "\033[1mUsage:\033[0m\n");
+	fprintf(stderr,
+		"%s <nb_coders> <t_burn_out> <t_compile> <t_code> <t_refactor>",
+		prog_name);
+	fprintf(stderr, "<nb_compiles> <donor_cooldown> <scheduler>\n\n");
+	fprintf(stderr, "\033[1mArguments:\033[0m\n");
+	fprintf(stderr, "  nb_coders       Number of coders (N >= 1)\n");
+	fprintf(stderr, "  t_burn_out      Time in ms before a coder burns out\n");
+	fprintf(stderr, "  t_compile       Time in ms required to compile\n");
+	fprintf(stderr, "  t_code          Time in ms spent coding\n");
+	fprintf(stderr, "  t_refactor      Time in ms spent refactoring\n");
+	fprintf(stderr, "  nb_compiles     Compiles required per coder\n");
+	fprintf(stderr, "  donor_cooldown  Cooldown in ms for donor dongle\n");
+	fprintf(stderr,
+		"  scheduler       Scheduling algorithm ('edf' or 'fifo')\n\n");
+	fprintf(stderr, "\033[1mExample:\033[0m\n");
+	fprintf(stderr, "  %s 5 3000 200 200 200 10 900 edf\n", prog_name);
 }
 
 int	extract_args(int ac, char **av)
@@ -40,11 +56,15 @@ int	extract_args(int ac, char **av)
 	while (i < ac - 1)
 	{
 		if (!is_number(av[i]))
-			return (printf("Error: '%s' is not a valid number\n", av[i]), 1);
+			return (fprintf(stderr,
+					"\033[1;31mError:\033[0m: '%s' is not a valid number\n",
+					av[i]), 0);
 		i++;
 	}
 	if ((strcmp(av[8], "edf") && strcmp(av[8], "fifo")) && ((strcmp(av[8],
 					"EDF") && strcmp(av[8], "FIFO"))))
-		return (printf("Error: '%s' is not a valid schedular\n", av[8]), 0);
+		return (fprintf(stderr,
+				"\033[1;31mError:\033[0m: '%s' is not a valid schedular\n",
+				av[8]), 0);
 	return (1);
 }

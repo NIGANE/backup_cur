@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:00:48 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 16:16:25 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/26 10:56:59 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,7 +167,7 @@ void						leave_dongles(t_coder *coder);
 //  parsing.c
 int							extract_args(int ac, char **av);
 int							is_number(char *s);
-void						usage_message(void);
+void						usage_message(const char *s);
 
 //  init.c
 t_env						*init_env(char **av);

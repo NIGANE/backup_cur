@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:44 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 17:10:20 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/26 10:27:05 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	monitor_body(t_env *env)
 		if (env->stop_simulation)
 			break ;
 		unlock(&(env->env_lock));
-		suspend(10);
+		suspend(1);
 		lock(&(env->env_lock));
 	}
 }
