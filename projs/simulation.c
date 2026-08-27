@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:44 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/26 10:27:05 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/27 12:33:14 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ void	monitor_body(t_env *env)
 	t_coder	*next_coder;
 
 	next_coder = NULL;
-	env->start_time = current_time_ms();
 	while (!(env->stop_simulation) && !compiles_end(env))
 	{
 		check_burn_out(env);
@@ -62,7 +61,7 @@ void	monitor_body(t_env *env)
 		if (env->stop_simulation)
 			break ;
 		unlock(&(env->env_lock));
-		suspend(1);
+		suspend(2);
 		lock(&(env->env_lock));
 	}
 }

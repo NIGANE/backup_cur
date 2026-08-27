@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:12 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 17:08:23 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/27 12:32:19 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ int	int_statics(char **av, t_env *env)
 	env->start_simulation = 0;
 	env->stop_simulation = 0;
 	env->total_compiles = 0;
+	env->req = 0;
 	env->target_compiles = env->nb_coders * env->required_compiles;
 	env->fifo = NULL;
 	env->heap = NULL;
@@ -52,5 +53,6 @@ int	int_statics(char **av, t_env *env)
 		if (!env->heap)
 			return (0);
 	}
+	env->start_time = current_time_ms();
 	return (1);
 }

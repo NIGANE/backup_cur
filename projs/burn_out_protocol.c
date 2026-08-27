@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:00:15 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 16:25:38 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/27 12:50:55 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void	check_burn_out(t_env *env)
 	if (!env)
 		return ;
 	i = 0;
+	flag = 0;
 	while (env->nb_coders > i)
 	{
 		if (env->coders[i].compiles_count == env->required_compiles)

@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:35 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 16:50:02 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/27 12:47:50 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ int	grab_dongles(t_coder *coder)
 		lock(&(left->dongle_lock));
 		_log("[%lld] [%d] has taken a dongle\n", timestamp(env->start_time),
 			coder);
+		if (env->nb_coders == 1)
+			return (unlock(&left->dongle_lock), 0);
 		lock(&(right->dongle_lock));
 		_log("[%lld] [%d] has taken a dongle\n", timestamp(env->start_time),
 			coder);
@@ -61,11 +63,11 @@ void	leave_dongles(t_coder *coder)
 {
 	coder->left_dongle->last_use = current_time_ms();
 	coder->right_dongle->last_use = current_time_ms();
-	coder->left_dongle->ready_to_use = 1;
-	coder->right_dongle->ready_to_use = 1;
 	unlock(&(coder->left_dongle->dongle_lock));
 	unlock(&(coder->right_dongle->dongle_lock));
 	lock(&coder->env->env_lock);
+	coder->left_dongle->ready_to_use = 1;
+	coder->right_dongle->ready_to_use = 1;
 	coder->left_dongle->available = 1;
 	coder->right_dongle->available = 1;
 	unlock(&coder->env->env_lock);
