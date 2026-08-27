@@ -80,7 +80,6 @@ class Agent():
         """
         # constrained decoding the function name
         self.generate_function_name()
-        # print(self.prompt.name)
         selected_fn: Dict[str, Any] = {}
         if (self.prompt.name not in self.fn_names
                 or self.prompt.name == "fn_undefined"):
