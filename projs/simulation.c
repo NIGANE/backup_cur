@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   simulation.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:44 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/27 12:33:14 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/27 15:49:15 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@ void	*monitor(void *arg)
 void	monitor_body(t_env *env)
 {
 	t_coder	*next_coder;
-
+	
+	update_start_time(env);
 	next_coder = NULL;
 	while (!(env->stop_simulation) && !compiles_end(env))
 	{
@@ -61,7 +62,7 @@ void	monitor_body(t_env *env)
 		if (env->stop_simulation)
 			break ;
 		unlock(&(env->env_lock));
-		suspend(2);
+		suspend(1);
 		lock(&(env->env_lock));
 	}
 }
@@ -75,8 +76,7 @@ void	*routine(void *arg)
 	env = coder->env;
 	if (!coder)
 		return (printf("Error detected!\n"), NULL);
-	while (coder->compiles_count < coder->req_compiles
-		&& !(env->stop_simulation))
+	while (!coder_finishes(coder) && !simulation_stopped(coder->env))
 	{
 		lock(&(env->env_lock));
 		if (!in_queue(coder) && (coder->compiles_count
@@ -94,17 +94,32 @@ void	*routine(void *arg)
 
 void	routine_body(t_coder *coder)
 {
+	lock(&coder->env->env_lock);
 	coder->ready = 0;
+	unlock(&coder->env->env_lock);
 	if (grab_dongles(coder))
 	{
+		lock(&coder->env->env_lock);
 		coder->last_compile_time = current_time_ms();
+		unlock(&coder->env->env_lock);
 		compile(coder);
 		leave_dongles(coder);
-		coder->compiles_count++;
-		debug(coder);
-		refactor(coder);
 		lock(&(coder->env->env_lock));
+		coder->compiles_count++;
 		coder->env->total_compiles++;
 		unlock(&(coder->env->env_lock));
+		debug(coder);
+		refactor(coder);
 	}
+}
+
+int	simulation_stopped(t_env *env)
+{
+	int	re;
+
+	re = 0;
+	lock(&env->env_lock);
+	re = env->stop_simulation;
+	unlock(&env->env_lock);
+	return (re);
 }

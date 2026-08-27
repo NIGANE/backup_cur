@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   header.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:00:48 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/27 12:15:36 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/27 15:35:29 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,9 @@ void						heapify(t_edf_heap *h, int i);
 int							fifo_full(t_env *env);
 int							heap_full(t_env *heap);
 int							int_statics(char **av, t_env *env);
+void						dongles_order(t_coder *coder, t_dongle **first,
+								t_dongle **second);
+int							coder_finishes(t_coder *coder);
 
 //  clean.c
 void						clean_env(t_env *env);
@@ -137,11 +140,13 @@ void						*monitor(void *arg);
 void						monitor_body(t_env *env);
 void						*routine(void *arg);
 void						routine_body(t_coder *coder);
+int							simulation_stopped(t_env *env);
 
 //  burn_out_protocol.c
 void						check_burn_out(t_env *env);
 void						burned_out(t_coder *coder, long long flag);
 t_env						*wake_all(t_env *env);
+void update_start_time(t_env *env);
 
 //  time.c
 void						sleep_coder(t_coder *coder);

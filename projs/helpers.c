@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   helpers.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:12 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/27 12:32:19 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/27 14:40:44 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,31 @@ int	int_statics(char **av, t_env *env)
 	}
 	env->start_time = current_time_ms();
 	return (1);
+}
+
+void	dongles_order(t_coder *coder, t_dongle **first, t_dongle **second)
+{
+	t_dongle	*tmp;
+
+	tmp = NULL;
+	if (!coder)
+		return ;
+	*first = coder->left_dongle;
+	*second = coder->right_dongle;
+	if (*first > *second)
+	{
+		tmp = *first;
+		*first = *second;
+		*second = tmp;
+	}
+}
+
+int	coder_finishes(t_coder *coder)
+{
+	int	finished;
+
+	lock(&coder->env->env_lock);
+	finished = (coder->compiles_count >= coder->req_compiles);
+	unlock(&coder->env->env_lock);
+	return (finished);
 }

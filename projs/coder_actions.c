@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coder_actions.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:00:33 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/23 16:54:25 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/27 14:51:16 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	compile(t_coder *coder)
 {
-	if (coder->env->stop_simulation)
+	if (simulation_stopped(coder->env))
 		return ;
 	_log("[%lld] [%d] is compiling\n", timestamp(coder->env->start_time),
 		coder);
@@ -23,7 +23,7 @@ void	compile(t_coder *coder)
 
 void	debug(t_coder *coder)
 {
-	if (coder->env->stop_simulation)
+	if (simulation_stopped(coder->env))
 		return ;
 	_log("[%lld] [%d] is debuging\n", timestamp(coder->env->start_time), coder);
 	suspend(coder->env->t_debug);
@@ -31,7 +31,7 @@ void	debug(t_coder *coder)
 
 void	refactor(t_coder *coder)
 {
-	if (coder->env->stop_simulation)
+	if (simulation_stopped(coder->env))
 		return ;
 	_log("[%lld] [%d] is refactoring\n", timestamp(coder->env->start_time),
 		coder);

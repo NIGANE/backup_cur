@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   burn_out_protocol.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:00:15 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/27 12:50:55 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/27 15:51:28 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,4 +72,17 @@ t_env	*wake_all(t_env *env)
 		cur = cur->next;
 	}
 	return (env);
+}
+
+void	update_start_time(t_env *env)
+{
+	int	i;
+
+	i = 0;
+	env->start_time = current_time_ms();
+	while (i < env->nb_coders)
+	{
+		env->coders[i].last_compile_time = env->start_time;
+		i++;
+	}
 }

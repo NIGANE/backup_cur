@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   resources_management.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
+/*   By: negane <negane@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:35 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/27 12:47:50 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/27 15:11:53 by negane           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,28 +24,28 @@ int	unlock(pthread_mutex_t *_lock)
 
 int	grab_dongles(t_coder *coder)
 {
-	t_dongle	*left;
-	t_dongle	*right;
+	t_dongle	*first;
+	t_dongle	*seccond;
 	t_env		*env;
 
-	left = coder->left_dongle;
-	right = coder->right_dongle;
+	dongles_order(coder, &first, &seccond);
 	env = coder->env;
-	if (env->stop_simulation)
+	if (simulation_stopped(env))
 		return (0);
-	cooldown(env, left, right);
-	if (left->ready_to_use && right->ready_to_use && !(env->stop_simulation))
+	cooldown(env, first, seccond);
+	if (first->ready_to_use && seccond->ready_to_use
+		&& !(simulation_stopped(env)))
 	{
-		lock(&(left->dongle_lock));
+		lock(&(first->dongle_lock));
 		_log("[%lld] [%d] has taken a dongle\n", timestamp(env->start_time),
 			coder);
 		if (env->nb_coders == 1)
-			return (unlock(&left->dongle_lock), 0);
-		lock(&(right->dongle_lock));
+			return (unlock(&first->dongle_lock), 0);
+		lock(&(seccond->dongle_lock));
 		_log("[%lld] [%d] has taken a dongle\n", timestamp(env->start_time),
 			coder);
-		left->ready_to_use = 0;
-		right->ready_to_use = 0;
+		first->ready_to_use = 0;
+		seccond->ready_to_use = 0;
 		return (1);
 	}
 	return (0);
@@ -55,7 +55,7 @@ void	cooldown(t_env *env, t_dongle *left, t_dongle *right)
 {
 	while ((timestamp(left->last_use) < env->t_cooldown
 			|| timestamp(right->last_use) < env->t_cooldown)
-		&& !env->stop_simulation)
+		&& !simulation_stopped(env))
 		suspend(2);
 }
 

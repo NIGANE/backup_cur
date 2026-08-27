@@ -6,12 +6,14 @@ SRCS = burn_out_protocol.c clean.c coder_actions.c fifo.c heap2.c heap.c helpers
 		simulation.c time.c
 OBJS		= $(SRCS:.c=.o)
 
-ARGS = 1 3000 200 200 200 10 800 fifo
+ARGS = 5 3000 200 200 200 10 801 edf
 #	nb_coders  burn_out  compile_t  debug_t  refactor_t  req_compiles  cooldown  schedular
 
 valgrind = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
+
 all: $(NAME)
+
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS)
