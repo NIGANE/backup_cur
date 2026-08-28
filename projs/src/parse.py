@@ -8,6 +8,8 @@ from src.models.PromptValidation import PromptValidation
 from src.models.ValidData import ValidData
 from src.models.ErrorHandler import MyError
 from pydantic import ValidationError
+from pathlib import Path
+import os
 
 
 def error_usage_func() -> str:
@@ -160,7 +162,7 @@ def parse() -> ValidData:
     return ValidData(filtered_functions, validated_prompts, output_file, model)
 
 
-def dump_json(outs: List[Dict[str, Any]], out_file: str) -> None:
+def dump_json(outs: List[Dict[str, Any]], path: str) -> None:
     """Write the generated function calls to a JSON file.
 
     Args:
@@ -171,8 +173,11 @@ def dump_json(outs: List[Dict[str, Any]], out_file: str) -> None:
         MyError: If the output file cannot be created or written.
     """
     try:
-        with open(out_file, "w") as file:
+        directory = os.path.dirname(path)
+        folder_path = Path(directory)
+        folder_path.mkdir(parents=True, exist_ok=True)
+        with open(path, "w") as file:
             dump(outs, file, indent=4)
         print(" - Output file is ready.")
-    except FileNotFoundError:
-        raise MyError(f"Error: \"{out_file}\" is not a valid path")
+    except Exception:
+        raise MyError(f"Error: \"{path}\" is not a valid path")
