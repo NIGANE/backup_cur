@@ -146,7 +146,7 @@ int							simulation_stopped(t_env *env);
 void						check_burn_out(t_env *env);
 void						burned_out(t_coder *coder, long long flag);
 t_env						*wake_all(t_env *env);
-void update_start_time(t_env *env);
+void						update_start_time(t_env *env);
 
 //  time.c
 void						sleep_coder(t_coder *coder);

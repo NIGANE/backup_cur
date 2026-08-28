@@ -42,7 +42,7 @@ void	*monitor(void *arg)
 void	monitor_body(t_env *env)
 {
 	t_coder	*next_coder;
-	
+
 	update_start_time(env);
 	next_coder = NULL;
 	while (!(env->stop_simulation) && !compiles_end(env))
