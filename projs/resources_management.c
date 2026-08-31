@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:01:35 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/31 18:25:25 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/31 18:31:01 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,12 @@ int	grab_dongles(t_coder *coder)
 		&& !(simulation_stopped(env)))
 	{
 		lock(&(first->dongle_lock));
-		_log("[%lld] [%d] has taken a dongle\n", timestamp(env->start_time),
+		_log("%lld %d has taken a dongle\n", timestamp(env->start_time),
 			coder);
 		if (env->nb_coders == 1)
 			return (unlock(&first->dongle_lock), 0);
 		lock(&(seccond->dongle_lock));
-		_log("[%lld] [%d] has taken a dongle\n", timestamp(env->start_time),
+		_log("%lld %d has taken a dongle\n", timestamp(env->start_time),
 			coder);
 		first->ready_to_use = 0;
 		seccond->ready_to_use = 0;

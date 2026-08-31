@@ -6,7 +6,7 @@
 /*   By: amerkht <amerkht@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 11:00:33 by amerkht           #+#    #+#             */
-/*   Updated: 2026/08/31 18:24:51 by amerkht          ###   ########.fr       */
+/*   Updated: 2026/08/31 18:30:36 by amerkht          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	compile(t_coder *coder)
 {
 	if (simulation_stopped(coder->env))
 		return ;
-	_log("[%lld] [%d] is compiling\n", timestamp(coder->env->start_time),
+	_log("%lld %d is compiling\n", timestamp(coder->env->start_time),
 		coder);
 	suspend(coder->env->t_compile);
 }
@@ -25,7 +25,7 @@ void	debug(t_coder *coder)
 {
 	if (simulation_stopped(coder->env))
 		return ;
-	_log("[%lld] [%d] is debuging\n", timestamp(coder->env->start_time), coder);
+	_log("%lld %d is debuging\n", timestamp(coder->env->start_time), coder);
 	suspend(coder->env->t_debug);
 }
 
@@ -33,7 +33,7 @@ void	refactor(t_coder *coder)
 {
 	if (simulation_stopped(coder->env))
 		return ;
-	_log("[%lld] [%d] is refactoring\n", timestamp(coder->env->start_time),
+	_log("%lld %d is refactoring\n", timestamp(coder->env->start_time),
 		coder);
 	suspend(coder->env->t_refactore);
 }
