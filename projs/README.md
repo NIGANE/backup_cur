@@ -1,89 +1,61 @@
-*This project has been created as part of the 42 curriculum by amerkht, amerkht.*
+*This project has been created as part of the 42 curriculum by aamajjou.*
 
 # Codexion
 
 ## Description
-**Codexion** is a high-performance concurrent multithreading simulation developed as part of the 42 curriculum. Inspired by Dijkstra's classic **Dining Philosophers Problem**, the project models $N$ software coders contending for shared hardware resources (dongles) to perform continuous compilation workflows under strict timing constraints.
 
-Each coder transitions through a cyclic state machine: **Compile**, **Debug**, and **Refactor**. To enter the `compile` state, a coder must acquire two adjacent hardware dongles (left and right). Upon releasing the dongles, they enter a mandatory cooldown phase (`donor_cooldown`). If any coder goes longer than `t_burn_out` milliseconds without compiling, they suffer from burnout, halting the entire system.
-
-The project features a real-time monitoring system and supports two dynamic scheduling paradigms:
-* **FIFO (First-In, First-Out):** Coders request execution tickets and acquire resources strictly in order of arrival.
-* **EDF (Earliest Deadline First):** Coders are prioritized based on their proximity to burning out ($\text{Deadline} = \text{last\_compile\_time} + \text{t\_burn\_out}$) managed via a dynamic min-heap priority queue.
-
----
+`Codexion` is a multithreaded C simulation of coders competing for limited hardware dongles to perform compilation, debugging and refactoring cycles. The project models concurrency, scheduling (FIFO or EDF), cooldowns for shared resources, burnout detection, and log serialization. The goal is to implement a safe, deadlock-free scheduler/emulator that demonstrates correct handling of classic concurrency problems (resource allocation, starvation, and timed waits).
 
 ## Instructions
 
-### Compilation
-The project is built using standard standard `make` targets with strict standard flags (`-Wall -Wextra -Werror -pthread`).
+- Build: run `make` at the project root. The produced binary is `codexion`.
+- Usage: `./codexion [number_of_coders] [time_to_burnout] [time_to_compile] [time_to_debug] [time_to_refactor] [number_of_compiles_required] [dongle_cooldown] [scheduler]`
+  - Example: `./codexion 5 800 200 100 100 3 50 fifo`
 
-```bash
-# Compile the binary
-make
-
-# Clean object files
-make clean
-
-# Clean object files and binary
-make fclean
-
-# Rebuild the binary
-make re
-```
+Notes:
+- The `Makefile` compiles with `-pthread` and produces `codexion`.
+- The program prints timestamped events to stdout; see `logs.c` for message formatting.
 
 ## Blocking cases handled
 
-During execution, multithreaded systems face several critical synchronization hazards. Below is a detailed breakdown of the blocking cases and concurrency issues addressed in this implementation:
+- Deadlock prevention: When acquiring two dongle mutexes the code uses an ordered locking scheme in `lock_dongles_pair()` (compare pointers and always lock the lower pointer first) to avoid cyclic waits and thus prevent deadlocks.
+- Starvation prevention: The system supports scheduler types (`fifo` and `edf`): EDF (earliest-deadline-first) is implemented using a heap of requests with explicit deadlines so the monitor can favor soon-to-burnout coders and reduce starvation.
+- Cooldown handling: After a coder releases dongles the dongles are set with an `available` timestamp (`release_dongles()`), which prevents immediate re-granting until the cooldown expires.
+- Precise burnout detection: The monitor periodically calls `check_burnout()` which compares `get_time()` with each coder's `last_compile` (or simulation start) and marks a burnout (`burned out`) when the elapsed time exceeds `time_to_burnout`.
+- Log serialization: All printing to stdout is protected by `prt_mtx` (see `log_line()` and `log_state()`), guaranteeing non-interleaved, consistent log lines.
 
-### 1. Deadlock Prevention & Coffman's Conditions
-A system deadlock can only occur if all four **Coffman conditions** are met simultaneously:
-1. **Mutual Exclusion:** Resources cannot be shared simultaneously.
-2. **Hold and Wait:** A thread holding a resource requests additional resources.
-3. **No Preemption:** Resources cannot be forcibly taken from a holding thread.
-4. **Circular Wait:** A closed dependency chain exists where Thread $A$ waits for Thread $B$, and Thread $B$ waits for Thread $A$.
+## Thread synchronization mechanisms
 
-**Resolution:** This solution strictly breaks the **Circular Wait** condition by enforcing a global resource acquisition hierarchy (Hierarchical Resource Lock Ordering). Regardless of whether a dongle is to a coder's physical left or right, a coder must **always acquire the lower-ID dongle first, followed by the higher-ID dongle**:
+- `pthread_mutex_t dgl_mtx` (per-`t_dongle`): protects each dongle's `busy` and `available` fields. Dongles are locked in a consistent order via `lock_dongles_pair()` / `unlock_dongles_pair()` to avoid deadlocks when a coder needs two dongles.
+- `pthread_mutex_t cdr_mtx` (per-`t_coder`): protects coder-local fields such as `last_compile`, `compiled`, `situation`, and `took_them`. Example: `is_coder_burned_out()` locks `cdr_mtx` while checking `situation` and `last_compile` to avoid races with the coder thread.
+- `pthread_cond_t cond_cdr` (per-`t_coder`): used for waiting and timed-waiting. Coders call `pthread_cond_wait(&coder->cond_cdr, &data->data_mtx)` inside `request()` while inserted in the heap; the monitor later `pthread_cond_broadcast()`s the corresponding coder(s) when dongles are granted or when the simulation stops.
+- `pthread_mutex_t data_mtx` (global `t_data`): serializes access to shared scheduler state (the heap of requests), `stop_simulation` flag, and `id_req`. The monitor holds `data_mtx` while scanning and granting requests (`check_simulation_status()` and `try_grant_dongles()`), preventing races between monitor and coder request insertion.
+- `pthread_mutex_t prt_mtx` (global `t_data`): serializes all output to stdout via `log_line()` and `log_state()`, preventing interleaving of output across threads.
 
-$$\text{First Lock} = \min(\text{dongle\_left}, \text{dongle\_right}), \quad \text{Second Lock} = \max(\text{dongle\_left}, \text{dongle\_right})$$
+Examples of coordination and race prevention:
+- A coder wanting dongles: `request()` locks `data_mtx`, inserts a `t_cdr_node` into the heap, then waits on its condition with `pthread_cond_wait(&coder->cond_cdr, &coder->data->data_mtx)`. This ensures the monitor and coder coordinate consistently on the heap state and condition signals without races.
+- Granting dongles: `try_grant_dongles()` (called by the monitor while holding `data_mtx`) uses `can_grant_dongles()` which briefly locks the pair of dongles (`lock_dongles_pair()`) to inspect `busy` and `available` atomically, avoiding inconsistent reads while other threads might change those fields.
+- Timed sleeps and interrupts: `smart_sleep()` uses `pthread_cond_timedwait()` on the coder's condition variable while holding `data_mtx` to allow early wake-ups (e.g., on burnout or stop) while still being interruptible and race-free.
 
-*Why it works:* Consider the classic wrap-around boundary where the last coder contends for `Dongle 0` and `Dongle N-1`. In a naive implementation, all coders grab their left resource first, creating a cycle. Under this strict rule, the last coder attempts to lock `Dongle 0` first (the smaller ID) instead of `Dongle N-1`. If `Dongle 0` is already held by Coder 0, the last coder blocks *before* picking up `Dongle N-1`, leaving `Dongle N-1` free for the preceding coder. Circular dependency chains become mathematically impossible across the entire simulation.
+## Project structure (key files)
 
----
-
-### 2. Starvation Prevention & Scheduling Fairness
-* **Hazard:** Adjacent coders repeatedly acquiring available dongles could starve an intermediate coder, causing them to sit in an infinite wait loop.
-* **Resolution:** Resource contention is governed by centralized dynamic schedulers (`FIFO` or `EDF`). Coders register execution tickets or burnout priority deadlines. Even if adjacent dongles become physically free, greedy coders cannot claim them unless they hold the active queue ticket/turn (`my_turn()`), ensuring fair and starvation-free scheduling.
-
----
-
-### 3. Cooldown Handling & Unblocked Waiting
-* **Hazard:** If a thread holds global environment or queue mutexes while waiting out a dongle's `donor_cooldown` period, it prevents unrelated coders from updating state or progressing.
-* **Resolution:** Cooldown conditions are evaluated using non-blocking timestamp comparisons (`last_release_ms`). Execution queue locks are released prior to timed suspension loops, decoupling state evaluation from resource cooldown delays.
-
----
-
-### 4. Precise Burnout Detection
-* **Hazard:** OS thread creation latency (`pthread_create` jitter) can delay later threads from running their first instruction, resulting in initial timestamp deficits and premature false-positive burnout triggers.
-* **Resolution:** Implemented a two-phase **Start-Gate Barrier**. All worker threads spawn, initialize, and block on a `start_lock`. Once all threads report readiness, the central monitor records $T_0$, initializes all `last_compile_time` markers simultaneously, and unlocks the gate to begin simulation execution.
-
----
-
-### 5. Log Serialization
-* **Hazard:** Asynchronous `printf` calls from multiple concurrent threads produce interleaved, corrupted, or out-of-order console outputs.
-* **Resolution:** Terminal write operations are funneled through an atomic logging function protected by a dedicated `print_lock` mutex, guaranteeing chronologically coherent and thread-safe output logging.
-
+- `main.c` — program bootstrap, world initialization and thread creation.
+- `monitor.c` — central monitor loop that checks burnout and grants dongles.
+- `routine.c` — `coder_routine()` and the main coder lifecycle (request → compile → debug → refactor).
+- `take_dongles.c` / `request_release.c` — request handling, heap processing, lock ordering, and release behaviour.
+- `logs.c` — serialized logging helpers.
+- `parse.c` — command-line parsing and validation.
 
 ## Resources
 
-### AI Usage
-Artificial Intelligence (Gemini) was utilized as an engineering assistant during the development of this project for the following specific tasks and components:
+- POSIX threads (`pthread`) documentation: https://man7.org/linux/man-pages/man7/pthreads.7.html —
+ https://www.codequoi.com/en/threads-mutexes-and-concurrent-programming-in-c/
+- POSIX threads (`pthread`) playlist:https://youtu.be/d9s_d28yJq0?si=eQU8N5v7WpojyPgC — https://youtu.be/KEiur5aZnIM?si=FFEmA6O2WW6LMup1
+- Classic concurrency problems: Dining Philosophers (lock ordering, starvation) — numerous references, e.g. Dijkstra and standard OS textbooks (Silberschatz et al.).
+- EDF scheduling overview: https://en.wikipedia.org/wiki/Earliest_deadline_first_scheduling
+- Heap / priority queue implementation patterns in C: common data-structure references and lecture notes.
 
-1. **Debugging & Race Condition Analysis:**
-   * *Startup Jitter Diagnosis:* Identified and resolved timer deficits caused by `pthread_create()` thread creation overhead by designing a two-phase Start-Gate synchronization barrier.
+AI usage disclosure
 
-2. **Algorithm & Data Structure Verification:**
-   * *EDF Min-Heap Operations:* Verified index arithmetic (`2i + 1`, `2i + 2`, `(i-1)/2`) for dynamic push, pop, and heapify routines in the Earliest Deadline First scheduler queue to eliminate off-by-one memory offsets.
+- An AI assistant was used to help me create this `README.md` file: summarizing the codebase, extracting synchronization and concurrency details, and drafting the usage and sections above. The codebase itself was not modified; the AI only produced documentation and explanations.
 
-3. **Documentation & Deliverables:**
-   * Assisted in drafting, structuring, and formatting markdown technical documentation to satisfy 42 subject requirements (`README.md`).
