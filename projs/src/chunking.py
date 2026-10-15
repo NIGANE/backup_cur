@@ -55,7 +55,7 @@ def blind_chunker(
 
         if len(line) > max_size:
             for i in range(0, len(line), max_size):
-                sub_line = line[i : i + max_size]
+                sub_line = line[i:i + max_size]
                 ob = MinimalSource(
                     file_path=target_file,
                     first_character_index=running_offset + i,
@@ -99,7 +99,7 @@ def regular_chunker(
     matches = list(header_pattern.finditer(content))
 
     if not matches:
-        return blind_chunker(target_file, content, curr_offset=0, max_size=max_size)
+        return blind_chunker(target_file, content, 0, max_size)
 
     indexes = [m.start() for m in matches] + [len(content)]
 

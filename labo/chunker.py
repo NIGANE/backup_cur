@@ -18,22 +18,29 @@ class Error(BaseException):
 
 
 class Chunker:
-    def __init__(self):
+    def __init__(self, src: str, dest: str, max_size: int = 2000):
         self.chunks: List[Tuple[MinimalSource, str]] = []
-        self.outer_dir: str = "data/process"
-        self.outer_file: str = "chunks.pkl"
+        self.res_file_name: str = "chunks.pkl"
+        self.src: str = src
+        self.discovered_files: List[Tuple[str, str]] = []
+        self.max_size = max_size
+        try:
+            os.makedirs(dest, exist_ok=True)
+        except Exception as e:
+            raise Error(e)
+        self.dest: str = Path(dest)/self.res_file_name
 
-    def discover_files(self, target_dir: str) -> List[Tuple[str, str]]:
+    def discover_files(self) -> 'Chunker':
 
         supported_extensions = {".py", ".md", ".rst", ".txt", ".mdx"}
         discoverd: List[Tuple[str, str]] = []
 
-        expanded_dir = os.path.expanduser(target_dir)
+        expanded_dir = os.path.expanduser(self.src)
         base_path: Path = Path(expanded_dir)
         if not base_path.exists():
-            raise FileNotFoundError(f"Directory not found: {target_dir}")
+            raise FileNotFoundError(f"Directory not found: {self.src}")
 
-        for root, _, files in os.walk(target_dir):
+        for root, _, files in os.walk(self.src):
             for file in files:
                 ext = Path(file).suffix.lower()
                 if ext in supported_extensions:
@@ -46,7 +53,15 @@ class Chunker:
                             discoverd.append((norm_path, content))
                     except Exception as e:
                         print(f"Warning: Failed to read {full_path}: {e}")
-        return discoverd
+        print("-- discoverd files: ", "---" * 10)
+        self.discovered_files = discoverd
+        for f in discoverd:
+            print("file location: ", f[0], f"{len(f[1])} bytes")
+        return self
+
+    def chunk(self) -> None:
+        for f in self.discovered_files:
+            self.chunks.extend(self.chunk_document(f[0], f[1]))
 
     def blind_chunker(self, target_file: str, source: str, curr_offset: int,
                       max_size: int) -> List[Tuple[MinimalSource, str]]:
@@ -195,8 +210,32 @@ class Chunker:
 
     def save(self) -> None:
         try:
-            os.makedirs(self.outer_dir, exist_ok=True)
-            with open(Path(self.outer_dir)/self.outer_file, "wb") as f:
+            with open(self.dest, "wb") as f:
                 pickle.dump(self.chunks, f)
         except Exception as e:
             raise Error(f"ChunkerError: {e}")
+        else:
+            print(f"chunks saved successfully -> {self.dest}")
+            return self.dest
+
+    @staticmethod
+    def load(dest) -> List[Tuple[MinimalSource, str]]:
+        if (not Path(dest).exists()):
+            raise FileNotFoundError(
+                f"FileNotFound: chunked file not found on '{dest}"
+                )
+        try:
+            with open(dest, "rb") as f:
+                return pickle.load(f)
+        except Exception as e:
+            raise Error(e)
+
+    def __repr__(self):
+        print("-- chunks : ", "---" * 10)
+        for ch in self.chunks:
+            print(f"chunk: {ch[0].file_path} ",
+                  f"({ch[0].first_character_index}",
+                  f"-{ch[0].last_character_index}) ",
+                  f"{len(ch[1])} bytes",
+                  sep="")
+        return ''
