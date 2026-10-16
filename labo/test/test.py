@@ -1,4 +1,6 @@
-source = "  hello world   "
-source.strip()
+from re import compile
 
-print(source)
+
+class Test:
+    def __init__(self):
+        pass
