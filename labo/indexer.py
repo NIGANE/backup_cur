@@ -91,4 +91,4 @@ class Indexer():
             idf[w] = max(0.0, val)
         return idf
 
-    def bm25_index
+    # def bm25_index
