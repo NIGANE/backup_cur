@@ -2,12 +2,23 @@ from chunker import MinimalSource, Error
 from typing import List, Tuple, Any, Dict
 from chunker import Chunker
 import math
+from pathlib import Path
+import os
+import pickle
 
 
 class Indexer():
-    def __init__(self):
+    def __init__(self, dest: str):
         self.tokens: List[List[str]] = []
         self.chunks: List[Tuple[MinimalSource, str]] = []
+        self.res_file_name: str = "bm25_index.pkl"
+        try:
+            os.makedirs(dest, exist_ok=True)
+        except Exception as e:
+            raise Error(e)
+        self.dest: Path = Path(dest) / self.res_file_name
+        self.term_fr: List[Dict[str, int]] = []
+        
 
     def tokenize_chunks(self, src: str) -> List[List[str]]:
         self.chunks = Chunker.load(src)
@@ -92,3 +103,25 @@ class Indexer():
         return idf
 
     # def bm25_index
+
+    def save(self) -> Path:
+        try:
+            with open(self.dest, "wb") as f:
+                pickle.dump(self.chunks, f)
+        except Exception as e:
+            raise Error(f"ChunkerError: {e}")
+        else:
+            print(f"index successfully saved -> {self.dest}")
+            return self.dest
+
+    @staticmethod
+    def load(dest) -> List[Tuple[MinimalSource, str]]:
+        if (not Path(dest).exists()):
+            raise FileNotFoundError(
+                f"FileNotFound: chunked file not found on '{dest}"
+                )
+        try:
+            with open(dest, "rb") as f:
+                return pickle.load(f)
+        except Exception as e:
+            raise Error(e)

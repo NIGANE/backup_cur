@@ -28,7 +28,7 @@ class Chunker:
             os.makedirs(dest, exist_ok=True)
         except Exception as e:
             raise Error(e)
-        self.dest: str = Path(dest)/self.res_file_name
+        self.dest: Path = Path(dest) / self.res_file_name
 
     def discover_files(self) -> 'Chunker':
 
@@ -204,18 +204,18 @@ class Chunker:
             reminder = content[last_end:]
             if reminder.strip():
                 chunks.extend(
-                    self.blind_chunker(target_file, reminder, max_size)
+                    self.blind_chunker(target_file, reminder,last_end, max_size)
                     )
         return (chunks)
 
-    def save(self) -> None:
+    def save(self) -> Path:
         try:
             with open(self.dest, "wb") as f:
                 pickle.dump(self.chunks, f)
         except Exception as e:
             raise Error(f"ChunkerError: {e}")
         else:
-            print(f"chunks saved successfully -> {self.dest}")
+            print(f"chunks successfully saved -> {self.dest}")
             return self.dest
 
     @staticmethod
