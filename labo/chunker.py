@@ -59,9 +59,10 @@ class Chunker:
             print("file location: ", f[0], f"{len(f[1])} bytes")
         return self
 
-    def chunk(self) -> None:
+    def chunk(self) -> Path:
         for f in self.discovered_files:
             self.chunks.extend(self.chunk_document(f[0], f[1]))
+        return self.save()
 
     def blind_chunker(self, target_file: str, source: str, curr_offset: int,
                       max_size: int) -> List[Tuple[MinimalSource, str]]:
@@ -219,7 +220,7 @@ class Chunker:
             return self.dest
 
     @staticmethod
-    def load(dest) -> List[Tuple[MinimalSource, str]]:
+    def load(dest: str) -> List[Tuple[MinimalSource, str]]:
         if (not Path(dest).exists()):
             raise FileNotFoundError(
                 f"FileNotFound: chunked file not found on '{dest}"

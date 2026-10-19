@@ -5,16 +5,9 @@ from indexer import Indexer
 def main():
     max_size = 2000
     chunker = Chunker("test", "data/process")
-    chunker.discover_files().chunk()
-    str(chunker)
-    chunker.save()
+    cnk_path = chunker.discover_files().chunk()
     indexer = Indexer("data/process")
-    tokens = indexer.tokenize_chunks(chunker.dest)
-    term_freq = indexer.term_frequency(tokens)
-    doc_freq = indexer.doc_frequency(tokens)
-    lenth = indexer.lenth(tokens)
-    idf = indexer.idf(doc_freq, len(tokens))
-    indexer.save()
-
+    idx_path = indexer.tokenize_chunks(str(cnk_path))
+    loads = indexer.load(str(idx_path))
 
 main()

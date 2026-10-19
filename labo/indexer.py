@@ -5,6 +5,16 @@ import math
 from pathlib import Path
 import os
 import pickle
+from pydantic import BaseModel
+
+
+
+class BM25Index(BaseModel):
+    term_freqs: List[Dict[str, int]]
+    doc_lens: List[int]
+    avg_dl: float
+    idf: Dict[str, float]
+    chunks: List[MinimalSource]
 
 
 class Indexer():
@@ -15,17 +25,30 @@ class Indexer():
         try:
             os.makedirs(dest, exist_ok=True)
         except Exception as e:
-            raise Error(e)
+            raise Error(f"IndexerError: {e}")
         self.dest: Path = Path(dest) / self.res_file_name
-        self.term_fr: List[Dict[str, int]] = []
-        
+        self.t_freq: List[Dict[str, int]] = []
+        self.doc_freq: Dict[str, int] = {}
+        self.len: Tuple[List[int], float] = ([], 0.0)
+        self.idfre: Dict[str, float] = {}
 
-    def tokenize_chunks(self, src: str) -> List[List[str]]:
+    def tokenize_chunks(self, src: str) -> Path:
         self.chunks = Chunker.load(src)
         if (not self.chunks):
-            return []
+            return Path('')
         self.tokens = [self.split(src[1]) for src in self.chunks]
-        return self.tokens
+        self.t_freq: List[Dict[str, int]] = self.term_frequency(self.tokens)
+        self.doc_freq: Dict[str, int] = self.doc_frequency(self.tokens)
+        self.len: Tuple[List[int], float] = self.lenth(self.tokens)
+        self.idfre: Dict[str, float] = self.idf(self.doc_freq, len(self.tokens))
+        self.export:BM25Index = BM25Index(
+            term_freqs=self.t_freq,
+            doc_lens=self.len[0],
+            avg_dl=self.len[1],
+            idf=self.idfre,
+            chunks=[ch[0] for ch in self.chunks]
+        )
+        return self.save()
 
     def split(self, src: str):
         res: List[str] = []
@@ -107,7 +130,7 @@ class Indexer():
     def save(self) -> Path:
         try:
             with open(self.dest, "wb") as f:
-                pickle.dump(self.chunks, f)
+                pickle.dump(self.export, f)
         except Exception as e:
             raise Error(f"ChunkerError: {e}")
         else:
@@ -115,7 +138,7 @@ class Indexer():
             return self.dest
 
     @staticmethod
-    def load(dest) -> List[Tuple[MinimalSource, str]]:
+    def load(dest: str) -> List[Tuple[MinimalSource, str]]:
         if (not Path(dest).exists()):
             raise FileNotFoundError(
                 f"FileNotFound: chunked file not found on '{dest}"
