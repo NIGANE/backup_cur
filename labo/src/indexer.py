@@ -1,6 +1,5 @@
-from chunker import MinimalSource, Error
-from typing import List, Tuple, Any, Dict
-from chunker import Chunker
+from src.chunker import MinimalSource, Error, Chunker
+from typing import List, Tuple, Dict
 import math
 from pathlib import Path
 import os
@@ -31,6 +30,7 @@ class Indexer():
         self.doc_freq: Dict[str, int] = {}
         self.len: Tuple[List[int], float] = ([], 0.0)
         self.idfre: Dict[str, float] = {}
+        self.last_resolved: List[MinimalSource] = []
 
     def tokenize_chunks(self, src: str) -> Path:
         self.chunks = Chunker.load(src)
@@ -50,7 +50,7 @@ class Indexer():
         )
         return self.save()
 
-    def split(self, src: str):
+    def split(self, src: str) -> List[str]:
         res: List[str] = []
         buffer: List[str] = []
         src = src.strip()
@@ -125,7 +125,32 @@ class Indexer():
             idf[w] = max(0.0, val)
         return idf
 
-    # def bm25_index
+    def search(self, query: List[str], ind: BM25Index,
+               k1: float = 1.5, b: float = 0.75) -> List[Tuple[float, int]]:
+
+        scores = [0.0] * len(ind.term_freqs)
+        for id, tf_dict in enumerate(ind.term_freqs):
+            dl = ind.doc_lens[id]
+            d_score = 0.0
+            for token in query:
+                if token not in ind.idf:
+                    continue
+
+                tf = tf_dict.get(token, 0)
+                if tf == 0:
+                    continue
+
+                idf_val = ind.idf[token]
+                numerator = tf * (k1 + 1.0)
+                denominator = tf + k1 * (1.0 - b + b * (dl / ind.avg_dl))
+
+                d_score += idf_val * (numerator / denominator)
+            scores[id] = d_score
+        res: List[Tuple[float, int]] = [(scores[i], i) for i in range(len(scores)) if scores[i] > 0.0]
+        res.sort(key=lambda x: x[0], reverse=True)
+        return res
+
+
 
     def save(self) -> Path:
         try:
@@ -137,14 +162,26 @@ class Indexer():
             print(f"index successfully saved -> {self.dest}")
             return self.dest
 
-    @staticmethod
-    def load(dest: str) -> List[Tuple[MinimalSource, str]]:
+    def load(self, dest: str) -> BM25Index:
         if (not Path(dest).exists()):
             raise FileNotFoundError(
                 f"FileNotFound: chunked file not found on '{dest}"
                 )
         try:
             with open(dest, "rb") as f:
-                return pickle.load(f)
+                self.export = pickle.load(f)
+                return self.export
         except Exception as e:
             raise Error(e)
+
+    def fetch_query_chunks(self, sc: List[Tuple[float, int]], k: int = 5):
+        ret = []
+        self.last_resolved = []
+        if len(sc) <= k:
+            ret = sc
+        else:
+            ret = [sc[i] for i in range(0, k)]
+        for _, id in ret:
+            source = self.export.chunks[id]
+            self.last_resolved.append(source)
+            print(f"{source.file_path} [{source.first_character_index}:{source.last_character_index}]")
