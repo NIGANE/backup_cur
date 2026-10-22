@@ -5,16 +5,9 @@ import ast
 import re
 from pydantic import BaseModel
 import pickle
-
-
-class MinimalSource(BaseModel):
-    file_path: str
-    first_character_index: int
-    last_character_index: int
-
-
-class Error(BaseException):
-    pass
+from tqdm import tqdm
+from src.models import MinimalSource
+from src.error import Error
 
 
 class Chunker:
@@ -26,7 +19,7 @@ class Chunker:
         self.max_size = max_size
         try:
             os.makedirs(dest, exist_ok=True)
-        except Exception as e:
+        except SystemError as e:
             raise Error(e)
         self.dest: Path = Path(dest) / self.res_file_name
 
@@ -38,7 +31,7 @@ class Chunker:
         expanded_dir = os.path.expanduser(self.src)
         base_path: Path = Path(expanded_dir)
         if not base_path.exists():
-            raise FileNotFoundError(f"Directory not found: {self.src}")
+            raise FileNotFoundError(f"Directory not found '{self.src}'")
 
         for root, _, files in os.walk(self.src):
             for file in files:
@@ -53,15 +46,17 @@ class Chunker:
                             discoverd.append((norm_path, content))
                     except Exception as e:
                         print(f"Warning: Failed to read {full_path}: {e}")
-        print("-- discoverd files: ", "---" * 10)
+        if (not discoverd):
+            raise Error(f"Emtpy given repo to parse on '{self.src}'")
         self.discovered_files = discoverd
-        for f in discoverd:
-            print("file location: ", f[0], f"{len(f[1])} bytes")
         return self
 
     def chunk(self) -> Path:
-        for f in self.discovered_files:
-            self.chunks.extend(self.chunk_document(f[0], f[1]))
+        with tqdm(self.discovered_files, desc="Chunking",
+            unit=" file") as group:
+            for f in group:
+                self.chunks.extend(self.chunk_document(f[0], f[1]))
+
         return self.save()
 
     def blind_chunker(self, target_file: str, source: str, curr_offset: int,
@@ -216,14 +211,13 @@ class Chunker:
         except Exception as e:
             raise Error(f"ChunkerError: {e}")
         else:
-            print(f"chunks successfully saved -> {self.dest}")
             return self.dest
 
     @staticmethod
     def load(dest: str) -> List[Tuple[MinimalSource, str]]:
         if (not Path(dest).exists()):
             raise FileNotFoundError(
-                f"FileNotFound: chunked file not found on '{dest}"
+                f"chunke file not found on '{Path(dest).parent}"
                 )
         try:
             with open(dest, "rb") as f:

@@ -5,6 +5,7 @@ from pathlib import Path
 import os
 import pickle
 from pydantic import BaseModel
+from tqdm import tqdm
 
 
 
@@ -35,8 +36,10 @@ class Indexer():
     def tokenize_chunks(self, src: str) -> Path:
         self.chunks = Chunker.load(src)
         if (not self.chunks):
-            return Path('')
-        self.tokens = [self.split(src[1]) for src in self.chunks]
+                return Path('')
+        with tqdm(self.chunks, desc="Tokenizing", unit=" chunks") as group:
+            for e in group:
+                self.tokens.append(self.split(e[1]))
         self.t_freq: List[Dict[str, int]] = self.term_frequency(self.tokens)
         self.doc_freq: Dict[str, int] = self.doc_frequency(self.tokens)
         self.len: Tuple[List[int], float] = self.lenth(self.tokens)
@@ -159,13 +162,12 @@ class Indexer():
         except Exception as e:
             raise Error(f"ChunkerError: {e}")
         else:
-            print(f"index successfully saved -> {self.dest}")
             return self.dest
 
     def load(self, dest: str) -> BM25Index:
         if (not Path(dest).exists()):
             raise FileNotFoundError(
-                f"FileNotFound: chunked file not found on '{dest}"
+                f"index file not found on '{Path(dest).parent}'"
                 )
         try:
             with open(dest, "rb") as f:
