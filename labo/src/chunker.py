@@ -234,3 +234,17 @@ class Chunker:
                   f"{len(ch[1])} bytes",
                   sep="")
         return ''
+
+    @staticmethod
+    def get_chunk(obj: MinimalSource):
+        path: Path = Path(obj.file_path)
+        st: int = obj.first_character_index
+        end: int = obj.last_character_index
+        if (not path.exists()):
+            raise (FileNotFoundError(f"target file not found '{path}'"))
+        try:
+            with open(path, 'r') as f:
+                f.seek(st)
+                return f.read(end - st)
+        except Exception as e:
+            raise Error(e)

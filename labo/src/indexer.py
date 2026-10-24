@@ -1,11 +1,15 @@
 from src.chunker import MinimalSource, Error, Chunker
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Optional, TypedDict
 import math
 from pathlib import Path
 import os
 import pickle
 from pydantic import BaseModel
 from tqdm import tqdm
+import json
+from src.error import UsageError
+from src.models import StudentSearchResults, MinimalSearchResults
+import uuid
 
 
 
@@ -16,28 +20,31 @@ class BM25Index(BaseModel):
     idf: Dict[str, float]
     chunks: List[MinimalSource]
 
+class SearchResults(TypedDict):
+    question_id: str
+    question: str
+    sources: List[MinimalSource]
+
 
 class Indexer():
-    def __init__(self, dest: str):
+    def __init__(self, dest: str = ''):
         self.tokens: List[List[str]] = []
         self.chunks: List[Tuple[MinimalSource, str]] = []
         self.res_file_name: str = "bm25_index.pkl"
-        try:
-            os.makedirs(dest, exist_ok=True)
-        except Exception as e:
-            raise Error(f"IndexerError: {e}")
-        self.dest: Path = Path(dest) / self.res_file_name
+        self.dataset_file: str = 'dataset_docs_public.json'
+        self.dest: Path = Path(dest)
         self.t_freq: List[Dict[str, int]] = []
         self.doc_freq: Dict[str, int] = {}
         self.len: Tuple[List[int], float] = ([], 0.0)
         self.idfre: Dict[str, float] = {}
         self.last_resolved: List[MinimalSource] = []
+        self.dataset_search: StudentSearchResults
 
     def tokenize_chunks(self, src: str) -> Path:
         self.chunks = Chunker.load(src)
         if (not self.chunks):
                 return Path('')
-        with tqdm(self.chunks, desc="Tokenizing", unit=" chunks") as group:
+        with tqdm(self.chunks, desc="Tokenizing", unit=" chunks", total=len(self.chunks) + 5) as group:
             for e in group:
                 self.tokens.append(self.split(e[1]))
         self.t_freq: List[Dict[str, int]] = self.term_frequency(self.tokens)
@@ -128,14 +135,14 @@ class Indexer():
             idf[w] = max(0.0, val)
         return idf
 
-    def search(self, query: List[str], ind: BM25Index,
+    def search(self, query: str, ind: BM25Index,
                k1: float = 1.5, b: float = 0.75) -> List[Tuple[float, int]]:
-
+        query_tokens: List[str] = self.split(query)
         scores = [0.0] * len(ind.term_freqs)
         for id, tf_dict in enumerate(ind.term_freqs):
             dl = ind.doc_lens[id]
             d_score = 0.0
-            for token in query:
+            for token in query_tokens:
                 if token not in ind.idf:
                     continue
 
@@ -153,30 +160,78 @@ class Indexer():
         res.sort(key=lambda x: x[0], reverse=True)
         return res
 
+    def search_multy(self, data: Dict[str, List[Dict[str, str]]], ind: BM25Index, k: int = 5):
+        if (not data.get('rag_questions')):
+            raise UsageError('hello')
 
+        res:List[SearchResults] = []
+
+        qts = [
+            dict(
+                question=qt.get("question"),
+                question_id=qt.get("question_id")
+            ) 
+            for qt in data['rag_questions']
+            ]
+        for qt in qts:
+            if (qt['question'] is None or qt["question"] in [ele["question"] for ele in res]):
+                continue
+            scores = self.search(qt['question'].lower(), ind)
+            res.append({
+                "question_id": qt.get("question_id") or str(uuid.uuid4()),
+                "question": qt["question"],
+                "sources": self.fetch_query_chunks(scores, k)
+            })
+
+        self.dataset_search = StudentSearchResults(
+            search_results=[
+                MinimalSearchResults(
+                    question_id=ele['question_id'],
+                    question=ele['question'],
+                    retrieved_sources=ele['sources']
+                ) for ele in res
+            ],
+            k=k
+        )
+        return self.save_dataset()
+            
 
     def save(self) -> Path:
         try:
-            with open(self.dest, "wb") as f:
+            os.makedirs(self.dest, exist_ok=True)
+            with open(self.dest / self.res_file_name, "wb") as f:
                 pickle.dump(self.export, f)
         except Exception as e:
-            raise Error(f"ChunkerError: {e}")
+            raise Error(f"{e}")
         else:
-            return self.dest
+            return self.dest / self.res_file_name
 
-    def load(self, dest: str) -> BM25Index:
-        if (not Path(dest).exists()):
-            raise FileNotFoundError(
-                f"index file not found on '{Path(dest).parent}'"
-                )
+    def save_dataset(self) -> Path:
         try:
-            with open(dest, "rb") as f:
+            os.makedirs(self.dest.parent, exist_ok=True)
+            with open(self.dest.parent / self.dataset_file, 'w') as f:
+                json.dump(
+                    self.dataset_search.model_dump(),
+                    f,
+                    indent=2
+                    )
+        except Exception as e:
+            raise Error(e)
+        else:
+            return self.dest / self.dataset_file
+
+    def load(self, dest: Path) -> Optional[BM25Index]:
+        if (not (dest / self.res_file_name).exists()):
+            return None
+        
+        try:
+            with open(dest / self.res_file_name, "rb") as f:
                 self.export = pickle.load(f)
                 return self.export
         except Exception as e:
             raise Error(e)
 
-    def fetch_query_chunks(self, sc: List[Tuple[float, int]], k: int = 5):
+    def fetch_query_chunks(self, sc: List[Tuple[float, int]], k: int = 5) -> List[MinimalSource]:
         ret = []
         self.last_resolved = []
         if len(sc) <= k:
@@ -186,4 +241,5 @@ class Indexer():
         for _, id in ret:
             source = self.export.chunks[id]
             self.last_resolved.append(source)
-            print(f"{source.file_path} [{source.first_character_index}:{source.last_character_index}]")
+        return self.last_resolved
+            
