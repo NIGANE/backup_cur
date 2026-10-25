@@ -1,19 +1,22 @@
 from pathlib import Path
 import json
-from src.error import Error
-from typing import Dict, List, Optional
+from src.error import Error, DataValidation
+from typing import Dict, List, Optional, Any, Tuple
 from src.chunker import Chunker
 from src.indexer import Indexer, BM25Index
 from src.error import Error, UsageError
-from src.models import MinimalSearchResults
-from transformers import pipeline
+from src.models import StudentSearchResults, MinimalAnswer, StudentSearchResultsAndAnswer
+from pydantic import ValidationError
+from pydantic_core import ErrorDetails
+from src.agent import Agent
+from tqdm import tqdm
 
 class Controller:
     def __init__(self):
         pass
 
     @staticmethod
-    def fetch_json(path: Path) -> Dict[str, List[Dict[str, str]]]:
+    def fetch_json(path: Path) -> Dict[str, List[Dict[str, Any]] | int]:
         if (not path.exists()):
             raise FileNotFoundError(f"file not found '{path}'")
         try:
@@ -21,31 +24,6 @@ class Controller:
                 return json.load(f)
         except Exception as e:
             raise Error(e)
-
-    @staticmethod
-    def inference(contexts: List[str], query: str, model: str = 'Qwen/Qwen3-0.6B'):
-        generator = pipeline(
-            'text-generation',
-            model=model,
-            device='cpu'
-            )
-        context: str = "\n\n".join([
-            f"- chunk: {ch}" for ch in contexts
-        ])
-        prompt = f"""Use the context below to answer the question.
-
-        Context:
-        {context}
-
-        Question: {query}
-        Answer:"""
-        res = generator(
-            prompt,
-            max_new_tokens=50,
-            do_sample=False,        # greedy = more deterministic
-            return_full_text=False 
-        )
-        return (res[0]['generated_text'])
 
     @staticmethod
     def index(path: Path, max_chunk_size: int = 2000) -> None:
@@ -82,8 +60,6 @@ class Controller:
         for source in ind.last_resolved:
             print(f"{source.file_path} [{source.first_character_index}:{source.last_character_index}]")
 
-
-
     @staticmethod
     def search_dataset(dataset_path: str = '', k: int = 5, save_directory: str = '', path: Path = Path('')):
         if (dataset_path == True or not dataset_path):
@@ -95,7 +71,7 @@ class Controller:
         if (isinstance(k, bool)):
             raise UsageError("missing 1 optional argument value '--k'?")
         src = Path(dataset_path)
-        data: Dict[str, List[Dict[str, str]]] = Controller.fetch_json(src)
+        data: Dict[str, List[Dict[str, str]] | int] = Controller.fetch_json(src)
         if (not data):
             raise UsageError(f"the feeded file is empty '{src}'")
         indexer = Indexer(save_directory)
@@ -125,8 +101,56 @@ class Controller:
         ind.fetch_query_chunks(scores, k)
 
         context: List[str] = []
+        agent: Agent = Agent()
         for e in ind.last_resolved:
             re = Chunker.get_chunk(e)
             context.append(re)
-        res = Controller.inference(context, query)
+        res: str = agent.inference(context, query)
         print(res)
+
+    @staticmethod
+    def answer_dataset(student_search_results_path: str = '',
+                       save_directory: str = '',
+                       path: Path = Path('')):
+
+        if (not student_search_results_path or student_search_results_path == True):
+            raise UsageError(
+                "missing 1 required positional argument '--student_search_results_path'"
+                )
+        if (not save_directory or save_directory == True):
+            raise UsageError(
+                "missing 1 required positional argument '--save_directory'"
+            )
+        src: Path = Path(student_search_results_path)
+        d_search: Dict[str, List[Dict[str, Any]] | int] = Controller.fetch_json(src)
+        try:
+            obj: StudentSearchResults = StudentSearchResults.model_validate(d_search)
+        except ValidationError as e:
+            err: ErrorDetails = e.errors()[0]
+            raise DataValidation(f"{err['type']} {err['loc'][0]}, {err['msg']} on data source " +
+                                 f"{src}")
+        data: List[MinimalAnswer] = []
+        agent: Agent = Agent()
+        with tqdm(obj.search_results, desc="Answering", unit=" Qestion") as update:
+            for ele in update:
+                context = []
+                for e in ele.retrieved_sources:
+                    context.append(Chunker.get_chunk(e))
+                
+                res = agent.inference(context, ele.question)
+                data.append(
+                    MinimalAnswer(
+                        question_id=ele.question_id,
+                        question=ele.question,
+                        retrieved_sources=ele.retrieved_sources,
+                        answer=res
+                    )
+                )
+        res = StudentSearchResultsAndAnswer(
+            search_results=data,
+            k=obj.k
+        )
+        dest: Path = agent.save(res, Path(save_directory))
+        print(f"Saved student_search_results_and_answer to {dest}")
+        
+

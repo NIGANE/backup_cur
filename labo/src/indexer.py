@@ -32,6 +32,7 @@ class Indexer():
         self.chunks: List[Tuple[MinimalSource, str]] = []
         self.res_file_name: str = "bm25_index.pkl"
         self.dataset_file: str = 'dataset_docs_public.json'
+        self.dataset_answer_file: str = "answer_dataset_docs_public.json"
         self.dest: Path = Path(dest)
         self.t_freq: List[Dict[str, int]] = []
         self.doc_freq: Dict[str, int] = {}
@@ -39,6 +40,10 @@ class Indexer():
         self.idfre: Dict[str, float] = {}
         self.last_resolved: List[MinimalSource] = []
         self.dataset_search: StudentSearchResults
+        if (self.dest.suffix):
+            file: str = self.dest.name
+            self.dest = self.dest.parent
+            self.dataset_file = self.dataset_answer_file = file
 
     def tokenize_chunks(self, src: str) -> Path:
         self.chunks = Chunker.load(src)
@@ -194,7 +199,6 @@ class Indexer():
             k=k
         )
         return self.save_dataset()
-            
 
     def save(self) -> Path:
         try:
@@ -208,8 +212,9 @@ class Indexer():
 
     def save_dataset(self) -> Path:
         try:
-            os.makedirs(self.dest.parent, exist_ok=True)
-            with open(self.dest.parent / self.dataset_file, 'w') as f:
+            os.makedirs(self.dest, exist_ok=True)
+
+            with open(self.dest / self.dataset_file, 'w') as f:
                 json.dump(
                     self.dataset_search.model_dump(),
                     f,

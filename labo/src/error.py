@@ -3,3 +3,6 @@ class UsageError(BaseException):
 
 class Error(BaseException):
     pass
+
+class DataValidation(BaseException):
+    pass
