@@ -1,29 +1,15 @@
-from src.chunker import MinimalSource, Error, Chunker
-from typing import List, Tuple, Dict, Optional, TypedDict
-import math
-from pathlib import Path
-import os
-import pickle
-from pydantic import BaseModel
-from tqdm import tqdm
-import json
-from src.error import UsageError
 from src.models import StudentSearchResults, MinimalSearchResults
+from src.types import BM25Index, RagQuestion, SearchResults
+from src.chunker import MinimalSource, Error, Chunker
+from typing import List, Tuple, Dict, Optional
+from collections import Counter
+from pathlib import Path
+from tqdm import tqdm
+import pickle
+import math
+import json
 import uuid
-
-
-
-class BM25Index(BaseModel):
-    term_freqs: List[Dict[str, int]]
-    doc_lens: List[int]
-    avg_dl: float
-    idf: Dict[str, float]
-    chunks: List[MinimalSource]
-
-class SearchResults(TypedDict):
-    question_id: str
-    question: str
-    sources: List[MinimalSource]
+import os
 
 
 class Indexer():
@@ -48,15 +34,20 @@ class Indexer():
     def tokenize_chunks(self, src: str) -> Path:
         self.chunks = Chunker.load(src)
         if (not self.chunks):
-                return Path('')
-        with tqdm(self.chunks, desc="Tokenizing", unit=" chunks", total=len(self.chunks) + 5) as group:
+            return Path('')
+        with tqdm(
+                self.chunks, desc="Tokenizing",
+                unit=" chunks", total=len(self.chunks) + 5
+                ) as group:
             for e in group:
                 self.tokens.append(self.split(e[1]))
         self.t_freq: List[Dict[str, int]] = self.term_frequency(self.tokens)
         self.doc_freq: Dict[str, int] = self.doc_frequency(self.tokens)
         self.len: Tuple[List[int], float] = self.lenth(self.tokens)
-        self.idfre: Dict[str, float] = self.idf(self.doc_freq, len(self.tokens))
-        self.export:BM25Index = BM25Index(
+        self.idfre: Dict[str, float] = self.idf(
+            self.doc_freq, len(self.tokens)
+            )
+        self.export: BM25Index = BM25Index(
             term_freqs=self.t_freq,
             doc_lens=self.len[0],
             avg_dl=self.len[1],
@@ -73,7 +64,8 @@ class Indexer():
         for i, e in enumerate(src):
             if (e.isalnum()):
                 if e.isnumeric():
-                    if buffer and not num and i > 0 and not src[i - 1].isalnum():
+                    if (buffer and not num and i > 0
+                            and not src[i - 1].isalnum()):
                         res.append("".join(buffer))
                         buffer = []
                     buffer.append(str(e))
@@ -100,38 +92,53 @@ class Indexer():
                 buffer = []
         return res
 
-    def term_frequency(self, src: List[List[str]]) -> List[Dict[str, int]]:
-        res: List[Dict[str, int]] = []
-        for ch in src:
-            res.append(self.fr(ch))
-        return res
+    # def term_frequency(self, src: List[List[str]]) -> List[Dict[str, int]]:
+    #     res: List[Dict[str, int]] = []
+    #     for ch in src:
+    #         res.append(self.fr(ch))
+    #     return res
 
+    # def fr(self, src: List[str]) -> Dict[str, int]:
+    #     res: Dict[str, int] = {}
+    #     for e in src:
+    #         cn: int = 0
+    #         if (e in res.keys()):
+    #             continue
+    #         for bf in src:
+    #             if bf == e:
+    #                 cn += 1
+    #         res[e] = cn
+    #     return res
+
+    # def lenth(self, src: List[List[str]]) -> Tuple[List[int], float]:
+    #     return (
+    #         [len(doc) for doc in src],
+    #         sum([len(doc) for doc in src]) / len(src)
+    #         )
+
+    # def doc_frequency(self, src: List[List[str]]) -> Dict[str, int]:
+    #     res: Dict[str, int] = {}
+    #     for doc in src:
+    #         for w in doc:
+    #             if w in res.keys():
+    #                 continue
+    #             res[w] = sum([1 for e in src if w in e])
+    #     return res
     def fr(self, src: List[str]) -> Dict[str, int]:
-        res: Dict[str, int] = {}
-        for e in src:
-            cn: int = 0
-            if (e in res.keys()):
-                continue
-            for bf in src:
-                if bf == e:
-                    cn += 1
-            res[e] = cn
-        return res
+        return dict(Counter(src))          # O(L) instead of O(L²)
 
-    def lenth(self, src: List[List[str]]) -> Tuple[List[int], float]:
-        return (
-            [len(doc) for doc in src],
-            sum([len(doc) for doc in src]) / len(src)
-            )
+    def term_frequency(self, src: List[List[str]]) -> List[Dict[str, int]]:
+        return [dict(Counter(doc)) for doc in src]
 
     def doc_frequency(self, src: List[List[str]]) -> Dict[str, int]:
-        res: Dict[str, int] = {}
+        df: Counter = Counter()
         for doc in src:
-            for w in doc:
-                if w in res.keys():
-                    continue
-                res[w] = sum([1 for e in src if w in e])
-        return res
+            df.update(set(doc))            # each word counted once per doc
+        return dict(df)                    # O(total tokens)
+
+    def lenth(self, src: List[List[str]]) -> Tuple[List[int], float]:
+        lens = [len(doc) for doc in src]
+        return lens, (sum(lens) / len(lens) if lens else 0.0)
 
     def idf(self, fq: Dict[str, int], size: int) -> Dict[str, float]:
         idf: Dict[str, float] = {}
@@ -161,25 +168,27 @@ class Indexer():
 
                 d_score += idf_val * (numerator / denominator)
             scores[id] = d_score
-        res: List[Tuple[float, int]] = [(scores[i], i) for i in range(len(scores)) if scores[i] > 0.0]
+        res: List[Tuple[float, int]] = [
+            (scores[i], i) for i in range(len(scores)) if scores[i] > 0.0
+            ]
         res.sort(key=lambda x: x[0], reverse=True)
         return res
 
-    def search_multy(self, data: Dict[str, List[Dict[str, str]]], ind: BM25Index, k: int = 5):
-        if (not data.get('rag_questions')):
-            raise UsageError('hello')
+    def search_multy(self, data: Dict[str, List[RagQuestion]],
+                     ind: BM25Index, k: int = 5):
 
-        res:List[SearchResults] = []
+        res: List[SearchResults] = []
 
         qts = [
             dict(
                 question=qt.get("question"),
                 question_id=qt.get("question_id")
-            ) 
+            )
             for qt in data['rag_questions']
             ]
         for qt in qts:
-            if (qt['question'] is None or qt["question"] in [ele["question"] for ele in res]):
+            if (qt['question'] is None
+                    or qt["question"] in [ele["question"] for ele in res]):
                 continue
             scores = self.search(qt['question'].lower(), ind)
             res.append({
@@ -228,7 +237,7 @@ class Indexer():
     def load(self, dest: Path) -> Optional[BM25Index]:
         if (not (dest / self.res_file_name).exists()):
             return None
-        
+
         try:
             with open(dest / self.res_file_name, "rb") as f:
                 self.export = pickle.load(f)
@@ -236,7 +245,8 @@ class Indexer():
         except Exception as e:
             raise Error(e)
 
-    def fetch_query_chunks(self, sc: List[Tuple[float, int]], k: int = 5) -> List[MinimalSource]:
+    def fetch_query_chunks(self, sc: List[Tuple[float, int]], k: int = 5
+                           ) -> List[MinimalSource]:
         ret = []
         self.last_resolved = []
         if len(sc) <= k:
@@ -247,4 +257,3 @@ class Indexer():
             source = self.export.chunks[id]
             self.last_resolved.append(source)
         return self.last_resolved
-            

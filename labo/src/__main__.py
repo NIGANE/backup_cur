@@ -1,14 +1,14 @@
+from src.error import UsageError, DataValidation
+from src.controller import Controller as ctr
+from functools import partial
+from pathlib import Path
 from typing import List
-from src.error import UsageError, Error, DataValidation
 import fire
 import sys
-from pathlib import Path
-from functools import partial
-from src.controller import Controller as ctr
-from pydantic import ValidationError
+
 
 def hints():
-    print("Usage: ...")    
+    print("Usage: ...")
 
 
 def main():
@@ -23,7 +23,7 @@ def main():
 
         if sys.argv[1].strip().lower() not in allowed_actions:
             raise UsageError(f"unknown action '{sys.argv[1]}'")
-    
+
         fire.Fire({
             "index": partial(ctr.index, path=data_path),
             "search": partial(ctr.search, path=data_path),
@@ -42,6 +42,4 @@ def main():
         sys.exit(1)
 
 
-
 main()
-

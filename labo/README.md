@@ -8,5 +8,5 @@
  - bm25 fomula components
 
  ## todo:
- - introductions to the functions (main.py)
- - search_dataset
+ - Counter lockup
+ - evaluation

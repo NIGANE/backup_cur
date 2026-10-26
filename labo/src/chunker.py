@@ -1,13 +1,12 @@
-import os
-from pathlib import Path
-from typing import List, Tuple
-import ast
-import re
-from pydantic import BaseModel
-import pickle
-from tqdm import tqdm
 from src.models import MinimalSource
+from typing import List, Tuple
 from src.error import Error
+from pathlib import Path
+from tqdm import tqdm
+import pickle
+import ast
+import os
+import re
 
 
 class Chunker:
@@ -16,7 +15,7 @@ class Chunker:
         self.res_file_name: str = "chunks.pkl"
         self.src: str = src
         self.discovered_files: List[Tuple[str, str]] = []
-        self.max_size = max_size
+        self.max_size: int = max_size
         try:
             os.makedirs(dest, exist_ok=True)
         except SystemError as e:
@@ -52,8 +51,9 @@ class Chunker:
         return self
 
     def chunk(self) -> Path:
-        with tqdm(self.discovered_files, desc="Chunking",
-            unit=" file") as group:
+        with tqdm(
+                self.discovered_files, desc="Chunking",
+                unit=" file") as group:
             for f in group:
                 self.chunks.extend(self.chunk_document(f[0], f[1]))
 
@@ -167,16 +167,19 @@ class Chunker:
         except Exception:
             return self.blind_chunker(target_file, content, 0, max_size)
 
-        nodes = [node for node in tree.body
-                 if isinstance(node, (ast.FunctionDef,
-                                      ast.ClassDef, ast.AsyncFunctionDef))]
+        nodes: List[ast.FunctionDef | ast.ClassDef | ast.AsyncFunctionDef] = [
+                node for node in tree.body
+                if isinstance(
+                    node, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)
+                    )
+                ]
         if (not nodes):
             return self.blind_chunker(target_file, content, 0, max_size)
-        lines = content.splitlines(True)
+        lines: List[str] = content.splitlines(True)
 
         for node in nodes:
-            start = sum(len(lines[i]) for i in range(node.lineno - 1))
-            end = sum(len(lines[i]) for i in range(node.end_lineno))
+            start: int = sum(len(lines[i]) for i in range(node.lineno - 1))
+            end: int = sum(len(lines[i]) for i in range(node.end_lineno))
 
             if (last_end != start):
                 hole = content[last_end:start]
@@ -184,12 +187,12 @@ class Chunker:
                     chunks.extend(self.blind_chunker(target_file, hole,
                                                      last_end, max_size))
 
-            chunk = content[start:end]
+            chunk: str = content[start:end]
             if (len(chunk) > max_size):
                 chunks.extend(self.blind_chunker(target_file, chunk,
                                                  start, max_size))
             else:
-                source = MinimalSource(
+                source: MinimalSource = MinimalSource(
                         file_path=target_file,
                         first_character_index=start,
                         last_character_index=end
@@ -197,10 +200,12 @@ class Chunker:
                 chunks.append((source, chunk))
             last_end = end
         if (last_end < len(content)):
-            reminder = content[last_end:]
+            reminder: str = content[last_end:]
             if reminder.strip():
                 chunks.extend(
-                    self.blind_chunker(target_file, reminder,last_end, max_size)
+                    self.blind_chunker(
+                        target_file, reminder, last_end, max_size
+                        )
                     )
         return (chunks)
 

@@ -1,6 +1,6 @@
-import uuid
-from typing import List, Union
 from pydantic import BaseModel, Field
+from typing import List, Union
+import uuid
 
 
 class MinimalSource(BaseModel):

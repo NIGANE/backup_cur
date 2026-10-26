@@ -18,11 +18,12 @@ index:
 
 answer:
 	uv run python3 -m src answer \
-	"What types are supported as containers in vLLM's JSONTree type definition?" \
+	"What is the type hint for the kv_range_for_decode parameter in the _attention_with_mask method?" \
 	--k 1
 
 clean:
 	@rm -rf src/__pycache__
 
 clean-all: clean
-# 	@rm -rf data/process -rf
+	@rm -rf data/process -rf
+	@rm -rf data/output
