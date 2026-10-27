@@ -29,7 +29,8 @@ def main():
             "search": partial(ctr.search, path=data_path),
             "search_dataset": partial(ctr.search_dataset, path=data_path),
             "answer": partial(ctr.answer, path=data_path),
-            "answer_dataset": partial(ctr.answer_dataset, path=data_path)
+            "answer_dataset": partial(ctr.answer_dataset, path=data_path),
+            "evaluate": ctr.evaluate
         })
     except UsageError as e:
         print(f"{e.__class__.__name__}: {e}")

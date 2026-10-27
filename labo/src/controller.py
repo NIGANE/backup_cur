@@ -19,6 +19,27 @@ class Controller:
         pass
 
     @staticmethod
+    def validate_paths(*paths: Tuple[str, str]) -> None:
+        for p in paths:
+            if (p[1] is True or not p[1]):
+                raise UsageError(
+                    f"missing 1 required positional argument '{p[0]}'")
+
+    @staticmethod
+    def validate_numeric(*numbers: Tuple[str, int | str | None, int]) -> None:
+        for n in numbers:
+            if (isinstance(n[1], str) and not n[1].isnumeric()):
+                raise UsageError(
+                    f"arg '{n[0]}' is not an integer")
+            if (isinstance(n[1], int) and n[1] <= n[2]):
+                raise UsageError(
+                    f"'{n[0]}' must be valid integer with "
+                    f"the range -> '{n[0]} >= {n[2]}'")
+            if (isinstance(n[1], bool)):
+                raise UsageError(
+                    f"missing 1 optional argument value '--{n[0]}'?")
+
+    @staticmethod
     def fetch_json(path: Path) -> Any:
         if (not path.exists()):
             raise FileNotFoundError(f"file not found '{path}'")
@@ -30,9 +51,9 @@ class Controller:
 
     @staticmethod
     def index(path: Path, max_chunk_size: int = 2000) -> None:
-        if (isinstance(max_chunk_size, str)
-                and not max_chunk_size.isnumeric()):
-            raise UsageError(f"arg '{max_chunk_size}' is not an integer")
+        Controller.validate_numeric(
+            ("max_chunk_size", max_chunk_size, 1)
+        )
 
         chunker = Chunker(str(path / 'raw'), str(path / 'process'))
         cnk_path = chunker.discover_files().chunk()
@@ -44,14 +65,14 @@ class Controller:
 
     @staticmethod
     def search(query: str = '', path: Path = Path(''), k: int = 5) -> None:
-        if (query == ''):
-            raise UsageError("missing 1 required positional argument 'qeury'")
-        if (isinstance(k, str) and not k.isnumeric()):
-            raise UsageError(f"arg '{k}' is not an integer")
-        if (isinstance(k, bool)):
-            raise UsageError("missing 1 optional argument value '--k'?")
-        ps_path: Path = path / 'process'
+        Controller.validate_paths(
+            ("query", query)
+        )
+        Controller.validate_numeric(
+            ("k", k, 1)
+        )
 
+        ps_path: Path = path / 'process'
         ind: Indexer = Indexer(str(ps_path))
         loads: Optional[BM25Index] = ind.load(ps_path)
         if (not loads):
@@ -68,16 +89,14 @@ class Controller:
     def search_dataset(dataset_path: str = '', k: int = 5,
                        save_directory: str = '', path: Path = Path('')
                        ) -> None:
-        if (dataset_path is True or not dataset_path):
-            raise UsageError(
-                "missing 1 required positional argument 'dataset_path'")
-        if (save_directory is True or not save_directory):
-            raise UsageError(
-                "missing 1 required positional argument 'save_directory'")
-        if (isinstance(k, str) and not k.isnumeric()):
-            raise UsageError(f"arg '{k}' is not an integer")
-        if (isinstance(k, bool)):
-            raise UsageError("missing 1 optional argument value '--k'?")
+        Controller.validate_paths(
+            ("dataset_path", dataset_path),
+            ("save_directory", save_directory)
+        )
+        Controller.validate_numeric(
+            ('k', k, 1)
+        )
+
         src = Path(dataset_path)
         data: Dict[str, List[RagQuestion]] = Controller.fetch_json(src)
         if (not data):
@@ -100,11 +119,11 @@ class Controller:
     def answer(query: str = '', k: int = 5, path: Path = Path('')):
         if (query == ''):
             raise UsageError("missing 1 required positional argument 'qeury'")
-        if (isinstance(k, str) and not k.isnumeric()):
-            raise UsageError(f"arg '{k}' is not an integer")
+        Controller.validate_numeric(
+            ("k", k, 1)
+        )
+
         ps_path: Path = path / 'process'
-        if (isinstance(k, bool)):
-            raise UsageError("missing 1 optional argument value '--k'?")
         ind: Indexer = Indexer(str(ps_path))
         loads: Optional[BM25Index] = ind.load(ps_path)
         if (not loads):
@@ -123,16 +142,11 @@ class Controller:
                        save_directory: str = '',
                        path: Path = Path('')):
 
-        if (not student_search_results_path
-                or student_search_results_path is True):
-            raise UsageError(
-                "missing 1 required positional argument "
-                "'--student_search_results_path'"
-                )
-        if (not save_directory or save_directory is True):
-            raise UsageError(
-                "missing 1 required positional argument '--save_directory'"
-            )
+        Controller.validate_paths(
+            ("student_search_results_path", student_search_results_path),
+            ("save_directory", save_directory)
+        )
+
         src: Path = Path(student_search_results_path)
         d_search: Any = Controller.fetch_json(src)
         try:
@@ -143,6 +157,7 @@ class Controller:
             raise DataValidation(f"{err['type']} {err['loc'][0]}, {err['msg']}"
                                  + "on data source" +
                                  f"{src}")
+        print(f"loaded {len(obj.search_results)} questions ...")
         data: List[MinimalAnswer] = []
         agent: Agent = Agent()
         with tqdm(obj.search_results,
@@ -163,3 +178,27 @@ class Controller:
         )
         dest: Path = agent.save(res, Path(save_directory))
         print(f"Saved student_search_results_and_answer to {dest}")
+
+    @staticmethod
+    def evaluate(student_search_results_path: str = '',
+                 dataset_path: str = ''):
+        Controller.validate_paths(
+            ("student_search_results_path", student_search_results_path),
+            ("dataset_path", dataset_path)
+        )
+        student_sr = Controller.fetch_json(Path(student_search_results_path))
+        source_of_truth = Controller.fetch_json(Path(dataset_path))
+        if (not student_sr):
+            raise ValueError("Student resutls file found empty!")
+        if (not source_of_truth):
+            raise ValueError("Dataset file is empty")
+        try:
+            obj: StudentSearchResults = StudentSearchResults.model_validate(
+                student_sr)
+        except ValidationError as e:
+            err: ErrorDetails = e.errors()[0]
+            raise DataValidation(f"{err['type']} {err['loc'][0]}, {err['msg']}"
+                                 + " on data source -> " +
+                                 f"{student_search_results_path}")
+        
+
