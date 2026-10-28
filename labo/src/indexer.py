@@ -2,9 +2,11 @@ from src.models import StudentSearchResults, MinimalSearchResults
 from src.types import BM25Index, RagQuestion, SearchResults
 from src.chunker import MinimalSource, Error, Chunker
 from typing import List, Tuple, Dict, Optional
-from collections import Counter
+from sentence_transformers import SentenceTransformer
+from collections import Counter, defaultdict
 from pathlib import Path
 from tqdm import tqdm
+import numpy as np
 import pickle
 import math
 import json
@@ -13,7 +15,7 @@ import os
 
 
 class Indexer():
-    def __init__(self, dest: str = ''):
+    def __init__(self, dest: str = '', hybrid_search: bool = False):
         self.tokens: List[List[str]] = []
         self.chunks: List[Tuple[MinimalSource, str]] = []
         self.res_file_name: str = "bm25_index.pkl"
@@ -26,6 +28,7 @@ class Indexer():
         self.idfre: Dict[str, float] = {}
         self.last_resolved: List[MinimalSource] = []
         self.dataset_search: StudentSearchResults
+        self.hybrid_search: bool = hybrid_search
         if (self.dest.suffix):
             file: str = self.dest.name
             self.dest = self.dest.parent
@@ -33,6 +36,7 @@ class Indexer():
 
     def tokenize_chunks(self, src: str) -> Path:
         self.chunks = Chunker.load(src)
+        data: List[str] = []
         if (not self.chunks):
             return Path('')
         with tqdm(
@@ -41,18 +45,23 @@ class Indexer():
                 ) as group:
             for e in group:
                 self.tokens.append(self.split(e[1]))
+                data.append(e[1])
+        embedgin: np.ndarray | None = (self.vectorize(data)
+                                       if self.hybrid_search else None)
         self.t_freq: List[Dict[str, int]] = self.term_frequency(self.tokens)
         self.doc_freq: Dict[str, int] = self.doc_frequency(self.tokens)
         self.len: Tuple[List[int], float] = self.lenth(self.tokens)
         self.idfre: Dict[str, float] = self.idf(
             self.doc_freq, len(self.tokens)
             )
+
         self.export: BM25Index = BM25Index(
             term_freqs=self.t_freq,
             doc_lens=self.len[0],
             avg_dl=self.len[1],
             idf=self.idfre,
-            chunks=[ch[0] for ch in self.chunks]
+            chunks=[ch[0] for ch in self.chunks],
+            embedding=embedgin
         )
         return self.save()
 
@@ -257,3 +266,47 @@ class Indexer():
             source = self.export.chunks[id]
             self.last_resolved.append(source)
         return self.last_resolved
+
+    def vectorize(self, data: List[str] | str, llm: str = "all-MiniLM-L6-v2"
+                  ) -> np.ndarray:
+        model = SentenceTransformer(llm)
+        return model.encode(data, convert_to_numpy=True)
+
+    def 
+
+    def cosine_similarity(self, chunk_embeddings: np.ndarray,
+                          query_vector: np.ndarray):
+        dot_products = np.dot(chunk_embeddings, query_vector)
+
+        query_norm = np.linalg.norm(query_vector)
+        chunk_norms = np.linalg.norm(chunk_embeddings, axis=1)
+
+        scores = dot_products / (query_norm * chunk_norms + 1e-9)
+        return scores
+
+    def rrf(self, vector_scores, bm25_scores,
+            chunks: List[MinimalSource],
+            k: int = 5, k_rrf: int = 60) -> List[MinimalSource]:
+
+        vector_ranked_indices = np.argsort(vector_scores)[::-1][:20]
+        vector_ranked = [(float(vector_scores[idx]), int(idx))
+                         for idx in vector_ranked_indices]
+
+        rrf_scores = defaultdict(float)
+
+        for rank, (score, chunk_idx) in enumerate(bm25_scores, start=1):
+            rrf_scores[chunk_idx] += 1.0 / (k_rrf + rank)
+
+        for rank, (score, chunk_idx) in enumerate(vector_ranked, start=1):
+            rrf_scores[chunk_idx] += 1.0 / (k_rrf + rank)
+
+        sorted_hybrid = sorted(rrf_scores.items(), key=lambda x: x[1],
+                               reverse=True)
+
+        top_sources = []
+        for chunk_idx, _ in sorted_hybrid[:k]:
+            source_meta = chunks[chunk_idx]
+            top_sources.append(source_meta)
+
+        return top_sources
+

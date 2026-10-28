@@ -11,6 +11,7 @@ from src.chunker import Chunker
 from src.agent import Agent
 from pathlib import Path
 from tqdm import tqdm
+import numpy as np
 import json
 
 
@@ -57,7 +58,7 @@ class Controller:
 
         chunker = Chunker(str(path / 'raw'), str(path / 'process'))
         cnk_path = chunker.discover_files().chunk()
-        indexer = Indexer(str(path / 'process'))
+        indexer = Indexer(str(path / 'process'), hybrid_search=True)
         dest: Path = indexer.tokenize_chunks(str(cnk_path))
         if (not dest):
             return Controller.index(path, max_chunk_size)
@@ -71,7 +72,6 @@ class Controller:
         Controller.validate_numeric(
             ("k", k, 1)
         )
-
         ps_path: Path = path / 'process'
         ind: Indexer = Indexer(str(ps_path))
         loads: Optional[BM25Index] = ind.load(ps_path)
@@ -79,8 +79,15 @@ class Controller:
             Controller.index(path)
             return Controller.search(query, path, k)
 
-        scores: List[Tuple[float, int]] = ind.search(query, loads)
-        sources: List[MinimalSource] = ind.fetch_query_chunks(scores, k)
+        bm25_scores: List[Tuple[float, int]] = ind.search(query, loads)
+        query_vectore: np.ndarray = ind.vectorize(query)
+        if (loads.embedding):
+            vector_scores = ind.cosine_similarity(
+                loads.embedding, query_vectore)
+            sources = ind.rrf(vector_scores, bm25_scores, loads.chunks)
+        else:
+            sources: List[MinimalSource] = ind.fetch_query_chunks(bm25_scores,
+                                                                  k)
         for source in sources:
             print(f"{source.file_path} [{source.first_character_index}:",
                   f"{source.last_character_index}]", sep="")
@@ -200,5 +207,5 @@ class Controller:
             raise DataValidation(f"{err['type']} {err['loc'][0]}, {err['msg']}"
                                  + " on data source -> " +
                                  f"{student_search_results_path}")
-        
+        pass
 
