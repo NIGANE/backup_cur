@@ -18,7 +18,7 @@ search_dataset:
 	--save_directory data/output/dataset_code_public.json
 
 search:
-	$(RUN) search  "What is the return type annotation for the _apply_matches function in vLLM's multimodal processing module?" \
+	$(RUN) search  "What is stored in the logits array during the qk_max calculation in vLLM's paged attention implementation?" \
 	--k 3
 
 index:
@@ -26,7 +26,7 @@ index:
 
 answer:
 	$(RUN) answer \
-	"What is the type hint for the kv_range_for_decode parameter in the _attention_with_mask method?" \
+	"What is the return type annotation for the _apply_matches function in vLLM's multimodal processing module?" \
 	--k 3
 
 clean:

@@ -20,8 +20,8 @@ class Agent:
     def inference(self, contexts: List[MinimalSource], query: str
                   ) -> Dict[str, str]:
 
-        prompt = self.construct_prompt(query, contexts, self.tokenizer)
-        res = self.gen(
+        prompt: str = self.construct_prompt(query, contexts, self.tokenizer)
+        res: List[Dict[str, str]] = self.gen(
             prompt,
             max_new_tokens=100,
             do_sample=False,

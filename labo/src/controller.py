@@ -11,8 +11,10 @@ from src.chunker import Chunker
 from src.agent import Agent
 from pathlib import Path
 from tqdm import tqdm
-import numpy as np
 import json
+from src.lexical_index import LexicalIndexer
+from src.hybrid_index import HybridIndexer
+# import numpy as np
 
 
 class Controller:
@@ -51,51 +53,63 @@ class Controller:
             raise Error(e)
 
     @staticmethod
-    def index(path: Path, max_chunk_size: int = 2000) -> None:
+    def index(path: Path, hybrid: str = '', max_chunk_size: int = 2000
+              ) -> None:
         Controller.validate_numeric(
             ("max_chunk_size", max_chunk_size, 1)
         )
+        if (isinstance(hybrid, str) and len(hybrid) > 0):
+            raise UsageError(f"unknown argument '{hybrid}'")
 
         chunker = Chunker(str(path / 'raw'), str(path / 'process'))
         cnk_path = chunker.discover_files().chunk()
-        indexer = Indexer(str(path / 'process'), hybrid_search=True)
+        if (hybrid is True):
+            indexer: HybridIndexer = HybridIndexer(str(path / 'process'))
+        else:
+            indexer: LexicalIndexer = LexicalIndexer(str(path / 'process'))
         dest: Path = indexer.tokenize_chunks(str(cnk_path))
         if (not dest):
-            return Controller.index(path, max_chunk_size)
+            return Controller.index(path, hybrid, max_chunk_size)
         print(f"Ingestion complete! Indices saved under {dest.parent}")
 
     @staticmethod
-    def search(query: str = '', path: Path = Path(''), k: int = 5) -> None:
+    def search(query: str = '', path: Path = Path(''), k: int = 5,
+               hybrid: str = '') -> None:
         Controller.validate_paths(
             ("query", query)
         )
         Controller.validate_numeric(
             ("k", k, 1)
         )
+        if (isinstance(hybrid, str) and len(hybrid) > 0):
+            raise UsageError(f"unknown argument '{hybrid}'")
+
         ps_path: Path = path / 'process'
-        ind: Indexer = Indexer(str(ps_path))
+        if (hybrid is True):
+            ind: HybridIndexer = HybridIndexer(str(ps_path))
+        else:
+            ind: LexicalIndexer = LexicalIndexer(str(ps_path))
         loads: Optional[BM25Index] = ind.load(ps_path)
         if (not loads):
-            Controller.index(path)
-            return Controller.search(query, path, k)
-
+            Controller.index(path, hybrid)
+            return Controller.search(query, path, k, hybrid)
+        sources: List[MinimalSource] = []
         bm25_scores: List[Tuple[float, int]] = ind.search(query, loads)
-        query_vectore: np.ndarray = ind.vectorize(query)
-        if (loads.embedding):
-            vector_scores = ind.cosine_similarity(
-                loads.embedding, query_vectore)
-            sources = ind.rrf(vector_scores, bm25_scores, loads.chunks)
+        if (hybrid is True):
+            if (loads.embedding is None):
+                raise UsageError("embedding did found on loads.\n"
+                                 "run index with --hybrid then try again")
+            sources = ind.hybrid_resolve(loads.embedding, bm25_scores, query)
         else:
-            sources: List[MinimalSource] = ind.fetch_query_chunks(bm25_scores,
-                                                                  k)
+            sources = ind.fetch_query_chunks(bm25_scores, k)
         for source in sources:
             print(f"{source.file_path} [{source.first_character_index}:",
                   f"{source.last_character_index}]", sep="")
 
     @staticmethod
     def search_dataset(dataset_path: str = '', k: int = 5,
-                       save_directory: str = '', path: Path = Path('')
-                       ) -> None:
+                       save_directory: str = '', path: Path = Path(''),
+                       hybrid: str = '') -> None:
         Controller.validate_paths(
             ("dataset_path", dataset_path),
             ("save_directory", save_directory)
@@ -103,6 +117,8 @@ class Controller:
         Controller.validate_numeric(
             ('k', k, 1)
         )
+        if (isinstance(hybrid, str) and len(hybrid) > 0):
+            raise UsageError(f"unknown argument '{hybrid}'")
 
         src = Path(dataset_path)
         data: Dict[str, List[RagQuestion]] = Controller.fetch_json(src)
@@ -112,36 +128,51 @@ class Controller:
             raise UsageError(
                 'given file doesnt contain rag_questions'
                 f"{src}")
-        indexer: Indexer = Indexer(save_directory)
+        if (hybrid is True):
+            indexer: HybridIndexer = HybridIndexer(save_directory)
+        else:
+            indexer: LexicalIndexer = LexicalIndexer(save_directory)
         loads: Optional[BM25Index] = indexer.load(path / 'process')
         if (not loads):
-            Controller.index(path)
+            Controller.index(path, hybrid)
             return Controller.search_dataset(
-                dataset_path, k, save_directory, path)
-
+                dataset_path, k, save_directory, path, hybrid)
         dest: Path = indexer.search_multy(data, loads, k)
         print(f"Saved student_search_results to {dest}")
 
     @staticmethod
-    def answer(query: str = '', k: int = 5, path: Path = Path('')):
+    def answer(query: str = '', k: int = 5, hybrid: str = '',
+               path: Path = Path('')) -> None:
         if (query == ''):
             raise UsageError("missing 1 required positional argument 'qeury'")
         Controller.validate_numeric(
             ("k", k, 1)
         )
+        if (isinstance(hybrid, str) and len(hybrid) > 0):
+            raise UsageError(f"unknown argument '{hybrid}'")
 
         ps_path: Path = path / 'process'
-        ind: Indexer = Indexer(str(ps_path))
+        if (hybrid is True):
+            ind: HybridIndexer = HybridIndexer(str(ps_path))
+        else:
+            ind: LexicalIndexer = LexicalIndexer(str(ps_path))
         loads: Optional[BM25Index] = ind.load(ps_path)
         if (not loads):
-            Controller.index(path)
-            return Controller.search(query, path, k)
+            Controller.index(path, hybrid)
+            return Controller.search(query, path, k, hybrid)
 
-        scores = ind.search(query, loads)
-        ind.fetch_query_chunks(scores, k)
+        sources: List[MinimalSource] = []
+        bm25: List[Tuple[float, int]] = ind.search(query, loads)
+        if (hybrid is True):
+            if (loads.embedding is None):
+                raise UsageError("embedding did found on loads.\n"
+                                 "run index with --hybrid then try again")
+            sources = ind.hybrid_resolve(loads.embedding, bm25, query)
+        else:
+            sources = ind.fetch_query_chunks(bm25, k)
 
         agent: Agent = Agent()
-        res: Dict[str, str] = agent.inference(ind.last_resolved, query)
+        res: Dict[str, str] = agent.inference(sources, query)
         print("Answer: ", res['generated_text'])
 
     @staticmethod
