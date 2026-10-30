@@ -14,12 +14,12 @@ from src.error import UsageError
 
 
 class HybridIndexer(Indexer):
-    def __init__(self, dest: str = '', llm: str = "all-MiniLM-L6-v2"):
+    def __init__(self, dest: str = 'data/process', llm: str = "all-MiniLM-L6-v2"):
         super().__init__(dest)
         self.model: SentenceTransformer = SentenceTransformer(llm)
 
     def tokenize_chunks(self, src: str) -> Path:
-        self.chunks = Chunker.load(src)
+        self.chunks = Chunker.load(src).chunks
         data: List[str] = []
         if (not self.chunks):
             return Path('')
@@ -149,7 +149,7 @@ class HybridIndexer(Indexer):
                          for idx in vector_ranked_indices]
 
         # 2. Slice top 20 candidates from bm25 scores
-        bm25_ranked = bm25_scores[:20]
+        bm25_ranked: List[Tuple[float, int]] = bm25_scores[:20]
 
         rrf_scores = defaultdict(float)
 

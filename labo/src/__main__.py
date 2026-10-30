@@ -34,13 +34,13 @@ def main():
         })
     except UsageError as e:
         print(f"{e.__class__.__name__}: {e}")
-        hints()
-        sys.exit(1)
-    except DataValidation as e:
-        print(f"{e.__class__.__name__}: {e}")
-    except BaseException as e:
-        print(f"{e.__class__.__name__}: {e}")
-        sys.exit(1)
+    #     hints()
+    #     sys.exit(1)
+    # except DataValidation as e:
+    #     print(f"{e.__class__.__name__}: {e}")
+    # except BaseException as e:
+    #     print(f"{e.__class__.__name__}: {e}")
+    #     sys.exit(1)
 
 
 main()

@@ -3,6 +3,7 @@ from src.types import BM25Index, RagQuestion, SearchResults
 from src.chunker import MinimalSource, Error, Chunker
 from typing import List, Tuple, Dict, Optional
 from collections import Counter
+from src.indexer import Indexer
 from pathlib import Path
 from tqdm import tqdm
 import pickle
@@ -10,19 +11,23 @@ import math
 import json
 import uuid
 import os
-from src.indexer import Indexer
 
 
 class LexicalIndexer(Indexer):
 
+
+    def index_file_founded(self):
+        
     def tokenize_chunks(self, src: str) -> Path:
-        self.chunks = Chunker.load(src)
+        if (self.index_file_founded()):
+            return Path('')
+        self.chunks = Chunker.load(src).chunks
         data: List[str] = []
         if (not self.chunks):
             return Path('')
         with tqdm(
                 self.chunks, desc="Tokenizing",
-                unit=" chunks", total=len(self.chunks) + 5
+                unit=" chunks"
                 ) as group:
             for e in group:
                 self.tokens.append(self.split(e[1]))
@@ -35,6 +40,8 @@ class LexicalIndexer(Indexer):
             )
 
         self.export: BM25Index = BM25Index(
+            mtime_chunks_file=Chunker.get_file_mtime(
+                            str(self.dest / Chunker.exported_format)),
             term_freqs=self.t_freq,
             doc_lens=self.len[0],
             avg_dl=self.len[1],

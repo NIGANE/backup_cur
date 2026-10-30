@@ -1,5 +1,7 @@
 from src.models import MinimalSource
-from typing import List, Tuple
+from pydantic import ValidationError
+from typing import List, Tuple, Any, Dict
+from src.types import ChunkResuls
 from src.error import Error
 from pathlib import Path
 from tqdm import tqdm
@@ -10,9 +12,11 @@ import re
 
 
 class Chunker:
-    def __init__(self, src: str, dest: str, max_size: int = 2000):
+    exported_format: str = "chunks.pkl"
+
+    def __init__(self, src: str, dest: str = 'data/process',
+                 max_size: int = 2000) -> None:
         self.chunks: List[Tuple[MinimalSource, str]] = []
-        self.res_file_name: str = "chunks.pkl"
         self.src: str = src
         self.discovered_files: List[Tuple[str, str]] = []
         self.max_size: int = max_size
@@ -20,9 +24,19 @@ class Chunker:
             os.makedirs(dest, exist_ok=True)
         except SystemError as e:
             raise Error(e)
-        self.dest: Path = Path(dest) / self.res_file_name
+        self.dest: Path = Path(dest)
+        self.chunk_file_path: Path = self.discover_files()
 
-    def discover_files(self) -> 'Chunker':
+    @staticmethod
+    def get_file_mtime(file_path: str) -> float:
+        return os.path.getmtime(file_path)
+
+    @staticmethod
+    def changed_file(old_mtime: float, file_path: str
+                     ) -> bool:
+        return (old_mtime != Chunker.get_file_mtime(file_path))
+
+    def discover_files(self) -> Path:
 
         supported_extensions = {".py", ".md", ".rst", ".txt", ".mdx"}
         discoverd: List[Tuple[str, str]] = []
@@ -47,17 +61,39 @@ class Chunker:
                         print(f"Warning: Failed to read {full_path}: {e}")
         if (not discoverd):
             raise Error(f"Emtpy given repo to parse on '{self.src}'")
-        self.discovered_files = discoverd
-        return self
+        ut_files: Dict[str, float] = {}
+        if (self.dest / self.exported_format).exists():
+            try:
+                old_file: Any = self.load(
+                    str(self.dest / self.exported_format))
+                old_data: ChunkResuls = ChunkResuls.model_validate(old_file)
+            except ValidationError:
+                self.discovered_files = discoverd
+            else:
+                self.discovered_files = self.filter_files(old_file, discoverd)
+                for f in discoverd:
+                    if f not in self.discovered_files:
+                        ut_files[f[0]] = old_data.ut_files[f[0]]
+        else:
+            self.discovered_files = discoverd
+        self.chunk()
+        for f in self.discovered_files:
+            ut_files[f[0]] = self.get_file_mtime(f[0])
 
-    def chunk(self) -> Path:
+        data: ChunkResuls = ChunkResuls(
+            chunks=self.chunks,
+            ut_files=ut_files
+        )
+        return self.save(data)
+
+    def chunk(self) -> None:
+        if (len(self.discovered_files) == 0):
+            return
         with tqdm(
                 self.discovered_files, desc="Chunking",
                 unit=" file") as group:
             for f in group:
                 self.chunks.extend(self.chunk_document(f[0], f[1]))
-
-        return self.save()
 
     def blind_chunker(self, target_file: str, source: str, curr_offset: int,
                       max_size: int) -> List[Tuple[MinimalSource, str]]:
@@ -209,17 +245,17 @@ class Chunker:
                     )
         return (chunks)
 
-    def save(self) -> Path:
+    def save(self, data: ChunkResuls) -> Path:
         try:
-            with open(self.dest, "wb") as f:
-                pickle.dump(self.chunks, f)
+            with open(self.dest / self.exported_format, "wb") as f:
+                pickle.dump(data, f)
         except Exception as e:
             raise Error(f"ChunkerError: {e}")
         else:
-            return self.dest
+            return self.dest / self.exported_format
 
     @staticmethod
-    def load(dest: str) -> List[Tuple[MinimalSource, str]]:
+    def load(dest: str) -> ChunkResuls:
         if (not Path(dest).exists()):
             raise FileNotFoundError(
                 f"chunke file not found on '{Path(dest).parent}"
@@ -239,6 +275,28 @@ class Chunker:
                   f"{len(ch[1])} bytes",
                   sep="")
         return ''
+
+    def filter_files(self, old_load: ChunkResuls, new: List[Tuple[str, str]]):
+        res: List[Tuple[str, str]] = []
+        for f in new:
+            if (f[0] in old_load.ut_files.keys()
+                    and self.changed_file(old_load.ut_files[f[0]], f[0])):
+                res.append(f)
+            else:
+                old: Tuple[MinimalSource, str] | None = self.get_source(
+                    old_load.chunks, f[0])
+                if (old is not None):
+                    self.chunks.append(old)
+        res.extend([f for f in new if f[0] not in old_load.ut_files.keys()])
+
+        return res
+
+    def get_source(self, chunks: List[Tuple[MinimalSource, str]],
+                   path: str) -> Tuple[MinimalSource, str] | None:
+        for el in chunks:
+            if el[0].file_path == path:
+                return el
+        return None
 
     @staticmethod
     def get_chunk(obj: MinimalSource):

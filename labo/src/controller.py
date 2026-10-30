@@ -14,7 +14,6 @@ from tqdm import tqdm
 import json
 from src.lexical_index import LexicalIndexer
 from src.hybrid_index import HybridIndexer
-# import numpy as np
 
 
 class Controller:
@@ -61,16 +60,16 @@ class Controller:
         if (isinstance(hybrid, str) and len(hybrid) > 0):
             raise UsageError(f"unknown argument '{hybrid}'")
 
-        chunker = Chunker(str(path / 'raw'), str(path / 'process'))
-        cnk_path = chunker.discover_files().chunk()
+        chunker: Chunker = Chunker(str(path / 'raw'))
+
         if (hybrid is True):
-            indexer: HybridIndexer = HybridIndexer(str(path / 'process'))
+            indexer: HybridIndexer = HybridIndexer()
         else:
-            indexer: LexicalIndexer = LexicalIndexer(str(path / 'process'))
-        dest: Path = indexer.tokenize_chunks(str(cnk_path))
-        if (not dest):
-            return Controller.index(path, hybrid, max_chunk_size)
-        print(f"Ingestion complete! Indices saved under {dest.parent}")
+            indexer: LexicalIndexer = LexicalIndexer()
+        dest: Path = indexer.tokenize_chunks(str(chunker.dest))
+        # if (not dest):
+        #     return Controller.index(path, hybrid, max_chunk_size)
+        # print(f"Ingestion complete! Indices saved under {dest.parent}")
 
     @staticmethod
     def search(query: str = '', path: Path = Path(''), k: int = 5,
@@ -95,6 +94,7 @@ class Controller:
             return Controller.search(query, path, k, hybrid)
         sources: List[MinimalSource] = []
         bm25_scores: List[Tuple[float, int]] = ind.search(query, loads)
+        print(len(bm25_scores))
         if (hybrid is True):
             if (loads.embedding is None):
                 raise UsageError("embedding did found on loads.\n"

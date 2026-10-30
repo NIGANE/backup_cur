@@ -11,7 +11,7 @@ import os
 
 
 class Indexer():
-    def __init__(self, dest: str = ''):
+    def __init__(self, dest: str = '/data/process'):
         self.tokens: List[List[str]] = []
         self.chunks: List[Tuple[MinimalSource, str]] = []
         self.res_file_name: str = "bm25_index.pkl"
