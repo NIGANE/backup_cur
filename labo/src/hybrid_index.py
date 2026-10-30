@@ -118,7 +118,8 @@ class HybridIndexer(Indexer):
         )
         return self.save_dataset()
 
-    def hybrid_resolve(self, embedding, bm25, query: str, chunks):
+    def hybrid_resolve(self, embedding, bm25, query: str,
+                       chunks: List[MinimalSource]):
         query_vectore: np.ndarray = self.vectorize(query)
         vector_scores: np.ndarray = self.cosine_similarity(
             embedding, query_vectore)

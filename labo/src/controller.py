@@ -2,7 +2,7 @@ from src.models import (StudentSearchResults, MinimalSource,
                         MinimalAnswer, StudentSearchResultsAndAnswer)
 from typing import Dict, List, Optional, Any, Tuple
 from src.error import Error, DataValidation
-from src.indexer import Indexer, BM25Index
+from src.indexer import BM25Index
 from pydantic_core import ErrorDetails
 from pydantic import ValidationError
 from src.types import RagQuestion
@@ -167,7 +167,8 @@ class Controller:
             if (loads.embedding is None):
                 raise UsageError("embedding did found on loads.\n"
                                  "run index with --hybrid then try again")
-            sources = ind.hybrid_resolve(loads.embedding, bm25, query)
+            sources = ind.hybrid_resolve(loads.embedding, bm25, query,
+                                         loads.chunks)[:k]
         else:
             sources = ind.fetch_query_chunks(bm25, k)
 
