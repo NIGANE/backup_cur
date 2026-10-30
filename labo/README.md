@@ -8,5 +8,4 @@
  - bm25 fomula components
 
  ## todo:
- - Counter lockup
- - evaluation
+ - index updateing, and redesing
