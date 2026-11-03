@@ -8,7 +8,7 @@ evaluate:
 answer_dataset:
 	$(RUN) answer_dataset \
 	--student_search_results_path "data/output/dataset_code_public.json" \
-	--save_directory "data/output/answer_dataset_docs_public.json"
+	--save_directory "data/output/answer_dataset_code_public.json"
 
 
 search_dataset:

@@ -10,6 +10,7 @@ import json
 import os
 from src.chunker import Chunker
 from pydantic import ValidationError
+from functools import lru_cache
 
 
 class Indexer():
@@ -25,6 +26,7 @@ class Indexer():
         self.len: Tuple[List[int], float] = ([], 0.0)
         self.idfre: Dict[str, float] = {}
         self.last_resolved: List[MinimalSource] = []
+        self.export: BM25Index = None
         self.dataset_search: StudentSearchResults
         if (self.dest.suffix):
             file: str = self.dest.name
@@ -82,6 +84,37 @@ class Indexer():
                     res.append("".join(buffer))
                 buffer = []
         return res
+    
+    @lru_cache(maxsize=20)
+    def search(self, query: str,
+               k1: float = 1.5, b: float = 0.75) -> List[Tuple[float, int]]:
+        query_tokens: List[str] = self.split(query)
+        scores = [0.0] * len(self.export.term_freqs)
+        for id, tf_dict in enumerate(self.export.term_freqs):
+            dl = self.export.doc_lens[id]
+            d_score = 0.0
+            for token in query_tokens:
+                if token not in self.export.idf:
+                    continue
+
+                tf = tf_dict.get(token, 0)
+                if tf == 0:
+                    continue
+
+                idf_val = self.export.idf[token]
+                numerator = tf * (k1 + 1.0)
+                denominator = tf + k1 * (1.0 - b + b * (dl / self.export.avg_dl))
+
+                d_score += idf_val * (numerator / denominator)
+            scores[id] = d_score
+        res: List[Tuple[float, int]] = [
+            (scores[i], i) for i in range(len(scores)) if scores[i] > 0.0
+            ]
+        res.sort(key=lambda x: x[0], reverse=True)
+        return res
+    
+    def cache_clear(self) -> None:
+        self.search.cache_clear()
 
     # def term_frequency(self, src: List[List[str]]) -> List[Dict[str, int]]:
     #     res: List[Dict[str, int]] = []

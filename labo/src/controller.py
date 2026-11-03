@@ -89,11 +89,12 @@ class Controller:
         else:
             ind: LexicalIndexer = LexicalIndexer(str(ps_path))
         loads: Optional[BM25Index] = ind.load(ps_path)
+
         if (not loads):
             Controller.index(path, hybrid)
             return Controller.search(query, path, k, hybrid)
         sources: List[MinimalSource] = []
-        bm25_scores: List[Tuple[float, int]] = ind.search(query, loads)
+        bm25_scores: List[Tuple[float, int]] = ind.search(query)
         if (hybrid is True):
             if (loads.embedding is None):
                 raise UsageError("embedding did found on loads.\n"
@@ -161,7 +162,7 @@ class Controller:
             return Controller.search(query, path, k, hybrid)
 
         sources: List[MinimalSource] = []
-        bm25: List[Tuple[float, int]] = ind.search(query, loads)
+        bm25: List[Tuple[float, int]] = ind.search(query)
         if (hybrid is True):
             if (loads.embedding is None):
                 raise UsageError("embedding did found on loads.\n"

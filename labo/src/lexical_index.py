@@ -13,6 +13,7 @@ import math
 import json
 import uuid
 import os
+from functools import lru_cache
 
 
 class LexicalIndexer(Indexer):
@@ -113,33 +114,6 @@ class LexicalIndexer(Indexer):
             idf[w] = max(0.0, val)
         return idf
 
-    def search(self, query: str, ind: BM25Index,
-               k1: float = 1.5, b: float = 0.75) -> List[Tuple[float, int]]:
-        query_tokens: List[str] = self.split(query)
-        scores = [0.0] * len(ind.term_freqs)
-        for id, tf_dict in enumerate(ind.term_freqs):
-            dl = ind.doc_lens[id]
-            d_score = 0.0
-            for token in query_tokens:
-                if token not in ind.idf:
-                    continue
-
-                tf = tf_dict.get(token, 0)
-                if tf == 0:
-                    continue
-
-                idf_val = ind.idf[token]
-                numerator = tf * (k1 + 1.0)
-                denominator = tf + k1 * (1.0 - b + b * (dl / ind.avg_dl))
-
-                d_score += idf_val * (numerator / denominator)
-            scores[id] = d_score
-        res: List[Tuple[float, int]] = [
-            (scores[i], i) for i in range(len(scores)) if scores[i] > 0.0
-            ]
-        res.sort(key=lambda x: x[0], reverse=True)
-        return res
-
     def search_multy(self, data: Dict[str, List[RagQuestion]],
                      ind: BM25Index, k: int = 5):
 
@@ -152,16 +126,17 @@ class LexicalIndexer(Indexer):
             )
             for qt in data['rag_questions']
             ]
-        for qt in qts:
-            if (qt['question'] is None
-                    or qt["question"] in [ele["question"] for ele in res]):
-                continue
-            scores = self.search(qt['question'].lower(), ind)
-            res.append({
-                "question_id": qt.get("question_id") or str(uuid.uuid4()),
-                "question": qt["question"],
-                "sources": self.fetch_query_chunks(scores, k)
-            })
+        with tqdm(qts, desc="Searching", unit=" Question") as group:
+            for qt in group:
+                if (qt['question'] is None
+                        or qt["question"] in [ele["question"] for ele in res]):
+                    continue
+                scores = self.search(qt['question'].lower())
+                res.append({
+                    "question_id": qt.get("question_id") or str(uuid.uuid4()),
+                    "question": qt["question"],
+                    "sources": self.fetch_query_chunks(scores, k)
+                })
 
         self.dataset_search = StudentSearchResults(
             search_results=[
