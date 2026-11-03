@@ -94,12 +94,11 @@ class Controller:
             return Controller.search(query, path, k, hybrid)
         sources: List[MinimalSource] = []
         bm25_scores: List[Tuple[float, int]] = ind.search(query, loads)
-        print(len(bm25_scores))
         if (hybrid is True):
             if (loads.embedding is None):
                 raise UsageError("embedding did found on loads.\n"
                                  "run index with --hybrid then try again")
-            sources = ind.hybrid_resolve(loads.embedding, bm25_scores, query)
+            sources = ind.hybrid_resolve(loads.embedding, bm25_scores, query, loads.chunks)[:k]
         else:
             sources = ind.fetch_query_chunks(bm25_scores, k)
         for source in sources:
@@ -153,9 +152,9 @@ class Controller:
 
         ps_path: Path = path / 'process'
         if (hybrid is True):
-            ind: HybridIndexer = HybridIndexer(str(ps_path))
+            ind: HybridIndexer = HybridIndexer()
         else:
-            ind: LexicalIndexer = LexicalIndexer(str(ps_path))
+            ind: LexicalIndexer = LexicalIndexer()
         loads: Optional[BM25Index] = ind.load(ps_path)
         if (not loads):
             Controller.index(path, hybrid)

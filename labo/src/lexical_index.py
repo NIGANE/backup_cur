@@ -16,7 +16,7 @@ import os
 
 
 class LexicalIndexer(Indexer):
-
+    
     def tokenize_chunks(self) -> Path:
         if (self.index_file_founded()):
             return self.dest / self.res_file_name
