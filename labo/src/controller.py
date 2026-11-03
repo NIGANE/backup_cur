@@ -60,16 +60,16 @@ class Controller:
         if (isinstance(hybrid, str) and len(hybrid) > 0):
             raise UsageError(f"unknown argument '{hybrid}'")
 
-        chunker: Chunker = Chunker(str(path / 'raw'))
+        Chunker(str(path / 'raw'))
 
         if (hybrid is True):
             indexer: HybridIndexer = HybridIndexer()
         else:
             indexer: LexicalIndexer = LexicalIndexer()
-        dest: Path = indexer.tokenize_chunks(str(chunker.dest))
-        # if (not dest):
-        #     return Controller.index(path, hybrid, max_chunk_size)
-        # print(f"Ingestion complete! Indices saved under {dest.parent}")
+        dest: Path = indexer.tokenize_chunks()
+        if (not dest):
+            return Controller.index(path, hybrid, max_chunk_size)
+        print(f"Ingestion complete! Indices saved under {dest.parent}")
 
     @staticmethod
     def search(query: str = '', path: Path = Path(''), k: int = 5,

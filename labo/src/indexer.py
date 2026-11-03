@@ -1,17 +1,19 @@
 from src.models import StudentSearchResults
 from src.types import BM25Index
 from src.chunker import MinimalSource, Error
-from typing import List, Tuple, Dict, Optional
+from typing import List, Tuple, Dict, Optional, Any
 from collections import Counter
 from pathlib import Path
 import pickle
 import math
 import json
 import os
+from src.chunker import Chunker
+from pydantic import ValidationError
 
 
 class Indexer():
-    def __init__(self, dest: str = '/data/process'):
+    def __init__(self, dest: str = 'data/process'):
         self.tokens: List[List[str]] = []
         self.chunks: List[Tuple[MinimalSource, str]] = []
         self.res_file_name: str = "bm25_index.pkl"
@@ -28,6 +30,22 @@ class Indexer():
             file: str = self.dest.name
             self.dest = self.dest.parent
             self.dataset_file = self.dataset_answer_file = file
+
+    def index_file_founded(self, hybrid: bool = False) -> bool:
+        path = self.dest / self.res_file_name
+        if not path.exists():
+            return False
+        try:
+            loads: Any = Chunker.load(str(path))
+            obj: BM25Index = BM25Index.model_validate(loads)
+            if hybrid and not obj.embedding:
+                return False
+        except ValidationError:
+            return False
+        source = self.dest / Chunker.exported_format
+        if not source.exists():
+            return False
+        return obj.mtime_index_file == Chunker.get_file_mtime(str(source))
 
     def split(self, src: str) -> List[str]:
         res: List[str] = []

@@ -4,22 +4,33 @@ from tqdm import tqdm
 import numpy as np
 from src.indexer import Indexer
 from src.chunker import Chunker
-from typing import List, Dict, Tuple
-from src.types import BM25Index, RagQuestion, SearchResults
+from typing import List, Dict, Tuple, Any
+from src.types import BM25Index, RagQuestion, SearchResults, ChunkResuls
 from sentence_transformers import SentenceTransformer
 from src.models import (MinimalSource,
                         StudentSearchResults, MinimalSearchResults)
 import uuid
-from src.error import UsageError
+from src.error import DataValidation, UsageError
+from pydantic import ValidationError
 
 
 class HybridIndexer(Indexer):
-    def __init__(self, dest: str = 'data/process', llm: str = "all-MiniLM-L6-v2"):
+    def __init__(self, dest: str = 'data/process',
+                 llm: str = "all-MiniLM-L6-v2"):
         super().__init__(dest)
         self.model: SentenceTransformer = SentenceTransformer(llm)
 
-    def tokenize_chunks(self, src: str) -> Path:
-        self.chunks = Chunker.load(src).chunks
+    def tokenize_chunks(self) -> Path:
+        if (self.index_file_founded(hybrid=True)):
+            return self.dest / self.res_file_name
+
+        try:
+            loads: Any = Chunker.load(str(self.dest / Chunker.exported_format))
+            obj: ChunkResuls = ChunkResuls.model_validate(loads)
+            self.chunks = obj.chunks
+        except ValidationError as e:
+            raise DataValidation(e)
+
         data: List[str] = []
         if (not self.chunks):
             return Path('')
@@ -39,6 +50,8 @@ class HybridIndexer(Indexer):
             )
 
         self.export: BM25Index = BM25Index(
+            mtime_index_file=Chunker.get_file_mtime(
+                str(self.dest / Chunker.exported_format)),
             term_freqs=self.t_freq,
             doc_lens=self.len[0],
             avg_dl=self.len[1],

@@ -76,10 +76,11 @@ class Chunker:
                         ut_files[f[0]] = old_data.ut_files[f[0]]
         else:
             self.discovered_files = discoverd
+        if len(self.discovered_files) == 0:
+            return (self.dest / self.exported_format)
         self.chunk()
         for f in self.discovered_files:
             ut_files[f[0]] = self.get_file_mtime(f[0])
-
         data: ChunkResuls = ChunkResuls(
             chunks=self.chunks,
             ut_files=ut_files

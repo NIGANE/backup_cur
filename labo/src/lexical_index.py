@@ -1,11 +1,13 @@
 from src.models import StudentSearchResults, MinimalSearchResults
-from src.types import BM25Index, RagQuestion, SearchResults
+from src.types import BM25Index, RagQuestion, SearchResults, ChunkResuls
 from src.chunker import MinimalSource, Error, Chunker
-from typing import List, Tuple, Dict, Optional
+from typing import List, Tuple, Dict, Optional, Any
 from collections import Counter
 from src.indexer import Indexer
 from pathlib import Path
 from tqdm import tqdm
+from pydantic import ValidationError
+from src.error import DataValidation
 import pickle
 import math
 import json
@@ -15,13 +17,17 @@ import os
 
 class LexicalIndexer(Indexer):
 
-
-    def index_file_founded(self):
-        
-    def tokenize_chunks(self, src: str) -> Path:
+    def tokenize_chunks(self) -> Path:
         if (self.index_file_founded()):
-            return Path('')
-        self.chunks = Chunker.load(src).chunks
+            return self.dest / self.res_file_name
+
+        try:
+            loads: Any = Chunker.load(str(self.dest / Chunker.exported_format))
+            obj: ChunkResuls = ChunkResuls.model_validate(loads)
+            self.chunks = obj.chunks
+        except ValidationError as e:
+            raise DataValidation(e)
+
         data: List[str] = []
         if (not self.chunks):
             return Path('')
@@ -40,8 +46,8 @@ class LexicalIndexer(Indexer):
             )
 
         self.export: BM25Index = BM25Index(
-            mtime_chunks_file=Chunker.get_file_mtime(
-                            str(self.dest / Chunker.exported_format)),
+            mtime_index_file=Chunker.get_file_mtime(
+                str(self.dest / Chunker.exported_format)),
             term_freqs=self.t_freq,
             doc_lens=self.len[0],
             avg_dl=self.len[1],

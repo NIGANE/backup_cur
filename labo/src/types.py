@@ -12,7 +12,7 @@ class RagQuestion(TypedDict):
 class BM25Index(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    mtime_chunks_file: float
+    mtime_index_file: float
     term_freqs: List[Dict[str, int]]
     doc_lens: List[int]
     avg_dl: float
