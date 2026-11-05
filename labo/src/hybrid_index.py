@@ -21,7 +21,7 @@ class HybridIndexer(Indexer):
         self.model: SentenceTransformer = SentenceTransformer(llm)
 
     def tokenize_chunks(self) -> Path:
-        if (self.index_file_founded(hybrid=True)):
+        if (self.index_file_founded(vector=True)):
             return self.dest / self.res_file_name
 
         try:

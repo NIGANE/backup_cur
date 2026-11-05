@@ -14,6 +14,8 @@ from tqdm import tqdm
 import json
 from src.lexical_index import LexicalIndexer
 from src.hybrid_index import HybridIndexer
+from src.vector_index import VectorIndexer
+import pickle as pkl
 
 
 class Controller:
@@ -52,28 +54,33 @@ class Controller:
             raise Error(e)
 
     @staticmethod
-    def index(path: Path, hybrid: str = '', max_chunk_size: int = 2000
+    def index(path: Path, hybrid: str = '', vector: str = '', max_chunk_size: int = 2000
               ) -> None:
         Controller.validate_numeric(
             ("max_chunk_size", max_chunk_size, 1)
         )
+        if isinstance(vector, str) and len(vector) > 0:
+            raise UsageError(f"unkonwn argument '{vector}'")
         if (isinstance(hybrid, str) and len(hybrid) > 0):
             raise UsageError(f"unknown argument '{hybrid}'")
+        if hybrid is True and vector is True:
+            raise UsageError("un must only one flag [--hybrid | --vector]")
 
         Chunker(str(path / 'raw'))
-
         if (hybrid is True):
             indexer: HybridIndexer = HybridIndexer()
+        elif vector is True:
+            indexer: VectorIndexer = VectorIndexer()
         else:
             indexer: LexicalIndexer = LexicalIndexer()
         dest: Path = indexer.tokenize_chunks()
         if (not dest):
-            return Controller.index(path, hybrid, max_chunk_size)
+            return Controller.index(path, hybrid, vector, max_chunk_size)
         print(f"Ingestion complete! Indices saved under {dest.parent}")
 
     @staticmethod
     def search(query: str = '', path: Path = Path(''), k: int = 5,
-               hybrid: str = '') -> None:
+               hybrid: str = '', vector: str = '') -> None:
         Controller.validate_paths(
             ("query", query)
         )
@@ -82,24 +89,33 @@ class Controller:
         )
         if (isinstance(hybrid, str) and len(hybrid) > 0):
             raise UsageError(f"unknown argument '{hybrid}'")
+        if (isinstance(vector, str) and len(vector) > 0):
+            raise UsageError(f"unknown argument '{vector}'")
+        if hybrid is True and vector is True:
+            raise UsageError("un must only one flag [--hybrid | --vector]")
 
         ps_path: Path = path / 'process'
         if (hybrid is True):
             ind: HybridIndexer = HybridIndexer(str(ps_path))
+        elif (vector is True):
+            ind: VectorIndexer = VectorIndexer()
         else:
             ind: LexicalIndexer = LexicalIndexer(str(ps_path))
         loads: Optional[BM25Index] = ind.load(ps_path)
 
         if (not loads):
-            Controller.index(path, hybrid)
-            return Controller.search(query, path, k, hybrid)
+            Controller.index(path, hybrid, vector)
+            return Controller.search(query, path, k, hybrid, vector)
         sources: List[MinimalSource] = []
-        bm25_scores: List[Tuple[float, int]] = ind.search(query)
+        bm25_scores: List[Tuple[float, int]] = ind.search(query) if not vector else None
+
         if (hybrid is True):
             if (loads.embedding is None):
                 raise UsageError("embedding did found on loads.\n"
                                  "run index with --hybrid then try again")
             sources = ind.hybrid_resolve(loads.embedding, bm25_scores, query, loads.chunks)[:k]
+        elif vector is True:
+            source = ind.vector_search(loads.embedding, query, loads.chunks, k)
         else:
             sources = ind.fetch_query_chunks(bm25_scores, k)
         for source in sources:
@@ -240,4 +256,23 @@ class Controller:
                                  + " on data source -> " +
                                  f"{student_search_results_path}")
         pass
+    
+    @staticmethod
+    def vector(k: int = 3) -> None:
+        from vector_index import VectorIndexer
+        indexer = VectorIndexer()
+        try:
+            with open(indexer.dest / indexer.res_file_name, "rb") as f:
+                load = pkl.load(f)
+            data: BM25Index = BM25Index.model_validate(load)
+            print('data validated')
+        except Exception:
+            print("Error")
+        sources = indexer.vector_search(
+            data.embedding,
+            "What are the default values for FP8_MIN and FP8_MAX constants in vLLM's triton_flash_attention module?",
+            data.chunks
+            )
+        for e in sources[:k]:
+            print(f"{e.file_path}[{e.first_character_index}:{e.last_character_index}]")
 

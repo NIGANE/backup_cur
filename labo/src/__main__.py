@@ -16,7 +16,7 @@ def main():
     try:
         allowed_actions: List[str] = [
             'index', 'search', 'search_dataset', 'answer',
-            'answer_dataset', 'evaluate'
+            'answer_dataset', 'evaluate', 'vector'
             ]
         if (len(sys.argv) == 1):
             raise UsageError("not enough args")
@@ -30,7 +30,8 @@ def main():
             "search_dataset": partial(ctr.search_dataset, path=data_path),
             "answer": partial(ctr.answer, path=data_path),
             "answer_dataset": partial(ctr.answer_dataset, path=data_path),
-            "evaluate": ctr.evaluate
+            "evaluate": ctr.evaluate,
+            "vector": ctr.vector
         })
     except UsageError as e:
         print(f"{e.__class__.__name__}: {e}")

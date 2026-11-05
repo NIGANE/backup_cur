@@ -10,6 +10,8 @@ answer_dataset:
 	--student_search_results_path "data/output/dataset_code_public.json" \
 	--save_directory "data/output/answer_dataset_code_public.json"
 
+vector:
+	uv run python3 -m src vector
 
 search_dataset:
 	$(RUN) search_dataset \

@@ -33,14 +33,14 @@ class Indexer():
             self.dest = self.dest.parent
             self.dataset_file = self.dataset_answer_file = file
 
-    def index_file_founded(self, hybrid: bool = False) -> bool:
+    def index_file_founded(self, vector: bool = False) -> bool:
         path = self.dest / self.res_file_name
         if not path.exists():
             return False
         try:
             loads: Any = Chunker.load(str(path))
             obj: BM25Index = BM25Index.model_validate(loads)
-            if hybrid and not obj.embedding:
+            if vector and obj.embedding is None:
                 return False
         except ValidationError:
             return False

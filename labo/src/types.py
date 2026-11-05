@@ -13,11 +13,11 @@ class BM25Index(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     mtime_index_file: float
-    term_freqs: List[Dict[str, int]]
-    doc_lens: List[int]
-    avg_dl: float
-    idf: Dict[str, float]
-    chunks: List[MinimalSource]
+    term_freqs: List[Dict[str, int]] | None
+    doc_lens: List[int] | None
+    avg_dl: float | None
+    idf: Dict[str, float] | None
+    chunks: List[MinimalSource] | None
     embedding: np.ndarray | None
 
 
