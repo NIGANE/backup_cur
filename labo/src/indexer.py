@@ -26,7 +26,7 @@ class Indexer():
         self.len: Tuple[List[int], float] = ([], 0.0)
         self.idfre: Dict[str, float] = {}
         self.last_resolved: List[MinimalSource] = []
-        self.export: BM25Index = None
+        self.export: BM25Index
         self.dataset_search: StudentSearchResults
         if (self.dest.suffix):
             file: str = self.dest.name
@@ -84,12 +84,13 @@ class Indexer():
                     res.append("".join(buffer))
                 buffer = []
         return res
-    
+
     @lru_cache(maxsize=20)
     def search(self, query: str,
                k1: float = 1.5, b: float = 0.75) -> List[Tuple[float, int]]:
         query_tokens: List[str] = self.split(query)
         scores = [0.0] * len(self.export.term_freqs)
+
         for id, tf_dict in enumerate(self.export.term_freqs):
             dl = self.export.doc_lens[id]
             d_score = 0.0
@@ -103,7 +104,8 @@ class Indexer():
 
                 idf_val = self.export.idf[token]
                 numerator = tf * (k1 + 1.0)
-                denominator = tf + k1 * (1.0 - b + b * (dl / self.export.avg_dl))
+                denominator = (
+                    tf + k1 * (1.0 - b + b * (dl / self.export.avg_dl)))
 
                 d_score += idf_val * (numerator / denominator)
             scores[id] = d_score
@@ -112,7 +114,7 @@ class Indexer():
             ]
         res.sort(key=lambda x: x[0], reverse=True)
         return res
-    
+
     def cache_clear(self) -> None:
         self.search.cache_clear()
 

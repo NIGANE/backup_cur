@@ -1,4 +1,3 @@
-from collections import defaultdict
 from pathlib import Path
 from tqdm import tqdm
 import numpy as np
@@ -85,7 +84,7 @@ class VectorIndexer(Indexer):
                     "question_id": qt.get("question_id") or str(uuid.uuid4()),
                     "question": qt["question"],
                     "sources": self.vector_search(
-                        ind.embedding, qt["question"], ind.chunks)[:k]
+                        ind.embedding, qt["question"], ind.chunks, k)
                 })
 
         self.dataset_search = StudentSearchResults(
@@ -101,7 +100,7 @@ class VectorIndexer(Indexer):
         return self.save_dataset()
 
     def vector_search(self, embedding, query: str,
-                       chunks: List[MinimalSource], k: int = 5):
+                      chunks: List[MinimalSource], k: int = 5):
         query_vector: np.ndarray = self.vectorize(query)
         vector_scores: np.ndarray = self.cosine_similarity(
             embedding, query_vector)

@@ -2,22 +2,19 @@ from src.models import StudentSearchResults, MinimalSearchResults
 from src.types import BM25Index, RagQuestion, SearchResults, ChunkResuls
 from src.chunker import MinimalSource, Error, Chunker
 from typing import List, Tuple, Dict, Optional, Any
-from collections import Counter
 from src.indexer import Indexer
 from pathlib import Path
 from tqdm import tqdm
 from pydantic import ValidationError
 from src.error import DataValidation
 import pickle
-import math
 import json
 import uuid
 import os
-from functools import lru_cache
 
 
 class LexicalIndexer(Indexer):
-    
+
     def tokenize_chunks(self) -> Path:
         if (self.index_file_founded()):
             return self.dest / self.res_file_name
@@ -57,62 +54,6 @@ class LexicalIndexer(Indexer):
             embedding=None
         )
         return self.save()
-
-    # def term_frequency(self, src: List[List[str]]) -> List[Dict[str, int]]:
-    #     res: List[Dict[str, int]] = []
-    #     for ch in src:
-    #         res.append(self.fr(ch))
-    #     return res
-
-    # def fr(self, src: List[str]) -> Dict[str, int]:
-    #     res: Dict[str, int] = {}
-    #     for e in src:
-    #         cn: int = 0
-    #         if (e in res.keys()):
-    #             continue
-    #         for bf in src:
-    #             if bf == e:
-    #                 cn += 1
-    #         res[e] = cn
-    #     return res
-
-    # def lenth(self, src: List[List[str]]) -> Tuple[List[int], float]:
-    #     return (
-    #         [len(doc) for doc in src],
-    #         sum([len(doc) for doc in src]) / len(src)
-    #         )
-
-    # def doc_frequency(self, src: List[List[str]]) -> Dict[str, int]:
-    #     res: Dict[str, int] = {}
-    #     for doc in src:
-    #         for w in doc:
-    #             if w in res.keys():
-    #                 continue
-    #             res[w] = sum([1 for e in src if w in e])
-    #     return res
-
-    def fr(self, src: List[str]) -> Dict[str, int]:
-        return dict(Counter(src))          # O(L) instead of O(L²)
-
-    def term_frequency(self, src: List[List[str]]) -> List[Dict[str, int]]:
-        return [dict(Counter(doc)) for doc in src]
-
-    def doc_frequency(self, src: List[List[str]]) -> Dict[str, int]:
-        df: Counter = Counter()
-        for doc in src:
-            df.update(set(doc))            # each word counted once per doc
-        return dict(df)                    # O(total tokens)
-
-    def lenth(self, src: List[List[str]]) -> Tuple[List[int], float]:
-        lens = [len(doc) for doc in src]
-        return lens, (sum(lens) / len(lens) if lens else 0.0)
-
-    def idf(self, fq: Dict[str, int], size: int) -> Dict[str, float]:
-        idf: Dict[str, float] = {}
-        for w, f in fq.items():
-            val = math.log(1.0 + (size - f + 0.5) / (f + 0.5))
-            idf[w] = max(0.0, val)
-        return idf
 
     def search_multy(self, data: Dict[str, List[RagQuestion]],
                      ind: BM25Index, k: int = 5):

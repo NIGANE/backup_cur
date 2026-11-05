@@ -1,4 +1,9 @@
 RUN = uv run python3 -m src
+K = --k 0
+query = "What is the return type annotation for the \
+		_apply_matches function in vLLM's multimodal \
+		processing module?"
+chunk_size = --max_chunk_size 2000
 
 evaluate:
 	$(RUN) evaluate \
@@ -10,26 +15,25 @@ answer_dataset:
 	--student_search_results_path "data/output/dataset_code_public.json" \
 	--save_directory "data/output/answer_dataset_code_public.json"
 
-vector:
-	uv run python3 -m src vector
 
 search_dataset:
 	$(RUN) search_dataset \
 	--dataset_path data/datasets/UnansweredQuestions/dataset_code_public.json \
-	--k 3 \
-	--save_directory data/output/dataset_code_public.json
+	$(K) \
+	--save_directory data/output/dataset_code_public.json --vector --hybrid
 
 search:
-	$(RUN) search  "What is stored in the logits array during the qk_max calculation in vLLM's paged attention implementation?" \
-	--k 3
+	$(RUN) search \
+	$(query) \
+	$(K)
 
 index:
-	$(RUN) index --max_chunk_size 2000
+	$(RUN) index $(chunk_size)
 
 answer:
 	$(RUN) answer \
-	"What is the return type annotation for the _apply_matches function in vLLM's multimodal processing module?" \
-	--k 3
+	$(query) \
+	$(K)
 
 clean:
 	@rm -rf src/__pycache__

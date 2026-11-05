@@ -15,7 +15,6 @@ import json
 from src.lexical_index import LexicalIndexer
 from src.hybrid_index import HybridIndexer
 from src.vector_index import VectorIndexer
-import pickle as pkl
 
 
 class Controller:
@@ -35,10 +34,10 @@ class Controller:
             if (isinstance(n[1], str) and not n[1].isnumeric()):
                 raise UsageError(
                     f"arg '{n[0]}' is not an integer")
-            if (isinstance(n[1], int) and n[1] <= n[2]):
+            if (isinstance(n[1], int) and n[1] < n[2]):
                 raise UsageError(
                     f"'{n[0]}' must be valid integer with "
-                    f"the range -> '{n[0]} >= {n[2]}'")
+                    f"the range  '{n[0]} >= {n[2]}'")
             if (isinstance(n[1], bool)):
                 raise UsageError(
                     f"missing 1 optional argument value '--{n[0]}'?")
@@ -54,7 +53,8 @@ class Controller:
             raise Error(e)
 
     @staticmethod
-    def index(path: Path, hybrid: str = '', vector: str = '', max_chunk_size: int = 2000
+    def index(path: Path, hybrid: str = '', vector: str = '',
+              max_chunk_size: int = 2000
               ) -> None:
         Controller.validate_numeric(
             ("max_chunk_size", max_chunk_size, 1)
@@ -64,9 +64,9 @@ class Controller:
         if (isinstance(hybrid, str) and len(hybrid) > 0):
             raise UsageError(f"unknown argument '{hybrid}'")
         if hybrid is True and vector is True:
-            raise UsageError("un must only one flag [--hybrid | --vector]")
+            raise UsageError("must use only one flag [--hybrid | --vector]")
 
-        Chunker(str(path / 'raw'))
+        Chunker(str(path / 'raw'), max_size=max_chunk_size)
         if (hybrid is True):
             indexer: HybridIndexer = HybridIndexer()
         elif vector is True:
@@ -81,6 +81,7 @@ class Controller:
     @staticmethod
     def search(query: str = '', path: Path = Path(''), k: int = 5,
                hybrid: str = '', vector: str = '') -> None:
+        print("k : ", k)
         Controller.validate_paths(
             ("query", query)
         )
@@ -92,7 +93,7 @@ class Controller:
         if (isinstance(vector, str) and len(vector) > 0):
             raise UsageError(f"unknown argument '{vector}'")
         if hybrid is True and vector is True:
-            raise UsageError("un must only one flag [--hybrid | --vector]")
+            raise UsageError("must use only one flag [--hybrid | --vector]")
 
         ps_path: Path = path / 'process'
         if (hybrid is True):
@@ -107,17 +108,20 @@ class Controller:
             Controller.index(path, hybrid, vector)
             return Controller.search(query, path, k, hybrid, vector)
         sources: List[MinimalSource] = []
-        bm25_scores: List[Tuple[float, int]] = ind.search(query) if not vector else None
-
+        bm25_scores: List[Tuple[float, int]] | None = (
+            ind.search(query) if not vector else None)
+        if (hybrid is True or vector is True) and loads.embedding is None:
+            raise UsageError("embeddings are not founded on index file.\n"
+                             "run index with --vector then try again")
         if (hybrid is True):
-            if (loads.embedding is None):
-                raise UsageError("embedding did found on loads.\n"
-                                 "run index with --hybrid then try again")
-            sources = ind.hybrid_resolve(loads.embedding, bm25_scores, query, loads.chunks)[:k]
+            sources = ind.hybrid_resolve(
+                loads.embedding, bm25_scores, query, loads.chunks, k)
         elif vector is True:
-            source = ind.vector_search(loads.embedding, query, loads.chunks, k)
+            sources = ind.vector_search(
+                loads.embedding, query, loads.chunks, k)
         else:
-            sources = ind.fetch_query_chunks(bm25_scores, k)
+            if bm25_scores:
+                sources = ind.fetch_query_chunks(bm25_scores, k)
         for source in sources:
             print(f"{source.file_path} [{source.first_character_index}:",
                   f"{source.last_character_index}]", sep="")
@@ -125,7 +129,7 @@ class Controller:
     @staticmethod
     def search_dataset(dataset_path: str = '', k: int = 5,
                        save_directory: str = '', path: Path = Path(''),
-                       hybrid: str = '') -> None:
+                       hybrid: str = '', vector: str = '') -> None:
         Controller.validate_paths(
             ("dataset_path", dataset_path),
             ("save_directory", save_directory)
@@ -135,6 +139,8 @@ class Controller:
         )
         if (isinstance(hybrid, str) and len(hybrid) > 0):
             raise UsageError(f"unknown argument '{hybrid}'")
+        if (isinstance(vector, str) and len(vector) > 0):
+            raise UsageError(f"unknown argument '{vector}'")
 
         src = Path(dataset_path)
         data: Dict[str, List[RagQuestion]] = Controller.fetch_json(src)
@@ -144,21 +150,31 @@ class Controller:
             raise UsageError(
                 'given file doesnt contain rag_questions'
                 f"{src}")
+        if (hybrid is True and vector is True):
+            raise UsageError("must use only one flag [--hybrid | --vector]")
+
         if (hybrid is True):
             indexer: HybridIndexer = HybridIndexer(save_directory)
+        elif vector is True:
+            indexer: VectorIndexer = VectorIndexer(save_directory)
         else:
             indexer: LexicalIndexer = LexicalIndexer(save_directory)
+
         loads: Optional[BM25Index] = indexer.load(path / 'process')
         if (not loads):
-            Controller.index(path, hybrid)
+            Controller.index(path, hybrid, vector)
             return Controller.search_dataset(
-                dataset_path, k, save_directory, path, hybrid)
+                dataset_path, k, save_directory, path, hybrid, vector)
+        if (hybrid is True or vector is True) and loads.embedding is None:
+            raise UsageError("embeddings are not founded on index file.\n"
+                             "run index with --vector then try again")
+
         dest: Path = indexer.search_multy(data, loads, k)
         print(f"Saved student_search_results to {dest}")
 
     @staticmethod
     def answer(query: str = '', k: int = 5, hybrid: str = '',
-               path: Path = Path('')) -> None:
+               path: Path = Path(''), vector: str = '') -> None:
         if (query == ''):
             raise UsageError("missing 1 required positional argument 'qeury'")
         Controller.validate_numeric(
@@ -166,27 +182,38 @@ class Controller:
         )
         if (isinstance(hybrid, str) and len(hybrid) > 0):
             raise UsageError(f"unknown argument '{hybrid}'")
+        if (isinstance(vector, str) and len(vector) > 0):
+            raise UsageError(f"unknown argument '{vector}'")
+        if (vector is True and hybrid is True):
+            raise UsageError("must use only one flag [--hybrid | --vector]")
 
         ps_path: Path = path / 'process'
         if (hybrid is True):
             ind: HybridIndexer = HybridIndexer()
+        elif (vector is True):
+            ind: VectorIndexer = VectorIndexer()
         else:
             ind: LexicalIndexer = LexicalIndexer()
         loads: Optional[BM25Index] = ind.load(ps_path)
         if (not loads):
-            Controller.index(path, hybrid)
-            return Controller.search(query, path, k, hybrid)
+            Controller.index(path, hybrid, vector)
+            return Controller.search(query, path, k, hybrid, vector)
+        if (hybrid is True or vector is True) and loads.embedding is None:
+            raise UsageError("embeddings are not founded on index file.\n"
+                             "run index with --vector then try again")
 
         sources: List[MinimalSource] = []
-        bm25: List[Tuple[float, int]] = ind.search(query)
+        bm25: List[Tuple[float, int]] | None = (
+            ind.search(query) if not vector else None)
         if (hybrid is True):
-            if (loads.embedding is None):
-                raise UsageError("embedding did found on loads.\n"
-                                 "run index with --hybrid then try again")
             sources = ind.hybrid_resolve(loads.embedding, bm25, query,
-                                         loads.chunks)[:k]
+                                         loads.chunks, k)
+        elif (vector is True):
+            sources = ind.vector_search(
+                loads.embedding, query, loads.chunks, k)
         else:
-            sources = ind.fetch_query_chunks(bm25, k)
+            if bm25:
+                sources = ind.fetch_query_chunks(bm25, k)
 
         agent: Agent = Agent()
         res: Dict[str, str] = agent.inference(sources, query)
@@ -256,23 +283,3 @@ class Controller:
                                  + " on data source -> " +
                                  f"{student_search_results_path}")
         pass
-    
-    @staticmethod
-    def vector(k: int = 3) -> None:
-        from vector_index import VectorIndexer
-        indexer = VectorIndexer()
-        try:
-            with open(indexer.dest / indexer.res_file_name, "rb") as f:
-                load = pkl.load(f)
-            data: BM25Index = BM25Index.model_validate(load)
-            print('data validated')
-        except Exception:
-            print("Error")
-        sources = indexer.vector_search(
-            data.embedding,
-            "What are the default values for FP8_MIN and FP8_MAX constants in vLLM's triton_flash_attention module?",
-            data.chunks
-            )
-        for e in sources[:k]:
-            print(f"{e.file_path}[{e.first_character_index}:{e.last_character_index}]")
-

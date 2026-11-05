@@ -67,7 +67,9 @@ class Chunker:
                 old_file: Any = self.load(
                     str(self.dest / self.exported_format))
                 old_data: ChunkResuls = ChunkResuls.model_validate(old_file)
-            except ValidationError:
+                if (old_data.size != self.max_size):
+                    raise Error
+            except (ValidationError, Error):
                 self.discovered_files = discoverd
             else:
                 self.discovered_files = self.filter_files(old_file, discoverd)
@@ -82,6 +84,7 @@ class Chunker:
         for f in self.discovered_files:
             ut_files[f[0]] = self.get_file_mtime(f[0])
         data: ChunkResuls = ChunkResuls(
+            size=self.max_size,
             chunks=self.chunks,
             ut_files=ut_files
         )

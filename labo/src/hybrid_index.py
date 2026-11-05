@@ -86,7 +86,7 @@ class HybridIndexer(Indexer):
                     "question_id": qt.get("question_id") or str(uuid.uuid4()),
                     "question": qt["question"],
                     "sources": self.hybrid_resolve(
-                        ind.embedding, bm25, qt["question"], ind.chunks)[:k]
+                        ind.embedding, bm25, qt["question"], ind.chunks, k)
                 })
 
         self.dataset_search = StudentSearchResults(
@@ -102,11 +102,11 @@ class HybridIndexer(Indexer):
         return self.save_dataset()
 
     def hybrid_resolve(self, embedding, bm25, query: str,
-                       chunks: List[MinimalSource]):
+                       chunks: List[MinimalSource], k: int = 5):
         query_vectore: np.ndarray = self.vectorize(query)
         vector_scores: np.ndarray = self.cosine_similarity(
             embedding, query_vectore)
-        self.last_resolved = self.rrf(vector_scores, bm25, chunks)
+        self.last_resolved = self.rrf(vector_scores, bm25, chunks, k)
         return self.last_resolved
 
     def vectorize(self, data: List[str] | str) -> np.ndarray:

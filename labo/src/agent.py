@@ -22,12 +22,16 @@ class Agent:
                   ) -> Dict[str, str]:
 
         return self._inference(
-            ((e.file_path, e.first_character_index, e.last_character_index) for e in contexts),
+            (
+                (e.file_path, e.first_character_index, e.last_character_index)
+                for e in contexts
+             ),
             query
             )
 
     @lru_cache(maxsize=20)
-    def _inference(self, contexts: Tuple[Tuple[str, int, int]], query: str) -> Dict[str, str]:
+    def _inference(self, contexts: Tuple[Tuple[str, int, int]], query: str
+                   ) -> Dict[str, str]:
         prompt: str = self.construct_prompt(query, contexts, self.tokenizer)
         res: List[Dict[str, str]] = self.gen(
             prompt,
@@ -55,7 +59,8 @@ class Agent:
             return dest / self.file
 
     @staticmethod
-    def build_format_context(search_results: Tuple[Tuple[str, int, int]]) -> str:
+    def build_format_context(search_results: Tuple[Tuple[str, int, int]]
+                             ) -> str:
         output: str = ""
 
         for nb, min_src in enumerate(search_results, 1):
@@ -95,7 +100,9 @@ class Agent:
         ]
 
     @staticmethod
-    def construct_prompt(question: str, search_result: Tuple[Tuple[str, int, int]], tokenizer: Any) -> str:
+    def construct_prompt(question: str,
+                         search_result: Tuple[Tuple[str, int, int]],
+                         tokenizer: Any) -> str:
         formatted_context = Agent.build_format_context(search_result)
         messages = Agent.build_messsages(question, formatted_context)
 
