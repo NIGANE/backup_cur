@@ -35,9 +35,12 @@ answer:
 	$(query) \
 	$(K)
 
+runserver:
+	$(RUN) runserver 
+
 clean:
 	@rm -rf src/__pycache__
 
 clean-all: clean
-	@rm -rf data/process -rf
+# 	@rm -rf data/process 
 	@rm -rf data/output

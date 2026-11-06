@@ -15,6 +15,10 @@ import json
 from src.lexical_index import LexicalIndexer
 from src.hybrid_index import HybridIndexer
 from src.vector_index import VectorIndexer
+import sys
+import os
+from django.core.management import execute_from_command_line
+
 
 
 class Controller:
@@ -283,3 +287,15 @@ class Controller:
                                  + " on data source -> " +
                                  f"{student_search_results_path}")
         pass
+    
+    @staticmethod
+    def api(*args):
+        # if (len(args) > 0):
+        #     raise UsageError(f"invalid {len(args)} arguments", [arg for arg in args])
+        src_dir = Path(__file__).resolve().parent
+        if str(src_dir) not in sys.path:
+            sys.path.insert(0, str(src_dir))
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'src.core.settings')
+        sys.argv = ["manage.py", "runserver", "localhost:8080"]
+        execute_from_command_line(sys.argv)
+        

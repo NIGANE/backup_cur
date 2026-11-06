@@ -16,7 +16,7 @@ def main():
     try:
         allowed_actions: List[str] = [
             'index', 'search', 'search_dataset', 'answer',
-            'answer_dataset', 'evaluate'
+            'answer_dataset', 'evaluate', 'runserver'
             ]
         if (len(sys.argv) == 1):
             raise UsageError("not enough args")
@@ -31,16 +31,17 @@ def main():
             "answer": partial(ctr.answer, path=data_path),
             "answer_dataset": partial(ctr.answer_dataset, path=data_path),
             "evaluate": ctr.evaluate,
+            'runserver': ctr.api,
         })
     except UsageError as e:
         print(f"{e.__class__.__name__}: {e}")
     #     hints()
     #     sys.exit(1)
-    except DataValidation as e:
-        print(f"{e.__class__.__name__}: {e}")
-    except BaseException as e:
-        print(f"{e.__class__.__name__}: {e}")
-        sys.exit(1)
+    # except DataValidation as e:
+    #     print(f"{e.__class__.__name__}: {e}")
+    # except BaseException as e:
+    #     print(f"{e.__class__.__name__}: {e}")
+    #     sys.exit(1)
 
 
 main()
