@@ -8,4 +8,4 @@
  - bm25 fomula components
 
  ## todo:
- - index updateing, and redesing
+ - use serializer with validation

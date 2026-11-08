@@ -14,7 +14,7 @@ import re
 class Chunker:
     exported_format: str = "chunks.pkl"
 
-    def __init__(self, src: str, dest: str = 'data/process',
+    def __init__(self, src: str = 'data/raw', dest: str = 'data/process',
                  max_size: int = 2000) -> None:
         self.chunks: List[Tuple[MinimalSource, str]] = []
         self.src: str = src

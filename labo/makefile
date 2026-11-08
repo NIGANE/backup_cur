@@ -1,5 +1,5 @@
 RUN = uv run python3 -m src
-K = --k 0
+K = --k 1
 query = "What is the return type annotation for the \
 		_apply_matches function in vLLM's multimodal \
 		processing module?"

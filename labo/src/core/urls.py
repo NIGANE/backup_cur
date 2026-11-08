@@ -20,5 +20,9 @@ from src.core.controller import Controller as ctr
 
 urlpatterns = [
     path('index', ctr.index, name='index'),
-    path('search', ctr.search, name='search')
+    path('search', ctr.search, name='search'),
+    path('search_dataset', ctr.search_dataset, name='search_dataset'),
+    path('answer', ctr.answer, name='answer'),
+    path('answer_dataset', ctr.answer_dataset, name='answer_dataset'),
+    path('test', ctr.test, name='test'),
 ]

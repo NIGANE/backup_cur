@@ -85,7 +85,6 @@ class Controller:
     @staticmethod
     def search(query: str = '', path: Path = Path(''), k: int = 5,
                hybrid: str = '', vector: str = '') -> None:
-        print("k : ", k)
         Controller.validate_paths(
             ("query", query)
         )
@@ -241,7 +240,7 @@ class Controller:
         except ValidationError as e:
             err: ErrorDetails = e.errors()[0]
             raise DataValidation(f"{err['type']} {err['loc'][0]}, {err['msg']}"
-                                 + "on data source" +
+                                 + " on data source" +
                                  f"{src}")
         print(f"loaded {len(obj.search_results)} questions ...")
         data: List[MinimalAnswer] = []
@@ -290,8 +289,6 @@ class Controller:
     
     @staticmethod
     def api(*args):
-        # if (len(args) > 0):
-        #     raise UsageError(f"invalid {len(args)} arguments", [arg for arg in args])
         src_dir = Path(__file__).resolve().parent
         if str(src_dir) not in sys.path:
             sys.path.insert(0, str(src_dir))
